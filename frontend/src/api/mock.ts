@@ -1,8 +1,8 @@
 import type { Activity, Center, ChildProfile, MeasurementRecord } from '../types/models'
 
 const child: ChildProfile = {
-  id: 'jiwoo',
-  name: '지우',
+  id: 'child_123',
+  name: '망고',
   ageLabel: '만 5세 · 61개월',
   gender: 'male',
   avatarIcon: 'user_smile',
@@ -10,7 +10,7 @@ const child: ChildProfile = {
 
 const records: MeasurementRecord[] = [
   {
-    id: 'r-1',
+    id: 'r_1',
     date: '2023년 10월 24일',
     type: 'official',
     grade: '새싹',
@@ -19,7 +19,7 @@ const records: MeasurementRecord[] = [
     needsWork: ['근력'],
   },
   {
-    id: 'r-2',
+    id: 'r_2',
     date: '2023년 07월 18일',
     type: 'official',
     grade: '씨앗',
@@ -28,7 +28,7 @@ const records: MeasurementRecord[] = [
     needsWork: ['근력', '지구력'],
   },
   {
-    id: 'r-3',
+    id: 'r_3',
     date: '2023년 04월 03일',
     type: 'self',
     grade: '씨앗',
@@ -40,7 +40,7 @@ const records: MeasurementRecord[] = [
 
 const activities: Activity[] = [
   {
-    id: 'a-1',
+    id: 'a_1',
     title: '엉금엉금 거북이 놀이',
     category: '민첩성',
     place: '실내',
@@ -50,7 +50,7 @@ const activities: Activity[] = [
     equipment: false,
   },
   {
-    id: 'a-2',
+    id: 'a_2',
     title: '징검다리 톡톡',
     category: '순발력',
     place: '실내',
@@ -60,7 +60,7 @@ const activities: Activity[] = [
     equipment: true,
   },
   {
-    id: 'a-3',
+    id: 'a_3',
     title: '높이높이 점프팡',
     category: '근력',
     place: '야외',
@@ -73,7 +73,7 @@ const activities: Activity[] = [
 
 const centers: Center[] = [
   {
-    id: 'c-1',
+    id: 'c_1',
     name: '꿈나무 성장센터',
     address: '서울시 송파구 올림픽로 00',
     distance: '1.2km',
@@ -81,7 +81,7 @@ const centers: Center[] = [
     open: true,
   },
   {
-    id: 'c-2',
+    id: 'c_2',
     name: '아이핏 피트니스',
     address: '서울시 강남구 테헤란로 00',
     distance: '2.8km',
@@ -89,7 +89,7 @@ const centers: Center[] = [
     open: true,
   },
   {
-    id: 'c-3',
+    id: 'c_3',
     name: '키즈 요가 스튜디오',
     address: '서울시 서초구 반포대로 00',
     distance: '4.1km',

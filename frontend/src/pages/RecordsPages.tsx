@@ -15,7 +15,7 @@ export function RecordsPage() {
   return (
     <AppLayout active="records">
       <PageIntro
-        eyebrow="지우의 성장 기록"
+        eyebrow="망고의 성장 기록"
         title="쑥쑥 자라고 있어요!"
         description={
           <>
@@ -116,7 +116,7 @@ export function GrowthPage() {
     <AppLayout active="records">
       <PageIntro
         eyebrow="성장 리포트"
-        title="지우의 변화가 보여요"
+        title="망고의 변화가 보여요"
         description={
           <>
             지난 측정과 비교해 좋아진 점을

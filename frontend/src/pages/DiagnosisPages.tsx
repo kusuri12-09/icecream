@@ -133,7 +133,7 @@ export function DiagnosisResultPage() {
           className="mx-auto mb-4 size-40 rounded-full border-[5px] border-primary-container bg-white shadow-[0_0_42px_rgba(181,234,215,.35)]"
         />
         <GradeBadge dark />
-        <h1 className="mt-4 font-display text-[27px] font-bold tracking-[-.1em]">민수님, 무럭무럭 자라고 있어요!</h1>
+        <h1 className="mt-4 font-display text-[27px] font-bold tracking-[-.1em]">망고님, 무럭무럭 자라고 있어요!</h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
           기초 체력이 눈에 띄게 좋아졌네요.
           <br />
@@ -207,7 +207,7 @@ export function MeasurementInputPage() {
   return (
     <AppLayout active="diagnosis">
       <section className="px-2 pb-5">
-        <span className="font-label text-sm font-semibold text-on-surface-variant">지우의 오늘</span>
+        <span className="font-label text-sm font-semibold text-on-surface-variant">망고의 오늘</span>
         <h1 className="mt-2 font-display text-[28px] tracking-[-.09em]">체력 측정 입력</h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
           측정 결과를 입력하면 성장 등급과

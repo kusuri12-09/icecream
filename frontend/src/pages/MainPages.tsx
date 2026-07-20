@@ -44,7 +44,7 @@ export function OnboardingPage() {
             <span className="grid size-8 place-items-center rounded-full bg-[#ffd7c9] text-primary">
               <span aria-hidden="true" className="size-4 rounded-full bg-white/55" />
             </span>
-            지우
+            망고
           </button>
           <button className="flex items-center gap-1.5 rounded-full border border-outline-variant bg-white py-1.5 pl-1.5 pr-3 text-sm text-on-surface-variant">
             <span className="grid size-8 place-items-center rounded-full bg-[#ffd8dd] text-secondary">
@@ -67,7 +67,7 @@ export function OnboardingPage() {
             <span className="mb-2 block font-label text-xs font-semibold text-on-surface-variant">아이 이름</span>
             <input
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary focus:ring-4 focus:ring-primary-container/50"
-              defaultValue="지우"
+              defaultValue="망고"
             />
           </label>
           <div>
@@ -113,7 +113,7 @@ export function HomePage() {
   return (
     <AppLayout active="home">
       <section className="px-1">
-        <h1 className="font-display text-[22px] tracking-[-.07em]">민수님, 오늘도 쑥쑥 자라요!</h1>
+        <h1 className="font-display text-[22px] tracking-[-.07em]">망고님, 오늘도 쑥쑥 자라요!</h1>
         <p className="mt-1 text-sm text-on-surface-variant">아이의 작은 변화도 소중한 성장 기록이에요.</p>
       </section>
       <Card className="mt-5 flex min-h-48 items-center justify-between overflow-hidden bg-gradient-to-br from-white to-[#f5faf7] p-7">
@@ -262,7 +262,7 @@ export function DashboardPage() {
         <div className="-mt-1">
           <GradeBadge />
           <h1 className="mt-2 font-display text-[28px] font-bold tracking-[-.09em]">
-            {child?.name ?? '지우'}의 성장 일기
+            {child?.name ?? '망고'}의 성장 일기
           </h1>
           <p className="mt-2 text-base text-on-surface-variant">건강하게 쑥쑥 자라나고 있어요!</p>
         </div>

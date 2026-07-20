@@ -21,7 +21,7 @@ export function ActivitiesPage() {
   return (
     <AppLayout active="home">
       <section className="relative min-h-52 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#e8f7f0] to-[#fff3de] p-6">
-        <span className="font-label text-sm font-semibold text-on-surface-variant">지우를 위한 맞춤 활동</span>
+        <span className="font-label text-sm font-semibold text-on-surface-variant">망고를 위한 맞춤 활동</span>
         <h1 className="mt-4 font-display text-[28px] leading-tight tracking-[-.09em]">
           오늘은 어떤 놀이를
           <br />
