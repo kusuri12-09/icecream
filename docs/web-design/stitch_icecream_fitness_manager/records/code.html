@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 기록</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .font-headline { font-family: 'Quicksand', sans-serif; }
+        
+        /* Custom Smooth Scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animation for growth chart */
+        @keyframes growUp {
+            from { height: 0; opacity: 0; }
+            to { height: var(--target-height); opacity: 1; }
+        }
+        .bar-animate {
+            animation: growUp 1s ease-out forwards;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002018",
+                        "secondary": "#874f4c",
+                        "primary-container": "#b5ead7",
+                        "on-secondary-container": "#7b4542",
+                        "surface-tint": "#366758",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f4f4f0",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#efeeea",
+                        "outline": "#707975",
+                        "background": "#faf9f5",
+                        "tertiary-fixed": "#e8e3cd",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#360e0d",
+                        "on-tertiary-fixed-variant": "#4a4737",
+                        "inverse-on-surface": "#f2f1ed",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#1c4f41",
+                        "outline-variant": "#c0c9c4",
+                        "tertiary-container": "#e4dfca",
+                        "inverse-primary": "#9dd1bf",
+                        "on-primary-container": "#396b5c",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e9e8e4",
+                        "on-surface": "#1b1c1a",
+                        "surface-variant": "#e3e2df",
+                        "on-background": "#1b1c1a",
+                        "inverse-surface": "#2f312e",
+                        "surface-bright": "#faf9f5",
+                        "tertiary-fixed-dim": "#ccc7b2",
+                        "surface-dim": "#dbdad6",
+                        "secondary-fixed": "#ffdad7",
+                        "surface": "#faf9f5",
+                        "primary-fixed": "#b9eedb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "margin-mobile": "20px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "safe-area": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Quicksand"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "label-sm-mobile": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md-mobile": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md-mobile": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "body-lg-mobile": ["17px", {"lineHeight": "26px", "fontWeight": "500"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-background fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-14 transition-opacity hover:opacity-80">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary lowercase tracking-tight">icecream</h1>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container active:scale-95 transition-transform">
+<img class="w-full h-full object-cover" data-alt="A soft-focus portrait of a happy preschool-aged child with warm, high-key natural lighting. The style is clean and professional, using a soft pastel color palette of mint and cream to match the icecream brand identity. The child has a gentle expression, evoking a sense of growth and health." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYaQ-VJfmebIAzODl1hkhcTXkXS3RrQZDL_07xefvrhMn9B0JIy-NGnz0AOSGrpzMbQ-pOAs8JYldvfJSrHYZxBSy9C4ZSEpp6JrwC7mq2CtQDhS40S94Zs1HMmBJLbl7gLPemkHeLE_ICRkpZnk03fhc0Crz-rowVkkN0BSK6CK_6JBeh6qpFn2cpSo2yH5RYD52fWYlWpG9RuqIOOf_tgcxTM5zf96s-6Oj92ifXXlEbtmW76fz04A"/>
+</div>
+</header>
+<main class="flex-1 mt-14 mb-24 px-margin-mobile pt-lg overflow-y-auto">
+<!-- Growth Summary Header -->
+<section class="mb-lg">
+<div class="flex flex-col gap-1">
+<p class="font-label-md-mobile text-label-md-mobile text-primary tracking-wide">우리 아이 성장 일기</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">쑥쑥 자라고 있어요!</h2>
+</div>
+</section>
+<!-- Growth Chart Card -->
+<section class="mb-lg">
+<div class="bg-surface-container-lowest rounded-lg p-lg shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-label-md-mobile text-label-md-mobile text-on-surface-variant">종합 체력 성장 그래프</h3>
+<span class="font-label-sm-mobile text-label-sm-mobile text-primary bg-primary-container/30 px-3 py-1 rounded-full">+12% 성장</span>
+</div>
+<!-- Simple Growth Graph -->
+<div class="h-48 w-full flex items-end justify-between gap-2 pt-xs">
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-surface-container rounded-t-full relative group">
+<div class="bar-animate bg-tertiary-fixed-dim w-full rounded-t-full bottom-0 absolute transition-all group-hover:opacity-80" style="--target-height: 40%; height: 40%;"></div>
+</div>
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline">1월</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-surface-container rounded-t-full relative group">
+<div class="bar-animate bg-tertiary-fixed-dim w-full rounded-t-full bottom-0 absolute transition-all group-hover:opacity-80" style="--target-height: 55%; height: 55%;"></div>
+</div>
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline">2월</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-surface-container rounded-t-full relative group">
+<div class="bar-animate bg-primary-fixed-dim w-full rounded-t-full bottom-0 absolute transition-all group-hover:opacity-80" style="--target-height: 75%; height: 75%;"></div>
+</div>
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline">3월</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-surface-container rounded-t-full relative group">
+<div class="bar-animate bg-primary w-full rounded-t-full bottom-0 absolute transition-all group-hover:opacity-80" style="--target-height: 95%; height: 95%;"></div>
+</div>
+<span class="font-label-sm-mobile text-label-sm-mobile text-primary font-bold">4월</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Records List Grouped by Date -->
+<section class="space-y-lg">
+<h3 class="font-label-md-mobile text-label-md-mobile text-on-surface font-bold">과거 진단 기록</h3>
+<!-- Group: 2024년 4월 -->
+<div class="space-y-md">
+<div class="flex items-center gap-md">
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline-variant">2024년 4월</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- Record Item: Fruit Grade -->
+<div class="bg-surface-container-lowest rounded-lg p-md flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.04)] border-l-4 border-primary active:scale-95 transition-transform">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+</div>
+<div>
+<p class="font-label-md-mobile text-label-md-mobile text-on-surface">종합 정기 진단</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-sm-mobile text-label-sm-mobile text-primary">열매 등급</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-sm-mobile text-label-sm-mobile text-outline">04.15</p>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Group: 2024년 3월 -->
+<div class="space-y-md">
+<div class="flex items-center gap-md">
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline-variant">2024년 3월</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- Record Item: Flower Grade -->
+<div class="bg-surface-container-lowest rounded-lg p-md flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.04)] border-l-4 border-secondary-container active:scale-95 transition-transform">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+</div>
+<div>
+<p class="font-label-md-mobile text-label-md-mobile text-on-surface">기초 체력 측정</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-sm-mobile text-label-sm-mobile text-secondary">꽃 등급</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-sm-mobile text-label-sm-mobile text-outline">03.12</p>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Record Item: Sprout Grade -->
+<div class="bg-surface-container-lowest rounded-lg p-md flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.04)] border-l-4 border-tertiary-fixed-dim active:scale-95 transition-transform">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+</div>
+<div>
+<p class="font-label-md-mobile text-label-md-mobile text-on-surface">유연성 집중 진단</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-sm-mobile text-label-sm-mobile text-tertiary">새싹 등급</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-sm-mobile text-label-sm-mobile text-outline">03.01</p>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Group: 2024년 2월 -->
+<div class="space-y-md">
+<div class="flex items-center gap-md">
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline-variant">2024년 2월</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- Record Item: Seed Grade -->
+<div class="bg-surface-container-lowest rounded-lg p-md flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.04)] border-l-4 border-outline-variant active:scale-95 transition-transform">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" style="font-variation-settings: 'FILL' 1;">grass</span>
+</div>
+<div>
+<p class="font-label-md-mobile text-label-md-mobile text-on-surface">첫 걸음 성장 진단</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-sm-mobile text-label-sm-mobile text-outline">씨앗 등급</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-sm-mobile text-label-sm-mobile text-outline">02.15</p>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-safe-area bg-surface/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-md">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">홈</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">진단</span>
+</button>
+<!-- ACTIVE TAB: 기록 -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-fixed-variant text-on-primary-container dark:text-primary-fixed-dim rounded-xl px-4 py-1.5 scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">기록</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">센터</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for bar entrance
+        document.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.bar-animate');
+            bars.forEach((bar, index) => {
+                bar.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f2f1ed",
+                    "surface-tint": "#366758",
+                    "inverse-primary": "#9dd1bf",
+                    "secondary-fixed-dim": "#fcb4b0",
+                    "on-error-container": "#93000a",
+                    "secondary": "#874f4c",
+                    "surface-variant": "#e3e2df",
+                    "outline": "#707975",
+                    "surface-container": "#efeeea",
+                    "primary-container": "#b5ead7",
+                    "on-primary-fixed-variant": "#1c4f41",
+                    "on-primary-fixed": "#002018",
+                    "on-surface": "#1b1c1a",
+                    "surface-container-high": "#e9e8e4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#6b3836",
+                    "background": "#faf9f5",
+                    "primary-fixed": "#b9eedb",
+                    "primary": "#366758",
+                    "inverse-surface": "#2f312e",
+                    "secondary-fixed": "#ffdad7",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#404945",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-highest": "#e3e2df",
+                    "on-tertiary-fixed": "#1e1c0f",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#4a4737",
+                    "secondary-container": "#ffb7b2",
+                    "surface-bright": "#faf9f5",
+                    "outline-variant": "#c0c9c4",
+                    "on-secondary-container": "#7b4542",
+                    "primary-fixed-dim": "#9dd1bf",
+                    "tertiary-container": "#e4dfca",
+                    "surface": "#faf9f5",
+                    "on-secondary-fixed": "#360e0d",
+                    "on-tertiary-container": "#666251",
+                    "on-primary-container": "#396b5c",
+                    "tertiary-fixed": "#e8e3cd",
+                    "tertiary-fixed-dim": "#ccc7b2",
+                    "tertiary": "#625f4e",
+                    "on-background": "#1b1c1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "margin-mobile": "20px",
+                    "md": "16px",
+                    "xs": "8px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Quicksand"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Quicksand"],
+                    "body-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-sm-mobile": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-nav { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        input[type="month"]::-webkit-calendar-picker-indicator {
+            filter: invert(36%) sepia(13%) saturate(1142%) hue-rotate(119deg) brightness(91%) contrast(85%);
+        }
+        .bento-card { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .bento-card:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- Top Navigation Anchor -->
+<header class="bg-background sticky top-0 z-40 w-full px-margin-mobile h-14 flex justify-between items-center">
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase">icecream</h1>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A charming close-up portrait of a cheerful 5-year-old child with a bright smile, set against a soft, sun-drenched pastel background. The image has a warm, high-key lighting style that emphasizes the soft skin tones and sparkling eyes, reflecting a nurturing and professional childcare aesthetic. The color palette features gentle mint and cream tones consistent with a premium child health application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXxbeyPiBUGFIBtdIBgbKgbTCzlHRobrgC1BVaB8GOIpnueExx53CQICFRsnVqdlotcMXjRs2BpzblOHnn-vn_KoRXvBs9bk8MNR4mTQigw_f9u8jZkUw2vG7mIe3EOMD7luFQHJZcSMRjk7LGpxR42mcQweMsPFqsK2LOei7Lu5ZgIofyuJLa4QC_YJhQGGAlg7NTQe_K20jfhEuBFr9yKe5FbSmzxDbJegysgV-qAPM5q1ui__rnzA"/>
+</div>
+</div>
+</header>
+<main class="px-margin-mobile pt-lg">
+<!-- Hero Section -->
+<section class="mb-xl text-center">
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface mb-md">아이의 성장을 함께 기록해요</h2>
+<button class="w-full h-14 bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-sm">
+                우리 아이 등록하고 시작하기
+                <span class="material-symbols-outlined">add_circle</span>
+</button>
+</section>
+<!-- Child Selector / Avatar Chips -->
+<section class="mb-lg overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-md min-w-max py-xs">
+<!-- Active Child -->
+<button class="flex items-center gap-xs bg-primary-container text-on-primary-container px-md py-sm rounded-full border-2 border-primary shadow-sm active:scale-95 transition-transform">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A studio portrait of a happy young boy with messy hair and a big grin. The lighting is soft and natural, emphasizing the playful and safe atmosphere of the app. The background is a solid soft cream, and the overall style is minimalist and clean, suitable for a professional health tracker for kids." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzCSiGXFGkoR_sb1ztt7rCBL7tfkEyihAF5hFIe8ORoBcdAD4RcB4NUvOIUS0eaB8ZsCxhMMOCfYtTXhpalEuCvzjwqw7k2x8k7zPMGDY2-IUlFc6YfUPedGrziZlJGUbGZChl9kFuOyHVHrhmLgct4VZGPP2cJ0i8JlhwzH6J6Xzu32Ng2bjMsPaX291eNsCHJRr-PVgEg-9EWIAPIlCMqj4dVtUEMfeRsVWPbIqlwk70vVNaYooY2w"/>
+</div>
+<span class="font-label-md">김민준</span>
+</button>
+<!-- Inactive Child -->
+<button class="flex items-center gap-xs bg-surface-container text-on-surface-variant px-md py-sm rounded-full border border-outline-variant hover:bg-surface-container-high transition-colors active:scale-95">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a cheerful young girl with braided hair, laughing joyfully. The visual style is soft-focus with pastel tones of coral and white, creating a warm and inviting professional aesthetic. The image is bright and airy, perfectly aligning with a growth-oriented child development application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjvnhggaPummhtgOhgIZVemjeKxJJnikg6hKy8r9Vs2dfRA11hqAumWx-SIgHNB7x0C3lVXOtEVG_4LzARmhvqcncGPV9kKVCxHK1TbBUXw_PE3CTaUhwCIL4QcqS8IQOC14NsGlaiKMSvk9xmf0rG_DFsw4_01BKhMrxKmytrarhNITqrmamOwgbOrSsnN-p6kbh6O47c7vsV2F_JgZWrOUeiDOeMmOvdeANmp7XGeHD-WZs2K4ACwA"/>
+</div>
+<span class="font-label-md">이지우</span>
+</button>
+<!-- Add New -->
+<button class="w-12 h-12 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center text-outline hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</section>
+<!-- Registration Form Card -->
+<section class="bento-card bg-surface-container-lowest rounded-lg p-lg shadow-sm border border-surface-container-high">
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-10 h-10 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">child_care</span>
+</div>
+<h3 class="font-headline-md text-headline-md-mobile text-on-surface">아이 프로필 등록</h3>
+</div>
+<form class="space-y-lg" id="childForm">
+<!-- Nickname Input -->
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant block ml-1">아이 별명</label>
+<input class="w-full h-[52px] bg-tertiary-container/30 border-outline-variant rounded-full px-lg focus:ring-primary focus:border-primary transition-all font-body-md text-on-surface placeholder:text-outline/50" placeholder="예: 쑥쑥이, 초코" type="text"/>
+</div>
+<!-- Gender Toggle -->
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant block ml-1">성별</label>
+<div class="grid grid-cols-2 gap-sm">
+<button class="gender-btn h-[52px] rounded-full border-2 border-outline-variant text-on-surface-variant font-label-md flex items-center justify-center gap-xs hover:bg-surface-container transition-all" id="gender-male" onclick="toggleGender('male')" type="button">
+<span class="material-symbols-outlined">male</span>
+                            남
+                        </button>
+<button class="gender-btn h-[52px] rounded-full border-2 border-outline-variant text-on-surface-variant font-label-md flex items-center justify-center gap-xs hover:bg-surface-container transition-all" id="gender-female" onclick="toggleGender('female')" type="button">
+<span class="material-symbols-outlined">female</span>
+                            여
+                        </button>
+</div>
+</div>
+<!-- Birth Month & Age Calculation -->
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant block ml-1">출생 연월</label>
+<input class="w-full h-[52px] bg-tertiary-container/30 border-outline-variant rounded-full px-lg focus:ring-primary focus:border-primary transition-all font-body-md text-on-surface" id="birthMonth" onchange="calculateAge()" type="month"/>
+<!-- Age Display & Warning -->
+<div class="hidden mt-sm p-md rounded-xl bg-surface-container-high transition-all" id="ageDisplay">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant">계산된 개월 수</span>
+<span class="font-headline-md text-primary" id="monthResult">--개월</span>
+</div>
+<div class="hidden mt-sm flex items-center gap-xs text-error font-label-sm" id="ageWarning">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                            유아기 측정 대상 범위 밖이에요 (48-83개월)
+                        </div>
+</div>
+</div>
+<div class="pt-md">
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-label-md rounded-xl hover:shadow-lg active:scale-95 transition-all" type="submit">
+                        저장하고 다음 단계로
+                    </button>
+</div>
+</form>
+</section>
+<!-- Info Card -->
+<section class="mt-lg bento-card bg-tertiary-container/20 rounded-lg p-lg border-l-4 border-primary">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary mt-1">info</span>
+<p class="font-body-md text-on-surface-variant">
+                    입력하신 정보는 아이의 <strong>성장 단계별 맞춤형 진단</strong>을 위해 사용됩니다. 만 4세에서 6세(48~83개월) 사이의 아이들에게 최적화된 서비스를 제공합니다.
+                </p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-safe-area bg-surface/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-md">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-fixed-variant text-on-primary-container dark:text-primary-fixed-dim rounded-xl px-4 py-1.5 scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">진단</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">기록</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">센터</span>
+</a>
+</nav>
+<script>
+        function toggleGender(gender) {
+            const maleBtn = document.getElementById('gender-male');
+            const femaleBtn = document.getElementById('gender-female');
+            
+            if (gender === 'male') {
+                maleBtn.classList.add('bg-primary-container', 'border-primary', 'text-on-primary-container');
+                maleBtn.classList.remove('border-outline-variant', 'text-on-surface-variant');
+                femaleBtn.classList.remove('bg-secondary-container', 'border-secondary', 'text-on-secondary-container');
+                femaleBtn.classList.add('border-outline-variant', 'text-on-surface-variant');
+            } else {
+                femaleBtn.classList.add('bg-secondary-container', 'border-secondary', 'text-on-secondary-container');
+                femaleBtn.classList.remove('border-outline-variant', 'text-on-surface-variant');
+                maleBtn.classList.remove('bg-primary-container', 'border-primary', 'text-on-primary-container');
+                maleBtn.classList.add('border-outline-variant', 'text-on-surface-variant');
+            }
+        }
+
+        function calculateAge() {
+            const birthInput = document.getElementById('birthMonth').value;
+            const ageDisplay = document.getElementById('ageDisplay');
+            const monthResult = document.getElementById('monthResult');
+            const ageWarning = document.getElementById('ageWarning');
+
+            if (!birthInput) return;
+
+            const birthDate = new Date(birthInput);
+            const today = new Date();
+            
+            let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
+            months += today.getMonth() - birthDate.getMonth();
+
+            ageDisplay.classList.remove('hidden');
+            monthResult.innerText = `${months}개월`;
+
+            if (months < 48 || months > 83) {
+                ageWarning.classList.remove('hidden');
+                monthResult.classList.replace('text-primary', 'text-error');
+            } else {
+                ageWarning.classList.add('hidden');
+                monthResult.classList.replace('text-error', 'text-primary');
+            }
+        }
+
+        // Form submission prevention for demo
+        document.getElementById('childForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('아이 프로필이 저장되었습니다!');
+        });
+    </script>
+</body></html>

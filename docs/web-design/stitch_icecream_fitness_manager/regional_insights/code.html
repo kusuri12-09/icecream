@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 지역 참여 인사이트</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .chart-bar-transition {
+            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .bento-item-full {
+            grid-column: span 2;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002018",
+                        "inverse-surface": "#2f312e",
+                        "on-surface-variant": "#404945",
+                        "outline-variant": "#c0c9c4",
+                        "surface-container-highest": "#e3e2df",
+                        "primary": "#366758",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "primary-container": "#b5ead7",
+                        "tertiary-fixed-dim": "#ccc7b2",
+                        "tertiary-fixed": "#e8e3cd",
+                        "surface-container-low": "#f4f4f0",
+                        "secondary-container": "#ffb7b2",
+                        "outline": "#707975",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#625f4e",
+                        "tertiary-container": "#e4dfca",
+                        "surface-container": "#efeeea",
+                        "on-primary-container": "#396b5c",
+                        "secondary": "#874f4c",
+                        "secondary-fixed-dim": "#fcb4b0",
+                        "inverse-on-surface": "#f2f1ed",
+                        "surface-bright": "#faf9f5",
+                        "background": "#faf9f5",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdad7",
+                        "surface": "#faf9f5",
+                        "surface-variant": "#e3e2df",
+                        "surface-dim": "#dbdad6",
+                        "on-secondary-fixed-variant": "#6b3836",
+                        "on-tertiary-fixed-variant": "#4a4737",
+                        "surface-tint": "#366758",
+                        "on-secondary-fixed": "#360e0d",
+                        "primary-fixed": "#b9eedb",
+                        "on-primary-fixed-variant": "#1c4f41",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e9e8e4",
+                        "inverse-primary": "#9dd1bf",
+                        "on-tertiary-fixed": "#1e1c0f",
+                        "on-tertiary-container": "#666251",
+                        "on-background": "#1b1c1a",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1a",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#9dd1bf",
+                        "on-secondary-container": "#7b4542"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xs": "8px",
+                        "sm": "12px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-margin-mobile h-14">
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95">menu</button>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase tracking-tight">icecream</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A soft and warm profile portrait of a smiling young child wearing a light mint-colored sweater, set against a clean studio background with soft ambient lighting. The visual style is high-end, minimalist, and tender, reflecting a nurturing and professional healthcare or fitness tracking app environment for parents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4-3UELbnSbLitk0bZZ74PCXAqI11PWr8Z7UsJmLiiEHHdUXJGeHcHlr2H2amMBUbctlmZNCk-Ps_NnHtqwf1sVNWo9qV5ixWfDnnZyEHupQpovyB6l-lfTP4853B_Uc3N2LZKYxMa_oIQjRuPk5a_hyUqfz32raWMH77RZIbXf0ZZUlyF3wdqliiQovn2Q2h040ZhT_J3775ybJkgYvnVagRPqDsDDJ5V_CGlny4VdjiBhszbGTlLaA"/>
+</div>
+</div>
+</header>
+<main class="pt-20 px-margin-mobile">
+<!-- Hero Insight Card -->
+<section class="mb-lg">
+<div class="bg-primary-container rounded-lg p-lg shadow-sm relative overflow-hidden">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="relative z-10">
+<span class="inline-flex items-center px-3 py-1 bg-white/50 rounded-full text-primary font-label-sm text-label-sm mb-sm">
+<span class="material-symbols-outlined text-sm mr-1">location_on</span>
+                        강남구 데이터
+                    </span>
+<h2 class="font-headline-md text-headline-md text-on-primary-container mb-md leading-tight">
+                        강남구의 유아 체력측정 참여는 <br/>
+<span class="text-primary font-extrabold underline decoration-secondary/30">전국 평균보다 낮은 편</span>이에요.
+                    </h2>
+<p class="font-body-md text-on-surface-variant mb-lg">
+                        가까운 센터에서 아이의 성장을 <br/>무료로 측정하고 리포트를 받아보세요.
+                    </p>
+<button class="w-full h-12 bg-primary text-white rounded-full font-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
+                        가까운 센터 찾기
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Regional Ranking Section -->
+<section class="mb-lg">
+<div class="flex justify-between items-end mb-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">서울시 참여율 랭킹</h3>
+<p class="font-body-md text-on-surface-variant text-sm">최근 30일 데이터 기준</p>
+</div>
+<button class="text-primary font-label-md flex items-center gap-1">
+                    전체보기
+                    <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<!-- Ranking List (Bar Chart Style) -->
+<div class="bg-white rounded-lg p-md shadow-sm border border-surface-variant">
+<div class="space-y-lg py-sm">
+<!-- Songpa -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">1. 송파구</span>
+<span class="font-label-md text-primary">82%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary chart-bar-transition" style="width: 82%"></div>
+</div>
+</div>
+<!-- Gangseo -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">2. 강서구</span>
+<span class="font-label-md text-primary">76%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary chart-bar-transition" style="width: 76%"></div>
+</div>
+</div>
+<!-- Nowon -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-on-surface">3. 노원구</span>
+<span class="font-label-md text-primary">68%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary chart-bar-transition" style="width: 68%"></div>
+</div>
+</div>
+<!-- Gangnam (Target) -->
+<div class="space-y-xs bg-secondary-container/10 p-2 -mx-2 rounded-md">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                                12. 강남구
+                            </span>
+<span class="font-label-md text-secondary">42%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container chart-bar-transition" style="width: 42%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<section class="mb-lg">
+<div class="bento-grid">
+<div class="bento-item-full bg-tertiary-container/30 rounded-lg p-lg border border-tertiary-container flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-tertiary text-4xl mb-xs">groups</span>
+<h4 class="font-label-sm text-tertiary uppercase tracking-widest mb-xs">Community Impact</h4>
+<p class="font-headline-lg text-on-surface leading-none mb-xs">
+                        우리 동네 아이들 <br/>
+<span class="text-primary text-4xl font-extrabold">1,245명</span>이
+                    </p>
+<p class="font-body-md text-on-surface-variant">함께 건강하게 성장하고 있어요</p>
+</div>
+<div class="bg-white rounded-lg p-md border border-surface-variant flex flex-col justify-between h-40">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+</div>
+<div>
+<p class="font-label-sm text-on-surface-variant">전월 대비 증가율</p>
+<p class="font-headline-md text-primary">+12.4%</p>
+</div>
+</div>
+<div class="bg-white rounded-lg p-md border border-surface-variant flex flex-col justify-between h-40">
+<div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</div>
+<div>
+<p class="font-label-sm text-on-surface-variant">평균 성장 등급</p>
+<p class="font-headline-md text-secondary">새싹 2단계</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual Map Placeholder -->
+<section class="mb-xl">
+<h3 class="font-headline-md text-on-surface mb-md">지역별 관심도 분포</h3>
+<div class="relative w-full aspect-video rounded-lg overflow-hidden shadow-sm border border-surface-variant">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A stylized, minimalist heat map of Seoul, South Korea districts. The map uses a soft pastel palette with mint green, soft coral, and cream tones to indicate data density. The aesthetic is clean, professional, and slightly playful, avoiding harsh colors for a nurturing, growth-oriented theme. Labels are elegant and clear, using modern sans-serif typography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCdG_vxpe7Yaoja761n8kKNPIkGzWho9_c7avuESpvuAJZ1xoGNogPzg-LkfmRP4RKRbeMzAhn2mOvw8UZdHi7t6J-wKuR1-djQG-61rYJZfaozcYPfFCHJQMgrQ8h88l8yL_PJyKJe0qYenjCYI7YErr6_b4MoE_NSLmnVlAYL--nd3Cln7Wtna2740-1PJDg1Hd-XTABgreFII9sIEa1b5ntRDqrqUHgXnt1Sg3Z4YxGHCvG5dYcoAQ')"></div>
+<div class="absolute inset-0 bg-primary/5 glass-effect"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-white/90 px-lg py-md rounded-full shadow-lg flex items-center gap-3">
+<span class="w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+<span class="font-label-md text-on-surface">실시간 참여 중인 지역: 강남구</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-safe-area bg-surface/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-md rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1.5" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm-mobile">진단</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1.5" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile">기록</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1.5" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-label-sm text-label-sm-mobile">센터</span>
+</a>
+</nav>
+<script>
+        // Simple intersection observer for bar chart animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bars = entry.target.querySelectorAll('.chart-bar-transition');
+                        bars.forEach(bar => {
+                            const width = bar.style.width;
+                            bar.style.width = '0%';
+                            setTimeout(() => {
+                                bar.style.width = width;
+                            }, 100);
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const rankingSection = document.querySelector('.bg-white.rounded-lg.p-md');
+            if (rankingSection) observer.observe(rankingSection);
+        });
+    </script>
+</body></html>

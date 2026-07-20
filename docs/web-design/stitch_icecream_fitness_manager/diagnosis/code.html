@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 맞춤 진단</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002018",
+                    "secondary": "#874f4c",
+                    "primary-container": "#b5ead7",
+                    "on-secondary-container": "#7b4542",
+                    "surface-tint": "#366758",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#efeeea",
+                    "outline": "#707975",
+                    "background": "#faf9f5",
+                    "tertiary-fixed": "#e8e3cd",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#360e0d",
+                    "on-tertiary-fixed-variant": "#4a4737",
+                    "inverse-on-surface": "#f2f1ed",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#1c4f41",
+                    "outline-variant": "#c0c9c4",
+                    "tertiary-container": "#e4dfca",
+                    "inverse-primary": "#9dd1bf",
+                    "on-primary-container": "#396b5c",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e9e8e4",
+                    "on-surface": "#1b1c1a",
+                    "surface-variant": "#e3e2df",
+                    "on-background": "#1b1c1a",
+                    "inverse-surface": "#2f312e",
+                    "surface-bright": "#faf9f5",
+                    "tertiary-fixed-dim": "#ccc7b2",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#625f4e",
+                    "secondary-container": "#ffb7b2",
+                    "primary": "#366758",
+                    "surface-container-highest": "#e3e2df",
+                    "primary-fixed-dim": "#9dd1bf",
+                    "secondary-fixed-dim": "#fcb4b0",
+                    "on-tertiary-fixed": "#1e1c0f",
+                    "on-surface-variant": "#404945",
+                    "on-secondary-fixed-variant": "#6b3836",
+                    "on-tertiary-container": "#666251",
+                    "surface-dim": "#dbdad6",
+                    "secondary-fixed": "#ffdad7",
+                    "surface": "#faf9f5",
+                    "primary-fixed": "#b9eedb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "12px",
+                    "margin-mobile": "20px",
+                    "lg": "24px",
+                    "xs": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Quicksand"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Quicksand"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .active-nav-indicator { transform: scale(1); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .custom-shadow-sm { shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .custom-shadow-md { shadow: 0 8px 24px rgba(181, 234, 215, 0.2); }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-background flex justify-between items-center px-margin-mobile h-14">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase">icecream</h1>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A profile picture of a young child smiling, captured in a soft, bright photography style with a warm cream background. The child is wearing a pastel mint sweater, and the lighting is gentle and natural, evoking a sense of safety and childhood innocence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDp7QF1FhvnFenL3_37t6fE_iuP25c2b_aJzE3WVp_chRhIo7TwLZBriJtuaJ4kBS_V8oFTDyVEYgtOsrOBcsff3YmG_RiF6MO9T-93AkZBUGrgbxLq8jUgld9U3F_yDXs6m1hmxHYovyzfeoqwj3a_zSeVcgT8VJwlRgfM9gO_W7WhKRXcuUIaUYKoEEU37u2LFKaNph-WHPPzrtc6Y8uMxlNzde4Gvvm7k62jilLwtOM1ZHSgrnxvg"/>
+</div>
+</header>
+<main class="pt-20 px-margin-mobile">
+<!-- Hero Section -->
+<section class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface mb-2">우리 아이의<br/>성장을 진단해요</h2>
+<p class="text-on-surface-variant font-body-md">국가 표준 체력 측정 기준에 따라<br/>부드럽게, 그리고 꼼꼼하게 체크합니다.</p>
+</section>
+<!-- Measurement Categories (Bento Style) -->
+<div class="grid grid-cols-2 gap-md mb-xl">
+<div class="col-span-2 bg-primary-container p-lg rounded-lg custom-shadow-md relative overflow-hidden">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary mb-2" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+<h3 class="font-headline-md text-primary">근력 및 근지구력</h3>
+<p class="font-label-sm text-on-primary-container">윗몸 말아 올리기 외 2건</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-20">
+<span class="material-symbols-outlined text-primary text-[80px]">exercise</span>
+</div>
+</div>
+<div class="bg-secondary-container p-md rounded-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-on-secondary-container mb-2">directions_run</span>
+<h3 class="font-headline-md text-on-secondary-container leading-tight">순발력</h3>
+</div>
+<p class="font-label-sm text-on-secondary-container">제자리 멀리뛰기</p>
+</div>
+<div class="bg-tertiary-container p-md rounded-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-on-tertiary-container mb-2" style="font-variation-settings: 'FILL' 1;">accessibility_new</span>
+<h3 class="font-headline-md text-on-tertiary-container leading-tight">유연성</h3>
+</div>
+<p class="font-label-sm text-on-tertiary-container">앉아 윗몸 굽히기</p>
+</div>
+</div>
+<!-- Detail Input Section: Sit and Reach -->
+<section class="bg-surface-container-lowest rounded-lg p-lg border border-surface-variant mb-lg">
+<div class="flex items-center gap-xs mb-md">
+<span class="bg-primary-container p-1 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">straighten</span>
+</span>
+<h3 class="font-headline-md text-on-surface">앉아 윗몸 굽히기</h3>
+</div>
+<!-- Instruction Image Card -->
+<div class="aspect-video w-full rounded-lg overflow-hidden bg-surface-container-low mb-lg relative">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist 3D illustration showing a young child sitting on a white floor with legs straight out, performing a sit-and-reach flexibility test. The background is a soft mint and cream gradient. The lighting is bright and airy, with a gentle professional medical aesthetic. The scene conveys a sense of growth and health monitoring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkmn8w_k6bzaUUFkxvGhxrb-5PZNYrhhC66ZacBB9-kdxQ8gdXjk_JBpdR7tBsth255fU_jqy2BAX_ZwcugIEA49ZKzPpApnMJAxoavrlAGl7OaOvf3MnUPRnEONM-gdqFc5Iyvg69y5Qq6pi6lex_cxdipvFmSUbOTuEz-c5e5_Le38GQcSQZRLAse2BjIFYgxbzHnTcnmQjLrH-W1-J4idvvQx9Pypt5jjlVroPpr_o_sCjQkSMB_Q"/>
+<div class="absolute bottom-3 left-3 bg-background/80 backdrop-blur px-3 py-1 rounded-full border border-primary/20">
+<p class="font-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                        무릎을 펴고 천천히 밀어주세요
+                    </p>
+</div>
+</div>
+<!-- Keypad Friendly Input -->
+<div class="space-y-sm">
+<label class="font-label-md text-on-surface-variant block ml-2">측정값 (cm)</label>
+<div class="relative flex items-center">
+<input class="w-full h-[72px] rounded-full bg-surface-container-low border-none text-center font-headline-lg text-primary focus:ring-2 focus:ring-primary placeholder:text-outline-variant" placeholder="00.0" step="0.1" type="number"/>
+<div class="absolute right-6 text-on-surface-variant font-headline-md">cm</div>
+</div>
+<p class="text-center text-on-surface-variant font-label-sm pt-2">아이의 유연성은 성장의 중요한 지표예요! ✨</p>
+</div>
+</section>
+<!-- CTA Action -->
+<button class="w-full h-14 bg-primary text-on-primary rounded-full font-headline-md shadow-md active:scale-95 transition-transform">
+            진단 결과 저장하기
+        </button>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-8 bg-surface/80 backdrop-blur-xl rounded-t-lg shadow-md">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile">홈</span>
+</div>
+<!-- ACTIVE TAB: 진단 -->
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 active-nav-indicator">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm-mobile">진단</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile">기록</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-sm text-label-sm-mobile">센터</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for input
+        const input = document.querySelector('input[type="number"]');
+        input.addEventListener('focus', () => {
+            input.parentElement.parentElement.classList.add('scale-[1.02]');
+            input.parentElement.parentElement.classList.add('transition-transform');
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.parentElement.classList.remove('scale-[1.02]');
+        });
+
+        // Hover effect for category cards
+        const cards = document.querySelectorAll('.grid > div');
+        cards.forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

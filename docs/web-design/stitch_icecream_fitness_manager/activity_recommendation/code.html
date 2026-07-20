@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 활동 추천</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002018",
+                    "inverse-surface": "#2f312e",
+                    "on-surface-variant": "#404945",
+                    "outline-variant": "#c0c9c4",
+                    "surface-container-highest": "#e3e2df",
+                    "primary": "#366758",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "primary-container": "#b5ead7",
+                    "tertiary-fixed-dim": "#ccc7b2",
+                    "tertiary-fixed": "#e8e3cd",
+                    "surface-container-low": "#f4f4f0",
+                    "secondary-container": "#ffb7b2",
+                    "outline": "#707975",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#625f4e",
+                    "tertiary-container": "#e4dfca",
+                    "surface-container": "#efeeea",
+                    "on-primary-container": "#396b5c",
+                    "secondary": "#874f4c",
+                    "secondary-fixed-dim": "#fcb4b0",
+                    "inverse-on-surface": "#f2f1ed",
+                    "surface-bright": "#faf9f5",
+                    "background": "#faf9f5",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#ffdad7",
+                    "surface": "#faf9f5",
+                    "surface-variant": "#e3e2df",
+                    "surface-dim": "#dbdad6",
+                    "on-secondary-fixed-variant": "#6b3836",
+                    "on-tertiary-fixed-variant": "#4a4737",
+                    "surface-tint": "#366758",
+                    "on-secondary-fixed": "#360e0d",
+                    "primary-fixed": "#b9eedb",
+                    "on-primary-fixed-variant": "#1c4f41",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-primary": "#9dd1bf",
+                    "on-tertiary-fixed": "#1e1c0f",
+                    "on-tertiary-container": "#666251",
+                    "on-background": "#1b1c1a",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1b1c1a",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#9dd1bf",
+                    "on-secondary-container": "#7b4542"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xl": "32px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "gutter": "16px",
+                    "xs": "8px",
+                    "sm": "12px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Quicksand"],
+                    "headline-lg": ["Quicksand"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .shadow-soft { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .shadow-mint { box-shadow: 0 8px 24px rgba(181, 234, 215, 0.2); }
+        .safe-pb { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md">
+<!-- Top AppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-background flex justify-between items-center px-margin-mobile h-14">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">menu</span>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase tracking-tight">icecream</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A soft and warm close-up portrait of a cheerful 5-year-old child with a bright smile, captured in high-key natural lighting. The style is minimalist and clean, with a shallow depth of field focusing on the child's joyful expression. Soft pastel colors and warm tones dominate the palette, creating a nurturing and safe atmosphere consistent with the icecream brand's gentle aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4Zb2ZaXemJBKxtp2LOL47Q9RRqLllCECA0IaF70UaSiUOa8N7GooU3EY-EMWoopCKJB6r6vDM-cO6dQbL1ZUopyo9N4WJCNsGhSLmPfiFOO29FiA-88Hf43tf25_8e-NHQHbnOwnJ5nHcSR93la5T7qeljCNxw8ysW85l0A3YPiSJMudnPBMWTLGsDuhAzUg1Ll0admzZBtZkMCn2O6JdQj-DP9lJNucduMdlhhY3-LHAV1yr33UlUg"/>
+</div>
+</header>
+<main class="pt-16 px-margin-mobile safe-pb">
+<!-- Header Section -->
+<section class="mt-lg">
+<p class="font-label-md text-label-md-mobile text-on-surface-variant">성장 맞춤형 놀이 제안</p>
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface mt-base">지후를 위한 맞춤 활동</h2>
+</section>
+<!-- Specific Weakness Highlight (Diagnostic Result Link) -->
+<section class="mt-lg">
+<div class="bg-secondary-container/20 rounded-lg p-lg border border-secondary-container/30 relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center gap-xs mb-xs">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+<span class="font-label-md text-secondary">집중 발달 항목: 근력</span>
+</div>
+<p class="font-body-lg text-on-secondary-container">
+                        현재 지후는 하체 <span class="font-bold">근력</span>을 기르는 놀이가 가장 필요해요. 
+                    </p>
+<p class="text-label-sm text-on-surface-variant mt-sm">
+                        지난 진단 결과, 또래 대비 근지구력이 약 15% 낮게 측정되었습니다.
+                    </p>
+</div>
+<!-- Decorative element -->
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px] text-secondary">exercise</span>
+</div>
+</div>
+</section>
+<!-- Category Filter Chips -->
+<div class="flex gap-sm mt-lg overflow-x-auto no-scrollbar py-base">
+<button class="bg-primary-container text-on-primary-container px-lg py-sm rounded-full font-label-md whitespace-nowrap shadow-mint active:scale-95 transition-all">전체</button>
+<button class="bg-surface-container-low text-on-surface-variant px-lg py-sm rounded-full font-label-md whitespace-nowrap border border-outline-variant/30 hover:bg-surface-container-high transition-colors">실내</button>
+<button class="bg-surface-container-low text-on-surface-variant px-lg py-sm rounded-full font-label-md whitespace-nowrap border border-outline-variant/30 hover:bg-surface-container-high transition-colors">야외</button>
+<button class="bg-surface-container-low text-on-surface-variant px-lg py-sm rounded-full font-label-md whitespace-nowrap border border-outline-variant/30 hover:bg-surface-container-high transition-colors">기구 필요</button>
+</div>
+<!-- Activity Card List -->
+<section class="mt-lg grid grid-cols-1 gap-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-soft active:scale-[0.98] transition-transform">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="A bright and airy photograph of a 4-year-old child happily crawling on a soft, green textured play mat. The scene is brightly lit with warm, diffused sunlight, creating a gentle and encouraging mood. The child is wearing simple, comfortable cotton clothing in soft pastel mint and white. The background is a minimalist, tidy interior with clean white walls and rounded furniture, following a high-end minimalist design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgMLVeA1u-S2N9WbkFLG3SE7jTifnlJfzZQBBP_oGqU8ZK9E4JdFqBvWI3gYtTTvgzGKER-XihcjdRzJOmfdHKmud-g5ti8PLOtGcuCtAEtm_rUw12WgEVfLzsOBDtV97RjgKmRP13ZXX-ZHkb_gZPoFtA7uK6EE4krBvU5jRzCrkEMltNgIzsVxdbFRYZ0obFqUxSNlTIvqOe6ezbtBnfMTeg3UoSxeqYA0Ipuc_EGGnGBEACGN7EmQ"/>
+<div class="absolute top-sm right-sm bg-white/80 backdrop-blur-md px-sm py-base rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-label-sm text-on-surface">15분</span>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex gap-xs mb-xs">
+<span class="bg-primary-container/30 text-primary px-sm py-[2px] rounded-full text-label-sm">#근력</span>
+<span class="bg-tertiary-container/30 text-tertiary px-sm py-[2px] rounded-full text-label-sm">#협응력</span>
+</div>
+<h3 class="font-headline-md text-on-surface">엉금엉금 거북이 놀이</h3>
+<p class="text-on-surface-variant mt-xs line-clamp-2">낮은 자세로 기어가며 전신 근육을 고르게 발달시키는 가장 기초적인 놀이 활동입니다.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-soft active:scale-[0.98] transition-transform">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="A playful and energetic high-angle shot of colorful soft foam blocks arranged as a path on a light-colored wooden floor. A pair of small, bright sneakers belonging to a child are visible stepping onto one of the blocks. The lighting is soft and natural, emphasizing textures and vibrant yet pastel colors like coral, mint, and cream. The composition is clean and focused on the tactile experience of play, embodying a growth-oriented and nurturing atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAw4sxCzgKbgHg7LeucpMDxGgijjIYO4khoOuDpoWk-KvXS8fSbTv4wlnDx70lE0q9lunXOID0rC8q_4G8_jWN9B0bLkqpRaFo4U1iWcdvmT8IEBPtOXm3STEktBN4ML6AbYFhOElJROa1dhdnXwPbeOBfQ0UrgOhdQPr-_HhKpdn4tyQE3-eN9p-GuLh3UiMrhiBMc1iLcf3UzgGFKQPF0csYqlQzpNkkVqcn0UTU4-fa7VH8VHj2og"/>
+<div class="absolute top-sm right-sm bg-white/80 backdrop-blur-md px-sm py-base rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-label-sm text-on-surface">10분</span>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex gap-xs mb-xs">
+<span class="bg-primary-container/30 text-primary px-sm py-[2px] rounded-full text-label-sm">#균형</span>
+<span class="bg-secondary-container/30 text-secondary px-sm py-[2px] rounded-full text-label-sm">#집중력</span>
+</div>
+<h3 class="font-headline-md text-on-surface">징검다리 톡톡</h3>
+<p class="text-on-surface-variant mt-xs line-clamp-2">색색의 블록 위를 중심 잡으며 걸어보세요. 하체 근력과 평형 감각을 동시에 기를 수 있어요.</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-soft active:scale-[0.98] transition-transform">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="A warm and tender shot of a parent's hands gently supporting a child's waist while they attempt a small jump in a sunlit playroom. The lighting is golden and soft, creating a nurturing and supportive mood. The space is filled with soft textures and a clean, minimalist layout with high whitespace. The color palette features whites, creams, and gentle wood tones, emphasizing a sense of safety and tenderness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1OMefT_2OW7YnG1taXhrGaNq8jl19MdlRi8Sf3EDuNIpaMWYwIV3V7W-aGqlkTGwjqy0lQtBXPkoZCP1IUZvtGpglunpmi2F3Jc-hwTtvyRZT0dE-xI4TXVAlzEMloIbvTcHKWEp307kG_mqlHDPt1YZBchqXDYcL3fU2hwal5FL_Oy-tlKLmz7jdYAlVrj2gmJFiY8Q9vlGExypuHLD7YWAK8JHUb_zaAQ0_pFYcz5WGgR0lybZ6HA"/>
+<div class="absolute top-sm right-sm bg-white/80 backdrop-blur-md px-sm py-base rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-label-sm text-on-surface">20분</span>
+</div>
+</div>
+<div class="p-lg">
+<div class="flex gap-xs mb-xs">
+<span class="bg-primary-container/30 text-primary px-sm py-[2px] rounded-full text-label-sm">#근력</span>
+<span class="bg-tertiary-container/30 text-tertiary px-sm py-[2px] rounded-full text-label-sm">#순발력</span>
+</div>
+<h3 class="font-headline-md text-on-surface">높이높이 점프팡</h3>
+<p class="text-on-surface-variant mt-xs line-clamp-2">손을 뻗어 하늘의 구름을 잡는 상상을 하며 제자리에서 가볍게 점프해봅니다.</p>
+</div>
+</div>
+</section>
+<!-- Botanical Growth Metaphor Footer Hint -->
+<section class="mt-xl mb-md text-center">
+<div class="inline-flex items-center gap-xs bg-tertiary-fixed/30 px-lg py-sm rounded-full">
+<span class="material-symbols-outlined text-tertiary text-lg">potted_plant</span>
+<span class="text-label-md text-on-tertiary-container">활동 2개를 더 완료하면 새싹이 더 자라나요!</span>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-safe-area bg-surface/80 dark:bg-surface-container/80 backdrop-blur-xl rounded-t-lg shadow-md">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-fixed-variant text-on-primary-container dark:text-primary-fixed-dim rounded-xl px-4 py-1.5 scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm-mobile">진단</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile">기록</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-sm text-label-sm-mobile">센터</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Handle safe area for bottom navigation on iOS
+        const setSafePadding = () => {
+            const safeAreaBottom = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0px';
+            document.querySelector('nav').style.paddingBottom = `calc(0.5rem + ${safeAreaBottom})`;
+        };
+        window.addEventListener('resize', setSafePadding);
+        setSafePadding();
+    </script>
+</body></html>

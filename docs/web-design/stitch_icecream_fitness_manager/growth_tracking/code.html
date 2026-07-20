@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 성장 기록</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&amp;family=Plus+Jakarta+Sans:wght@400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f2f1ed",
+                    "surface-tint": "#366758",
+                    "inverse-primary": "#9dd1bf",
+                    "secondary-fixed-dim": "#fcb4b0",
+                    "on-error-container": "#93000a",
+                    "secondary": "#874f4c",
+                    "surface-variant": "#e3e2df",
+                    "outline": "#707975",
+                    "surface-container": "#efeeea",
+                    "primary-container": "#b5ead7",
+                    "on-primary-fixed-variant": "#1c4f41",
+                    "on-primary-fixed": "#002018",
+                    "on-surface": "#1b1c1a",
+                    "surface-container-high": "#e9e8e4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#6b3836",
+                    "background": "#faf9f5",
+                    "primary-fixed": "#b9eedb",
+                    "primary": "#366758",
+                    "inverse-surface": "#2f312e",
+                    "secondary-fixed": "#ffdad7",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#404945",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-highest": "#e3e2df",
+                    "on-tertiary-fixed": "#1e1c0f",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#4a4737",
+                    "secondary-container": "#ffb7b2",
+                    "surface-bright": "#faf9f5",
+                    "outline-variant": "#c0c9c4",
+                    "on-secondary-container": "#7b4542",
+                    "primary-fixed-dim": "#9dd1bf",
+                    "tertiary-container": "#e4dfca",
+                    "surface": "#faf9f5",
+                    "on-secondary-fixed": "#360e0d",
+                    "on-tertiary-container": "#666251",
+                    "on-primary-container": "#396b5c",
+                    "tertiary-fixed": "#e8e3cd",
+                    "tertiary-fixed-dim": "#ccc7b2",
+                    "tertiary": "#625f4e",
+                    "on-background": "#1b1c1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "margin-mobile": "20px",
+                    "md": "16px",
+                    "xs": "8px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Quicksand"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Quicksand"],
+                    "body-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "label-md-mobile": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-sm-mobile": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .grade-gradient-bg {
+        background: linear-gradient(180deg, 
+          rgba(255, 183, 178, 0.08) 0%, 
+          rgba(255, 249, 227, 0.1) 40%, 
+          rgba(181, 234, 215, 0.08) 100%);
+      }
+      .scroll-hide::-webkit-scrollbar { display: none; }
+      .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .chart-line-official {
+        stroke-dasharray: 0;
+        stroke: #366758;
+        stroke-width: 3;
+        fill: none;
+      }
+      .chart-line-self {
+        stroke-dasharray: 6 4;
+        stroke: #366758;
+        stroke-opacity: 0.3;
+        stroke-width: 2;
+        fill: none;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-background flex justify-between items-center w-full px-margin-mobile h-14 z-40 sticky">
+<div class="flex items-center gap-md">
+<button class="hover:opacity-80 transition-opacity Active: scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase">icecream</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A soft, high-key portrait of a smiling child in a clean minimalist environment. The lighting is bright and warm, with gentle pastel green and cream tones in the background, creating a professional yet nurturing feel. The style is soft-focus photography with high clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA19GoOO4sbA-_SjFqX6g8sRhW9ooisXmT8rSOpkQ_yGbxjSGrgKbFh4h7mZY9ve8S8IaELQraOj36WSKLUSZxl4xICK0LzEfTkCw-_DVI9JpajSvw5aRtj68Z6LKK3RChAifWwVs5WIpxbnDZxx0ulK4v5pLMnHmgvHXII_eN99G_5m4Aq-vthD_CNTHj-AKSnC1ROxgIWmE_0eqMc_3We5PSEGfCMgPsIbGH4_GQOlXsm18S-kIv7fQ"/>
+</div>
+</header>
+<main class="px-margin-mobile pt-lg space-y-lg">
+<!-- Page Title & Item Selector -->
+<section class="space-y-md">
+<div class="flex justify-between items-end">
+<div>
+<span class="text-primary font-label-md text-label-md-mobile flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">monitoring</span>
+                        성장 히스토리
+                    </span>
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface mt-1">우리 아이 성장 리포트</h2>
+</div>
+</div>
+<!-- Item Filter Selector -->
+<div class="flex gap-sm overflow-x-auto scroll-hide py-1">
+<button class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-md whitespace-nowrap shadow-sm">
+                    전신 밸런스
+                </button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">
+                    심폐지구력
+                </button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">
+                    순발력
+                </button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">
+                    유연성
+                </button>
+</div>
+</section>
+<!-- Growth Trend Chart Card -->
+<section class="bg-surface-container-lowest rounded-lg p-lg shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative overflow-hidden border border-surface-container">
+<!-- Grade Background Bands -->
+<div class="absolute inset-0 flex flex-col pointer-events-none opacity-40">
+<div class="flex-1 bg-secondary-container/10 border-b border-secondary-container/20 flex items-center px-4">
+<span class="text-[10px] font-label-sm text-on-secondary-container/40 uppercase">Excellent</span>
+</div>
+<div class="flex-1 bg-tertiary-container/10 border-b border-tertiary-container/20 flex items-center px-4">
+<span class="text-[10px] font-label-sm text-on-tertiary-container/40 uppercase">Growth</span>
+</div>
+<div class="flex-1 bg-primary-container/10 flex items-center px-4">
+<span class="text-[10px] font-label-sm text-on-primary-container/40 uppercase">Starting</span>
+</div>
+</div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-label-md text-on-surface flex items-center gap-2">
+                            성장 추이
+                            <span class="material-symbols-outlined !text-[18px] text-outline">info</span>
+</h3>
+<p class="text-[11px] text-outline mt-0.5">최근 6개월간의 변화입니다</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="text-[10px] font-label-sm text-on-surface-variant">정식 측정</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full border border-dashed border-primary/50"></span>
+<span class="text-[10px] font-label-sm text-on-surface-variant">자가 측정</span>
+</div>
+</div>
+</div>
+<!-- SVG Chart Implementation -->
+<div class="chart-container">
+<svg class="w-full h-full drop-shadow-sm" viewbox="0 0 320 200">
+<!-- Y-axis Guidelines -->
+<line stroke="#efeeea" stroke-width="1" x1="0" x2="320" y1="66" y2="66"></line>
+<line stroke="#efeeea" stroke-width="1" x1="0" x2="320" y1="133" y2="133"></line>
+<!-- Official Line (Solid) -->
+<path class="chart-line-official" d="M 20 160 Q 60 140, 100 150 T 180 90 T 260 70 T 300 40"></path>
+<!-- Self Line (Dashed) -->
+<path class="chart-line-self" d="M 20 165 Q 60 150, 100 155 T 180 110 T 260 90 T 300 65"></path>
+<!-- Data points - Official -->
+<circle cx="100" cy="150" fill="#366758" r="4"></circle>
+<circle cx="180" cy="90" fill="#366758" r="4"></circle>
+<circle cx="260" cy="70" fill="#366758" r="4"></circle>
+<circle cx="300" cy="40" fill="#366758" r="5" stroke="white" stroke-width="2"></circle>
+<!-- Data points - Self -->
+<circle cx="140" cy="130" fill="#366758" opacity="0.3" r="3"></circle>
+<circle cx="220" cy="100" fill="#366758" opacity="0.3" r="3"></circle>
+</svg>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] font-label-sm text-outline">
+<span>1월</span>
+<span>2월</span>
+<span>3월</span>
+<span>4월</span>
+<span>5월</span>
+<span>6월</span>
+</div>
+</div>
+</section>
+<!-- Measurement History List -->
+<section class="space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md-mobile text-on-surface">측정 히스토리</h3>
+<button class="text-primary font-label-sm flex items-center gap-1">
+                    전체보기
+                    <span class="material-symbols-outlined !text-[14px]">chevron_right</span>
+</button>
+</div>
+<div class="space-y-sm">
+<!-- History Item 1 -->
+<div class="bg-surface-container-low rounded-lg p-md flex items-center justify-between hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-on-surface">2024. 05. 24</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-label-sm">정식 측정</span>
+</div>
+<p class="text-outline text-[12px] mt-0.5">열매 등급 • 상위 12%</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<div class="hidden sm:block">
+<div class="text-primary font-bold text-headline-md">A+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="bg-surface-container-low rounded-lg p-md flex items-center justify-between hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-on-surface">2024. 05. 10</span>
+<span class="px-2 py-0.5 rounded-full bg-outline-variant/30 text-on-surface-variant text-[10px] font-label-sm">자가 측정</span>
+</div>
+<p class="text-outline text-[12px] mt-0.5">새싹 등급 • 상위 35%</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<div class="hidden sm:block">
+<div class="text-tertiary font-bold text-headline-md">B</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="bg-surface-container-low rounded-lg p-md flex items-center justify-between hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-on-surface">2024. 04. 12</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-label-sm">정식 측정</span>
+</div>
+<p class="text-outline text-[12px] mt-0.5">새싹 등급 • 상위 42%</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<div class="hidden sm:block">
+<div class="text-tertiary font-bold text-headline-md">B-</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Insights Banner -->
+<section class="bg-primary-container/20 border border-primary-container/40 rounded-lg p-lg flex items-center gap-lg">
+<div class="flex-1">
+<h4 class="font-label-md text-primary-container-on-surface-variant text-primary font-bold">성장 전문가의 한마디</h4>
+<p class="text-body-md text-on-surface-variant mt-sm leading-relaxed">
+                    지후는 지난달 대비 <span class="text-primary font-bold">밸런스 능력이 15% 향상</span>되었습니다. 자가 측정 결과도 안정적으로 유지되고 있어, 다음 정식 검사에서는 <span class="text-secondary font-bold">열매 등급</span> 유지가 기대됩니다.
+                </p>
+</div>
+<div class="w-16 h-16 shrink-0 bg-white rounded-2xl shadow-sm flex items-center justify-center overflow-hidden border border-primary-container/30">
+<img class="w-10 h-10 object-contain" data-alt="A small, stylized 3D illustration of a vibrant green sprout with two tiny leaves emerging from a mound of soft brown earth. The lighting is ethereal and soft, with a clean white studio background. The style is modern 3D render with a tactile, soft-touch finish, following the icecream design system's organic clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVix6XQyf9YOMLwAVTuFUQtvHkvLpAZm_9ACQAnozTEUkasYLvBNe8QAEhiUXzOjLHvtcoIAKy9zj0ZbogF9uSXlCawvotmS9iEgwdoiIHI1ZMVIjWCpC9SYEdilffHttY9AD67zS3uPgl1I8S7ABuV-ZbZ7GvE_kGr84B9Sp_LpvWrfVtVoXku1th1sXKEt70zFEO_AubmaH1q4pDloJ86VVCFq65K_9md8z1fuzyCzwNtUEFC7LcZw"/>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pt-2 pb-safe-area bg-surface/80 backdrop-blur-xl shadow-md">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-sm text-label-sm-mobile">진단</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile">기록</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-sm text-label-sm-mobile">센터</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for chart responsiveness or filter changes
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary');
+                btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+            });
+        });
+
+        // Simple animation entry for the chart path
+        window.addEventListener('DOMContentLoaded', () => {
+            const paths = document.querySelectorAll('path');
+            paths.forEach(path => {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+                path.getBoundingClientRect(); // trigger reflow
+                path.style.transition = 'stroke-dashoffset 1.5s ease-out';
+                path.style.strokeDashoffset = '0';
+            });
+        });
+    </script>
+</body></html>

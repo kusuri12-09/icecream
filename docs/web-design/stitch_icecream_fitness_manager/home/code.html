@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>icecream - 우리 아이 성장 대시보드</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Quicksand:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .safe-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        body {
+            background-color: #faf9f5;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002018",
+                    "secondary": "#874f4c",
+                    "primary-container": "#b5ead7",
+                    "on-secondary-container": "#7b4542",
+                    "surface-tint": "#366758",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#efeeea",
+                    "outline": "#707975",
+                    "background": "#faf9f5",
+                    "tertiary-fixed": "#e8e3cd",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#360e0d",
+                    "on-tertiary-fixed-variant": "#4a4737",
+                    "inverse-on-surface": "#f2f1ed",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#1c4f41",
+                    "outline-variant": "#c0c9c4",
+                    "tertiary-container": "#e4dfca",
+                    "inverse-primary": "#9dd1bf",
+                    "on-primary-container": "#396b5c",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e9e8e4",
+                    "on-surface": "#1b1c1a",
+                    "surface-variant": "#e3e2df",
+                    "on-background": "#1b1c1a",
+                    "inverse-surface": "#2f312e",
+                    "surface-bright": "#faf9f5",
+                    "tertiary-fixed-dim": "#ccc7b2",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#625f4e",
+                    "secondary-container": "#ffb7b2",
+                    "primary": "#366758",
+                    "surface-container-highest": "#e3e2df",
+                    "primary-fixed-dim": "#9dd1bf",
+                    "secondary-fixed-dim": "#fcb4b0",
+                    "on-tertiary-fixed": "#1e1c0f",
+                    "on-surface-variant": "#404945",
+                    "on-secondary-fixed-variant": "#6b3836",
+                    "on-tertiary-container": "#666251",
+                    "surface-dim": "#dbdad6",
+                    "secondary-fixed": "#ffdad7",
+                    "surface": "#faf9f5",
+                    "primary-fixed": "#b9eedb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "12px",
+                    "margin-mobile": "20px",
+                    "lg": "24px",
+                    "xs": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Quicksand"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Quicksand"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden pb-32">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-margin-mobile h-14 flex justify-between items-center w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform" data-icon="menu">menu</button>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary lowercase tracking-tight">icecream</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border-2 border-white shadow-sm active:scale-95 transition-transform">
+<img class="w-full h-full object-cover" data-alt="A soft, high-key studio portrait of a joyful 5-year-old child with a bright smile, set against a minimalist creamy pastel background. The lighting is warm and diffused, creating a gentle and nurturing atmosphere consistent with a professional child development app. The image quality is crisp with a shallow depth of field, emphasizing a safe and friendly aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPvOHh2hylwtTn6MQYCeWkZaQU2E3n2hvGDbrmvpDnLTLWxvzdx8tBhyhtthXA5TRHR3yZQDLyQr7p7UT_bdqLyoFm1McJcr09ovCFGuFekHlSVhSvDFLkjgMVWZk_ad43xLQa-Mn-XZB15CHjiWunHE4YXMF9qh_UH_Xz5I8Nc42mXbJx9QhNq9OPqkagSu7XjDMW1tVRIgYIsmEbMaQG7zrTt-1ACFJSzMWjLnrAL6dsbGO3w7CQMg"/>
+</div>
+</header>
+<main class="px-margin-mobile mt-lg space-y-lg">
+<!-- Greeting & Status Card -->
+<section class="space-y-sm">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg-mobile text-on-surface">민수님,</span>
+<span class="font-body-lg text-on-surface-variant">오늘도 쑥쑥 자라요!</span>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-lg shadow-sm border border-surface-container flex items-center justify-between overflow-hidden relative">
+<div class="space-y-base relative z-10">
+<p class="font-label-md text-on-surface-variant">현재 성장 등급</p>
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+<span class="font-headline-md text-primary">새싹 등급</span>
+</div>
+<p class="font-label-sm text-on-surface-variant mt-2">다음 등급인 '잎새'까지 12포인트!</p>
+</div>
+<!-- Abstract decorative shape -->
+<div class="absolute -right-8 -bottom-8 w-40 h-40 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 w-24 h-24">
+<img class="w-full h-full object-contain" data-alt="A stylized, minimalist 3D illustration of a vibrant green sprout emerging from soft, fertile soil. The style is claymorphic with smooth, rounded edges and soft pastel colors. The lighting is bright and cheerful, suggesting growth and health. This visual serves as a metaphorical achievement badge for a child's fitness level in a nurturing digital environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9XErl0phNySC-qkpEnBZ09FMsj90kGpjEtYCkCTMKfPC1wc__zKBFmKsNCV5mhO2M1-da6DZXkZgKROjL1ZSOCf0oqRpDiMzxC5t7RQY1VlYGjgMGLANIsg5iH4g_cHIM5V67i7_s_HO-m0u_U-xvo1mRSOpAeH73JVqzgWiimgnqIebdT8NewrVTvewIHsYkcLVTsdwwo5aNOD5XH6pTIazjTmav2_NpFwD07yQLi6eskggsaJWSHg"/>
+</div>
+</div>
+</section>
+<!-- Activity Summary (Bento Grid) -->
+<section class="space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-on-surface">최근 활동 기록</h3>
+<button class="text-primary font-label-md hover:opacity-80 transition-opacity">전체보기</button>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<!-- Activity 1 -->
+<div class="bg-white p-md rounded-lg shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer active:scale-95 transition-transform">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary mb-xs">
+<span class="material-symbols-outlined" data-icon="directions_run">directions_run</span>
+</div>
+<p class="font-label-sm text-on-surface-variant">셔틀런</p>
+<p class="font-headline-md text-on-surface">15회 <span class="text-label-sm text-outline font-normal">성공</span></p>
+<div class="mt-xs h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4 rounded-full"></div>
+</div>
+</div>
+<!-- Activity 2 -->
+<div class="bg-white p-md rounded-lg shadow-sm border border-surface-container hover:shadow-md transition-shadow cursor-pointer active:scale-95 transition-transform">
+<div class="w-10 h-10 rounded-xl bg-primary-container/30 flex items-center justify-center text-primary mb-xs">
+<span class="material-symbols-outlined" data-icon="vertical_align_top">vertical_align_top</span>
+</div>
+<p class="font-label-sm text-on-surface-variant">제자리멀리뛰기</p>
+<p class="font-headline-md text-on-surface">110cm</p>
+<div class="mt-xs flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm">지난번보다 5cm ↑</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Today's Tip Section -->
+<section class="space-y-md">
+<h3 class="font-headline-md text-on-surface">오늘의 성장 팁</h3>
+<div class="group relative bg-tertiary-fixed/30 rounded-lg p-lg overflow-hidden border border-tertiary-fixed/50 hover:bg-tertiary-fixed/40 transition-colors">
+<div class="flex flex-col md:flex-row gap-lg items-center">
+<div class="flex-1 space-y-sm">
+<div class="inline-flex items-center gap-2 bg-white/60 px-3 py-1 rounded-full border border-white/80">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="lightbulb">lightbulb</span>
+<span class="font-label-sm text-on-tertiary-fixed-variant">놀이 가이드</span>
+</div>
+<h4 class="font-headline-md text-on-tertiary-fixed">아이와 함께하는 '풍선 배구'</h4>
+<p class="font-body-md text-on-tertiary-fixed-variant leading-relaxed">
+                            실내에서 안전하게 민첩성과 협응력을 길러주세요. 풍선이 땅에 닿지 않게 주고받으며 자연스럽게 움직임을 유도합니다.
+                        </p>
+<button class="flex items-center gap-2 bg-primary text-white px-lg py-sm rounded-full font-label-md shadow-md active:scale-95 transition-transform">
+                            자세히 알아보기
+                            <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="w-full md:w-48 h-40 rounded-lg bg-surface overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A heartwarming, high-quality photograph of a mother and her young son playing together indoors with a colorful balloon. The room is bright, minimalist, and filled with natural soft light, featuring light wood floors and cream-colored walls. The style is airy and professional, focusing on the genuine emotional connection and the active, healthy lifestyle promoted by the icecream app. The overall mood is soft, cheerful, and encouraging." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8nOSHAo-ykNe8-NGM6XQI3Joq6QYZfwrPx7ySqFzpvkbXESKypS6qeFx94mfGrsxZItJdBtRsQTtaHaLya5hw5j3EubRU2e_3VeuelE9CrdsZe9lYyCSz7MqrOyrs9dFI54O6Abtd9iJwWykpAM3PAfdjO7-7eCP_ALmURKHXDoOHiSaEnexVkmNHWdbvBbp4wzHMNc34InXAIhxiHO4WZh4OJQjeX3wKzHrcIpB8eeCQlIUqsloVSA"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Action Grid -->
+<section class="grid grid-cols-4 gap-md pt-lg">
+<div class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-surface-container flex items-center justify-center text-on-surface-variant group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+</div>
+<span class="font-label-sm">운동하기</span>
+</div>
+<div class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-surface-container flex items-center justify-center text-on-surface-variant group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="nutrition">nutrition</span>
+</div>
+<span class="font-label-sm">식단가이드</span>
+</div>
+<div class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-surface-container flex items-center justify-center text-on-surface-variant group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</div>
+<span class="font-label-sm">성장리포트</span>
+</div>
+<div class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-surface-container flex items-center justify-center text-on-surface-variant group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+</div>
+<span class="font-label-sm">전문가상담</span>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-around items-center px-gutter pt-2 pb-safe-area shadow-md rounded-t-lg">
+<!-- 홈 (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm-mobile">홈</span>
+</a>
+<!-- 진단 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-sm text-label-sm-mobile">진단</span>
+</a>
+<!-- 기록 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-label-sm text-label-sm-mobile">기록</span>
+</a>
+<!-- 센터 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-label-sm text-label-sm-mobile">센터</span>
+</a>
+</nav>
+<!-- Floating Action Button (Only on Home/Dashboard as per mandate) -->
+<button class="fixed bottom-24 right-margin-mobile w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-[28px]" data-icon="add_task">add_task</span>
+</button>
+<script>
+        // Simple micro-interaction for active states
+        document.querySelectorAll('nav a, section div, button').forEach(el => {
+            el.addEventListener('touchstart', () => {
+                el.classList.add('opacity-70');
+            });
+            el.addEventListener('touchend', () => {
+                el.classList.remove('opacity-70');
+            });
+        });
+    </script>
+</body></html>
