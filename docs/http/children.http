@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:8000
+@accessToken = REPLACE_WITH_ACCESS_TOKEN
+@childId = child_1
+
+### 자녀 등록
+POST {{baseUrl}}/api/v1/children
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "nickname": "콩이",
+  "gender": "MALE",
+  "birthYearMonth": "2021-05"
+}
+
+### 자녀 목록
+GET {{baseUrl}}/api/v1/children
+Authorization: Bearer {{accessToken}}
+
+### 자녀 단건 조회
+GET {{baseUrl}}/api/v1/children/{{childId}}
+Authorization: Bearer {{accessToken}}
+
+### 자녀 수정
+PATCH {{baseUrl}}/api/v1/children/{{childId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "nickname": "수정된 콩이"
+}
+
+### 자녀 삭제
+DELETE {{baseUrl}}/api/v1/children/{{childId}}
+Authorization: Bearer {{accessToken}}

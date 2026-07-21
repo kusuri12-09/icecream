@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:8000
+@accessToken = REPLACE_WITH_ACCESS_TOKEN
+
+### 센터 전체 검색
+GET {{baseUrl}}/api/v1/centers?page=1&size=20
+Authorization: Bearer {{accessToken}}
+
+### 좌표 기반 근처 센터 검색
+GET {{baseUrl}}/api/v1/centers?lat=37.5&lng=127.0&radiusKm=10&page=1&size=20
+Authorization: Bearer {{accessToken}}
+
+### 지역 기반 센터 검색
+GET {{baseUrl}}/api/v1/centers?sidoSigungu=서울%20강남구&page=1&size=20
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:8000
+@accessToken = REPLACE_WITH_ACCESS_TOKEN
+@childId = child_1
+@measurementId = measurement_1
+
+### 정식 측정 생성 및 진단
+POST {{baseUrl}}/api/v1/children/{{childId}}/measurements
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "type": "OFFICIAL",
+  "measuredAt": "2026-07-19",
+  "items": [
+    { "itemKey": "CARDIO", "value": 63 },
+    { "itemKey": "GRIP", "value": 53.8 },
+    { "itemKey": "MUSCULAR_END", "value": 9 },
+    { "itemKey": "FLEXIBILITY", "value": 12 },
+    { "itemKey": "AGILITY", "value": 9.46 },
+    { "itemKey": "POWER", "value": 105 },
+    { "itemKey": "COORDINATION", "value": 23.21 }
+  ]
+}
+
+### 자가 측정 생성
+POST {{baseUrl}}/api/v1/children/{{childId}}/measurements
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "type": "SELF",
+  "measuredAt": "2026-07-20",
+  "items": [
+    { "itemKey": "CARDIO", "value": 40 },
+    { "itemKey": "GRIP", "value": 42 },
+    { "itemKey": "MUSCULAR_END", "value": 3 },
+    { "itemKey": "FLEXIBILITY", "value": 8 },
+    { "itemKey": "BMI", "value": 18.5 }
+  ]
+}
+
+### 측정 목록
+GET {{baseUrl}}/api/v1/children/{{childId}}/measurements?type=OFFICIAL&page=1&size=20&sort=measuredAt,desc
+Authorization: Bearer {{accessToken}}
+
+### 측정 상세
+GET {{baseUrl}}/api/v1/measurements/{{measurementId}}
+Authorization: Bearer {{accessToken}}
+
+### 성장 추적 - 특정 항목
+GET {{baseUrl}}/api/v1/children/{{childId}}/growth?itemKey=CARDIO
+Authorization: Bearer {{accessToken}}
+
+### 성장 추적 - 전체 항목
+GET {{baseUrl}}/api/v1/children/{{childId}}/growth
+Authorization: Bearer {{accessToken}}
+
+### 측정 삭제
+DELETE {{baseUrl}}/api/v1/measurements/{{measurementId}}
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,15 @@
+@baseUrl = http://localhost:8000
+@accessToken = REPLACE_WITH_ACCESS_TOKEN
+@measurementId = measurement_1
+
+### 연령대 기반 활동 조회
+GET {{baseUrl}}/api/v1/activities?ageGroup=PRESCHOOL&page=1&size=20
+Authorization: Bearer {{accessToken}}
+
+### 체력 요소 기반 활동 조회
+GET {{baseUrl}}/api/v1/activities?fitnessElement=CARDIO,POWER&ageGroup=PRESCHOOL&page=1&size=20
+Authorization: Bearer {{accessToken}}
+
+### 측정 약점 기반 활동 추천
+GET {{baseUrl}}/api/v1/activities?measurementId={{measurementId}}&ageGroup=PRESCHOOL&page=1&size=20
+Authorization: Bearer {{accessToken}}
