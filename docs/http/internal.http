@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:8000
+@adminAccessToken = REPLACE_WITH_ADMIN_ACCESS_TOKEN
+
+### 센터·동영상 전체 동기화
+POST {{baseUrl}}/api/v1/internal/sync
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "targets": ["CENTERS", "ACTIVITIES"]
+}
+
+### 센터만 동기화
+POST {{baseUrl}}/api/v1/internal/sync
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "targets": ["CENTERS"]
+}
+
+### 동영상만 동기화
+POST {{baseUrl}}/api/v1/internal/sync
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "targets": ["ACTIVITIES"]
+}
