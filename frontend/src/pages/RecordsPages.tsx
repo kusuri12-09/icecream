@@ -1,21 +1,37 @@
+import { useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AppLayout, Card, SectionTitle } from '../components/AppLayout'
+import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Icon } from '../components/Icon'
-import { useChild, useGrowth, useRecords } from '../hooks/useFitnessData'
-
-const chartData = [
-  { month: '2023.01', official: 42, self: 36 },
-  { month: '2023.04', official: 49, self: 40 },
-  { month: '2023.07', official: 58, self: 47 },
-  { month: '2023.10', official: 72, self: 61 },
-]
+import { useChild, useDeleteMeasurement, useGrowth, useMeasurement, useRecords } from '../hooks/useFitnessData'
 
 export function RecordsPage() {
-  const { data: records = [] } = useRecords()
+  const navigate = useNavigate()
+  const { data: child } = useChild()
+  const { data: records = [], isLoading, error } = useRecords()
+  const { data: growth } = useGrowth(child?.id)
+  const chartData = useMemo(() => {
+    const points = new Map<string, { official: number[]; self: number[] }>()
+    for (const series of growth?.series ?? []) {
+      for (const point of series.points) {
+        const current = points.get(point.measuredAt) ?? { official: [], self: [] }
+        current[point.type === 'OFFICIAL' ? 'official' : 'self'].push(point.value)
+        points.set(point.measuredAt, current)
+      }
+    }
+    return [...points.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([measuredAt, values]) => ({
+        month: measuredAt.slice(0, 7).replace('-', '.'),
+        official: average(values.official),
+        self: average(values.self),
+      }))
+  }, [growth])
+
   return (
     <AppLayout active="records">
       <PageIntro
-        eyebrow="망고의 성장 기록"
+        eyebrow={`${child?.name ?? '아이'}의 성장 기록`}
         title="쑥쑥 자라고 있어요!"
         description={
           <>
@@ -26,76 +42,45 @@ export function RecordsPage() {
         }
       />
       <Card className="p-5">
-        <SectionTitle
-          title="종합 체력 성장 그래프"
-          action={
-            <button className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
-              최근 1년 <Icon name="expand_more" className="text-base" />
-            </button>
-          }
-        />
+        <SectionTitle title="종합 체력 성장 그래프" />
         <div className="mt-5 h-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 12, right: 6, left: -28, bottom: 0 }}>
-              <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis domain={[0, 80]} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,.08)' }} />
-              <Line
-                type="monotone"
-                dataKey="official"
-                name="정식 측정"
-                stroke="#366758"
-                strokeWidth={4}
-                dot={{ r: 4, fill: '#366758' }}
-              />
-              <Line
-                type="monotone"
-                dataKey="self"
-                name="자가측정 참고"
-                stroke="#f4aaa7"
-                strokeWidth={3}
-                strokeDasharray="5 8"
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {chartData.length ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 12, right: 6, left: -28, bottom: 0 }}>
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,.08)' }} />
+                <Line type="monotone" dataKey="official" name="정식 측정" stroke="#366758" strokeWidth={4} dot={{ r: 4, fill: '#366758' }} connectNulls />
+                <Line type="monotone" dataKey="self" name="자가측정 참고" stroke="#f4aaa7" strokeWidth={3} strokeDasharray="5 8" dot={false} connectNulls />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="grid h-full place-items-center text-sm text-on-surface-variant">성장 그래프를 표시할 측정 기록이 없어요.</div>
+          )}
         </div>
         <div className="mt-2 flex justify-center gap-4 text-[11px] text-on-surface-variant">
-          <span className="flex items-center gap-1">
-            <i className="w-5 border-t-[3px] border-primary" />
-            정식 측정
-          </span>
-          <span className="flex items-center gap-1">
-            <i className="w-5 border-t-[3px] border-dashed border-[#f4aaa7]" />
-            자가측정 참고
-          </span>
+          <span className="flex items-center gap-1"><i className="w-5 border-t-[3px] border-primary" />정식 측정</span>
+          <span className="flex items-center gap-1"><i className="w-5 border-t-[3px] border-dashed border-[#f4aaa7]" />자가측정 참고</span>
         </div>
       </Card>
       <section className="mt-8">
-        <SectionTitle
-          title="과거 진단 기록"
-          action={
-            <button className="flex items-center gap-1 text-sm font-bold text-primary">
-              전체보기 <Icon name="arrow_forward" className="text-base" />
-            </button>
-          }
-        />
+        <SectionTitle title="과거 진단 기록" />
         <div className="mt-3 grid gap-2">
+          {isLoading && <p className="py-6 text-center text-sm text-on-surface-variant">기록을 불러오고 있어요…</p>}
+          {error && <p className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">기록을 불러오지 못했어요.</p>}
+          {!isLoading && !error && records.length === 0 && <p className="py-6 text-center text-sm text-on-surface-variant">아직 진단 기록이 없어요.</p>}
           {records.map((record) => (
             <button
               className="flex items-center gap-3 rounded-[20px] border border-outline-variant/40 bg-white p-3.5 text-left shadow-soft"
               key={record.id}
+              onClick={() => navigate(`/records/${record.id}`)}
             >
               <span className="flex-1 text-sm">
                 {record.date}
-                <small className="mt-1 block text-[10px] text-on-surface-variant">
-                  {record.type === 'official' ? '정식 측정' : '자가측정 참고'}
-                </small>
+                <small className="mt-1 block text-[10px] text-on-surface-variant">{record.type === 'official' ? '정식 측정' : '자가측정 참고'}</small>
               </span>
-              <span className="text-xs text-primary">
-                <Icon name={record.grade === '새싹' ? 'seedling' : 'seedling'} /> {record.grade} 등급
-              </span>
-              <b>{record.score}점</b>
+              <span className="text-xs text-primary"><Icon name="seedling" /> {record.grade} 등급</span>
+              <b>{record.score == null ? '상세' : `${Math.round(record.score)}점`}</b>
               <Icon name="chevron_right" className="text-lg text-outline" />
             </button>
           ))}
@@ -105,6 +90,50 @@ export function RecordsPage() {
   )
 }
 
+function average(values: number[]) {
+  return values.length ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10 : undefined
+}
+
+export function MeasurementDetailPage() {
+  const navigate = useNavigate()
+  const { measurementId } = useParams()
+  const { data: measurement, isLoading, error } = useMeasurement(measurementId)
+  const deleteMutation = useDeleteMeasurement()
+
+  async function handleDelete() {
+    if (!measurement || !window.confirm('이 측정 기록을 삭제할까요?')) return
+    await deleteMutation.mutateAsync({ measurementId: measurement.id, childId: measurement.childId })
+    navigate('/records', { replace: true })
+  }
+
+  if (isLoading) {
+    return <AppLayout active="records" back><div className="grid min-h-[50vh] place-items-center text-sm text-on-surface-variant">상세 기록을 불러오고 있어요…</div></AppLayout>
+  }
+  if (error || !measurement) {
+    return <AppLayout active="records" back><p className="rounded-2xl bg-error-container p-4 text-sm text-on-error-container">측정 기록을 불러오지 못했어요.</p></AppLayout>
+  }
+
+  return (
+    <AppLayout active="records" back>
+      <PageIntro eyebrow="측정 상세" title={`${measurement.measuredAt} 기록`} description="측정 항목별 결과와 성장 프로필을 확인해보세요." />
+      <Card className="p-6">
+        <div className="flex items-center justify-between"><GradeBadge grade={measurement.grade} /><span className="text-sm text-on-surface-variant">{measurement.type === 'official' ? '정식 측정' : '자가측정'}</span></div>
+        <div className="mt-6 grid gap-2">
+          {measurement.items.map((item) => (
+            <div key={item.itemKey} className="flex items-center gap-3 rounded-2xl bg-surface-container-low p-3">
+              <span className="flex-1 text-sm">{item.label || item.itemKey}</span>
+              <b>{item.value}</b>
+              {item.isWeak && <span className="text-xs text-secondary">개선 필요</span>}
+            </div>
+          ))}
+        </div>
+      </Card>
+      <button type="button" onClick={handleDelete} disabled={deleteMutation.isPending} className="mt-4 w-full rounded-full border border-error/40 px-5 py-3 text-sm text-error disabled:opacity-50">
+        {deleteMutation.isPending ? '삭제하고 있어요…' : '측정 기록 삭제'}
+      </button>
+    </AppLayout>
+  )
+}
 export function GrowthPage() {
   const { data: child } = useChild()
   const { data: growth } = useGrowth(child?.id)

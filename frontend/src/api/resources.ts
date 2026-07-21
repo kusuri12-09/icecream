@@ -52,7 +52,11 @@ export async function getMeasurements(childId: string) {
 
 export async function getMeasurement(measurementId: string) {
   const response = await apiRequest<unknown>(`/api/v1/measurements/${measurementId}`)
-  return mapMeasurement(unwrapData<unknown>(response))
+  return mapMeasurementResult(unwrapData<unknown>(response))
+}
+
+export async function deleteMeasurement(measurementId: string) {
+  await apiRequest<unknown>('/api/v1/measurements/' + measurementId, { method: 'DELETE' })
 }
 
 export async function getGrowth(childId: string, itemKey?: string): Promise<GrowthData> {

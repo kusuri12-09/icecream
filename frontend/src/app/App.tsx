@@ -10,6 +10,7 @@ import { useCurrentUser } from '../hooks/useAuth'
 
 const RecordsPage = lazy(() => import('../pages/RecordsPages').then(({ RecordsPage: Page }) => ({ default: Page })))
 const GrowthPage = lazy(() => import('../pages/RecordsPages').then(({ GrowthPage: Page }) => ({ default: Page })))
+const MeasurementDetailPage = lazy(() => import('../pages/RecordsPages').then(({ MeasurementDetailPage: Page }) => ({ default: Page })))
 
 function RouteLoading() {
   return (
@@ -44,7 +45,7 @@ export function App() {
             <Route path="/diagnosis" element={<DiagnosisPage />} />
             <Route path="/diagnosis/input" element={<MeasurementInputPage />} />
             <Route path="/diagnosis/result" element={<DiagnosisResultPage />} />
-            <Route path="/records" element={<RecordsPage />} />
+            <Route path="/records/:measurementId" element={<MeasurementDetailPage />} />`r`n            <Route path="/records" element={<RecordsPage />} />
             <Route path="/growth" element={<GrowthPage />} />
             <Route path="/activities" element={<ActivitiesPage />} />
             <Route path="/centers" element={<CentersPage />} />

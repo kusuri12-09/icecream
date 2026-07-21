@@ -5,6 +5,7 @@ import {
   getActivities,
   getCenters,
   getGrowth,
+  deleteMeasurement,
   getMeasurement,
   getMeasurements,
   createChild,
@@ -65,6 +66,17 @@ export function useCreateMeasurement() {
     },
   })
 }
+export function useDeleteMeasurement() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { measurementId: string; childId?: string }) => deleteMeasurement(input.measurementId),
+    onSuccess: (_result, variables) => {
+      if (variables.childId) queryClient.invalidateQueries({ queryKey: ['measurements', variables.childId] })
+      queryClient.removeQueries({ queryKey: ['measurement', variables.measurementId] })
+    },
+  })
+}
+
 export const useMeasurement = (measurementId?: string) =>
   useQuery({
     queryKey: ['measurement', measurementId],
