@@ -1,12 +1,18 @@
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import quote_plus
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_env: str = "development"
-    database_url: str = "sqlite:///./icecream.db"
+    database_url: str | None = None
+    db_host: str = "localhost"
+    db_port: int = 5432
+    db_name: str = "icecream"
+    db_user: str | None = None
+    db_password: str | None = None
     jwt_secret_key: str = "dev-only-change-this-secret"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
@@ -19,6 +25,16 @@ class Settings(BaseSettings):
     @property
     def admin_email_set(self) -> set[str]:
         return {item.strip().lower() for item in self.admin_emails.split(",") if item.strip()}
+
+    @property
+    def resolved_database_url(self) -> str:
+        if self.database_url:
+            return self.database_url
+        if self.db_user and self.db_password:
+            user = quote_plus(self.db_user)
+            password = quote_plus(self.db_password)
+            return f"postgresql+psycopg://{user}:{password}@{self.db_host}:{self.db_port}/{self.db_name}"
+        return "postgresql+psycopg://icecream:icecream@localhost:5432/icecream"
 
 
 @lru_cache
