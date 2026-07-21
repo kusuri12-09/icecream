@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote_plus
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,9 +11,9 @@ class Settings(BaseSettings):
     database_url: str | None = None
     db_host: str = "localhost"
     db_port: int = 5432
-    db_name: str = "icecream"
-    db_user: str | None = None
-    db_password: str | None = None
+    db_name: str = Field(default="icecream", validation_alias=AliasChoices("POSTGRES_DB", "DB_NAME"))
+    db_user: str | None = Field(default=None, validation_alias=AliasChoices("POSTGRES_USER", "DB_USER"))
+    db_password: str | None = Field(default=None, validation_alias=AliasChoices("POSTGRES_PASSWORD", "DB_PASSWORD"))
     jwt_secret_key: str = "dev-only-change-this-secret"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
