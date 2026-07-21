@@ -65,14 +65,24 @@ export async function getGrowth(childId: string, itemKey?: string): Promise<Grow
   return unwrapData<GrowthData>(response)
 }
 
-export async function getActivities() {
-  const response = await apiRequest<unknown>('/api/v1/activities')
+export async function getActivities(params: { fitnessElement?: string; measurementId?: string } = {}) {
+  const query = new URLSearchParams()
+  if (params.fitnessElement) query.set('fitnessElement', params.fitnessElement)
+  if (params.measurementId) query.set('measurementId', params.measurementId)
+  const queryString = query.toString()
+  const response = await apiRequest<unknown>('/api/v1/activities' + (queryString ? '?' + queryString : ''))
   const data = unwrapData<{ items?: unknown[] }>(response)
   return (data.items ?? []).map(mapActivity)
 }
 
-export async function getCenters() {
-  const response = await apiRequest<unknown>('/api/v1/centers')
+export async function getCenters(params: { lat?: number; lng?: number; radiusKm?: number; sidoSigungu?: string } = {}) {
+  const query = new URLSearchParams()
+  if (params.lat != null) query.set('lat', String(params.lat))
+  if (params.lng != null) query.set('lng', String(params.lng))
+  if (params.radiusKm != null) query.set('radiusKm', String(params.radiusKm))
+  if (params.sidoSigungu) query.set('sidoSigungu', params.sidoSigungu)
+  const queryString = query.toString()
+  const response = await apiRequest<unknown>('/api/v1/centers' + (queryString ? '?' + queryString : ''))
   const data = unwrapData<{ items?: unknown[] }>(response)
   return (data.items ?? []).map(mapCenter)
 }
