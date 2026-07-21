@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "title": "국민체력100 유아기 체력인증 기준표",
+    "ageGroup": "preschool",
+    "ageRangeMonths": [48, 83],
+    "source": "국민체육진흥공단 국민체력100 인증기준 (문화체육관광부 고시 제2025-0027호 기반)",
+    "sourceUrl": "https://nfa.kspo.or.kr/reserve/0/selectMeasureGradeItemListByAgeSe.kspo",
+    "note": "유아기 측정은 참고용으로 인증서가 발급되지 않으며 등급(씨앗·새싹·꽃·열매)만 판정한다. 성인·어르신식 조건부 혼합 로직은 없다.",
+    "version": "2025",
+    "gradeOrder": ["fruit", "flower", "sprout", "seed"],
+    "comparisonRules": {
+      "higher": "측정값 >= 기준값 이면 충족 (클수록 우수)",
+      "lower": "측정값 <= 기준값 이면 충족 (시간 항목: 민첩성·협응력, 작을수록 우수)",
+      "bmi": "측정값 < 기준값 이면 충족 (원문 부등호 '<' 반영, strict 미만)"
+    },
+    "judgeLogic": "gradeOrder 순서대로(fruit→flower→sprout) 각 등급의 requiredItems가 모두 충족되는 첫 등급을 부여. 어느 것도 충족 못하면 seed. 특정 등급의 requiredItems 중 미입력 값이 있으면 그 등급은 판정 불가(다음 등급으로), 단 seed는 항상 폴백 가능."
+  },
+  "items": {
+    "cardio":       { "label": "심폐지구력", "measure": "10m 왕복오래달리기", "unit": "회",  "direction": "higher", "category": "health" },
+    "grip":         { "label": "근력",     "measure": "상대악력",           "unit": "%",  "direction": "higher", "category": "health" },
+    "muscularEnd":  { "label": "근지구력",  "measure": "윗몸말아올리기",       "unit": "회",  "direction": "higher", "category": "health" },
+    "flexibility":  { "label": "유연성",    "measure": "앉아윗몸앞으로굽히기",  "unit": "cm", "direction": "higher", "category": "health" },
+    "agility":      { "label": "민첩성",    "measure": "5m×4 왕복달리기",     "unit": "초",  "direction": "lower",  "category": "motor" },
+    "power":        { "label": "순발력",    "measure": "제자리멀리뛰기",       "unit": "cm", "direction": "higher", "category": "motor" },
+    "coordination": { "label": "협응력",    "measure": "3×3 버튼누르기",      "unit": "초",  "direction": "lower",  "category": "motor" },
+    "bmi":          { "label": "신체조성",  "measure": "BMI",              "unit": "kg/㎡", "direction": "lower",  "category": "body" }
+  },
+  "gradeRules": {
+    "fruit":  { "requiredItems": ["cardio", "grip", "muscularEnd", "flexibility", "agility", "power", "coordination"], "rule": "all" },
+    "flower": { "requiredItems": ["cardio", "grip", "muscularEnd", "flexibility", "agility", "power", "coordination"], "rule": "all" },
+    "sprout": { "requiredItems": ["cardio", "grip", "muscularEnd", "flexibility", "bmi"], "rule": "all" },
+    "seed":   { "requiredItems": [], "rule": "fallback" }
+  },
+  "thresholds": {
+    "fruit": {
+      "male": {
+        "48-53": { "cardio": 48, "grip": 49.3, "muscularEnd": 4,  "flexibility": 13,   "agility": 11.06, "power": 86,  "coordination": 31.53 },
+        "54-59": { "cardio": 59, "grip": 52.9, "muscularEnd": 5,  "flexibility": 13,   "agility": 9.88,  "power": 97,  "coordination": 26.28 },
+        "60-65": { "cardio": 63, "grip": 53.8, "muscularEnd": 9,  "flexibility": 12,   "agility": 9.46,  "power": 105, "coordination": 23.21 },
+        "66-71": { "cardio": 78, "grip": 54.1, "muscularEnd": 9,  "flexibility": 13,   "agility": 9.13,  "power": 110, "coordination": 22.48 },
+        "72-83": { "cardio": 93, "grip": 56.3, "muscularEnd": 13, "flexibility": 12.5, "agility": 8.8,   "power": 118, "coordination": 21.37 }
+      },
+      "female": {
+        "48-53": { "cardio": 49, "grip": 44.3, "muscularEnd": 2,  "flexibility": 14.3, "agility": 11.06, "power": 83,  "coordination": 30.72 },
+        "54-59": { "cardio": 62, "grip": 51.1, "muscularEnd": 5,  "flexibility": 14.3, "agility": 10.21, "power": 90,  "coordination": 26.76 },
+        "60-65": { "cardio": 67, "grip": 48.9, "muscularEnd": 8,  "flexibility": 14,   "agility": 10.31, "power": 95,  "coordination": 25.04 },
+        "66-71": { "cardio": 73, "grip": 53.7, "muscularEnd": 10, "flexibility": 15,   "agility": 9.58,  "power": 103, "coordination": 23.21 },
+        "72-83": { "cardio": 84, "grip": 51.9, "muscularEnd": 13, "flexibility": 15,   "agility": 9.19,  "power": 106, "coordination": 21.91 }
+      }
+    },
+    "flower": {
+      "male": {
+        "48-53": { "cardio": 35, "grip": 41.4, "muscularEnd": 0, "flexibility": 10.7, "agility": 11.73, "power": 76,  "coordination": 33.5 },
+        "54-59": { "cardio": 44, "grip": 46.1, "muscularEnd": 1, "flexibility": 10.5, "agility": 10.73, "power": 92,  "coordination": 28.88 },
+        "60-65": { "cardio": 48, "grip": 47.4, "muscularEnd": 5, "flexibility": 10.1, "agility": 10.12, "power": 95,  "coordination": 25.39 },
+        "66-71": { "cardio": 57, "grip": 48.8, "muscularEnd": 5, "flexibility": 10,   "agility": 9.81,  "power": 102, "coordination": 24.38 },
+        "72-83": { "cardio": 64, "grip": 49.6, "muscularEnd": 8, "flexibility": 10.5, "agility": 9.33,  "power": 110, "coordination": 22.74 }
+      },
+      "female": {
+        "48-53": { "cardio": 36, "grip": 40.3, "muscularEnd": 0, "flexibility": 12.5, "agility": 11.8,  "power": 70,  "coordination": 33.43 },
+        "54-59": { "cardio": 50, "grip": 43.7, "muscularEnd": 1, "flexibility": 12.7, "agility": 11,    "power": 86,  "coordination": 28.59 },
+        "60-65": { "cardio": 53, "grip": 42.8, "muscularEnd": 3, "flexibility": 12.3, "agility": 10.81, "power": 88,  "coordination": 27.42 },
+        "66-71": { "cardio": 55, "grip": 46.8, "muscularEnd": 6, "flexibility": 12.2, "agility": 10.19, "power": 96,  "coordination": 24.95 },
+        "72-83": { "cardio": 60, "grip": 47.4, "muscularEnd": 9, "flexibility": 12.7, "agility": 9.72,  "power": 100, "coordination": 23.52 }
+      }
+    },
+    "sprout": {
+      "male": {
+        "48-53": { "cardio": 25, "grip": 36.1, "muscularEnd": 0, "flexibility": 8.2, "bmi": 17.5 },
+        "54-59": { "cardio": 34, "grip": 40.6, "muscularEnd": 0, "flexibility": 7.8, "bmi": 18.1 },
+        "60-65": { "cardio": 31, "grip": 41.7, "muscularEnd": 1, "flexibility": 7,   "bmi": 19.2 },
+        "66-71": { "cardio": 38, "grip": 41.3, "muscularEnd": 1, "flexibility": 7,   "bmi": 18.7 },
+        "72-83": { "cardio": 45, "grip": 43.2, "muscularEnd": 4, "flexibility": 8,   "bmi": 19.5 }
+      },
+      "female": {
+        "48-53": { "cardio": 28, "grip": 34.3, "muscularEnd": 0, "flexibility": 10,  "bmi": 17.5 },
+        "54-59": { "cardio": 36, "grip": 37.3, "muscularEnd": 0, "flexibility": 10,  "bmi": 17.7 },
+        "60-65": { "cardio": 39, "grip": 37.9, "muscularEnd": 0, "flexibility": 9.9, "bmi": 18.1 },
+        "66-71": { "cardio": 41, "grip": 39.8, "muscularEnd": 2, "flexibility": 10,  "bmi": 18.1 },
+        "72-83": { "cardio": 42, "grip": 41.5, "muscularEnd": 5, "flexibility": 10,  "bmi": 18.3 }
+      }
+    }
+  }
+}
