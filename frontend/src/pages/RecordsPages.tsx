@@ -1,7 +1,7 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AppLayout, Card, SectionTitle } from '../components/AppLayout'
 import { Icon } from '../components/Icon'
-import { useRecords } from '../hooks/useFitnessData'
+import { useChild, useGrowth, useRecords } from '../hooks/useFitnessData'
 
 const chartData = [
   { month: '2023.01', official: 42, self: 36 },
@@ -106,17 +106,23 @@ export function RecordsPage() {
 }
 
 export function GrowthPage() {
-  const metrics = [
-    ['유연성', '94%', '+18%', 'bg-primary'],
-    ['순발력', '82%', '+12%', 'bg-secondary'],
-    ['근력', '55%', '+8%', 'bg-[#b4ad8d]'],
-    ['지구력', '68%', '+15%', 'bg-primary'],
-  ] as const
+  const { data: child } = useChild()
+  const { data: growth } = useGrowth(child?.id)
+  const metricColors = ['bg-primary', 'bg-secondary', 'bg-[#b4ad8d]', 'bg-primary'] as const
+  const metrics = (growth?.series ?? []).slice(0, 4).map((series, index) => {
+    const latest = series.points.at(-1)
+    const previous = series.points.at(-2)
+    const score = latest ? `${Math.min(100, Math.round(latest.value))}%` : '-'
+    const change = latest && previous ? `${latest.value - previous.value >= 0 ? '+' : ''}${Math.round(latest.value - previous.value)}%` : ''
+    return [series.label, score, change, metricColors[index % metricColors.length]] as const
+  })
+  const overallScore = metrics[0]?.[1] ?? '-'
+
   return (
     <AppLayout active="records">
       <PageIntro
         eyebrow="성장 리포트"
-        title="망고의 변화가 보여요"
+        title={`${child?.name ?? '아이'}의 변화가 보여요`}
         description={
           <>
             지난 측정과 비교해 좋아진 점을
@@ -127,28 +133,23 @@ export function GrowthPage() {
       />
       <Card className="flex items-center gap-5 bg-gradient-to-br from-white to-[#f0fbf6] p-6">
         <div className="grid size-28 flex-none place-items-center rounded-full border-[10px] border-primary-container border-r-primary">
-          <b className="font-display text-3xl text-primary">72</b>
+          <b className="font-display text-3xl text-primary">{overallScore}</b>
           <small className="-mt-1 text-[10px] text-on-surface-variant">종합 점수</small>
         </div>
         <div>
-          <span className="rounded-full bg-primary-container px-3 py-2 text-xs text-primary">지난 측정보다 +14점</span>
-          <h2 className="mt-4 font-display text-xl">새싹 등급</h2>
+          <span className="rounded-full bg-primary-container px-3 py-2 text-xs text-primary">
+            {growth?.gradeHistory.at(-1)?.grade ?? '측정 기록을 불러오는 중이에요'}
+          </span>
+          <h2 className="mt-4 font-display text-xl">성장 추이</h2>
           <p className="mt-1 text-xs leading-5 text-on-surface-variant">
-            꾸준한 활동으로
+            측정 기록을 바탕으로
             <br />
-            기초 체력이 좋아졌어요.
+            성장 흐름을 확인해보세요.
           </p>
         </div>
       </Card>
       <section className="mt-7">
-        <SectionTitle
-          title="항목별 변화"
-          action={
-            <button className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
-              최근 1년 <Icon name="expand_more" className="text-base" />
-            </button>
-          }
-        />
+        <SectionTitle title="항목별 변화" />
         <div className="mt-3 grid gap-2">
           {metrics.map(([name, score, change, color]) => (
             <div
@@ -162,7 +163,7 @@ export function GrowthPage() {
                 {name}
               </span>
               <span className="h-2 overflow-hidden rounded-full bg-surface-container">
-                <i className={`block h-full rounded-full ${color}`} style={{ width: score }} />
+                <i className={`block h-full rounded-full ${color}`} style={{ width: score === '-' ? '0%' : score }} />
               </span>
               <strong className="text-right text-xs">{score}</strong>
               <em className="text-right text-[11px] not-italic text-primary">{change}</em>
@@ -175,16 +176,15 @@ export function GrowthPage() {
           <Icon name="flag" className="text-base" />
           다음 목표
         </span>
-        <h2 className="mt-4 font-display text-lg">꽃 등급까지 12포인트</h2>
+        <h2 className="mt-4 font-display text-lg">다음 성장 단계를 향해 가고 있어요</h2>
         <div className="mt-4 h-2.5 rounded-full bg-surface-container">
           <span className="block h-full w-3/4 rounded-full bg-gradient-to-r from-primary-container to-primary" />
         </div>
-        <p className="mt-3 text-xs text-on-surface-variant">조금만 더 힘내면 다음 성장 단계에 도달해요!</p>
+        <p className="mt-3 text-xs text-on-surface-variant">측정 기록이 쌓일수록 변화가 더 선명해져요.</p>
       </Card>
     </AppLayout>
   )
 }
-
 function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: React.ReactNode }) {
   return (
     <section className="px-2 pb-6">

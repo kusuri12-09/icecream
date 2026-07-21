@@ -5,16 +5,20 @@ export interface ChildProfile {
   id: string
   name: string
   ageLabel: string
+  ageMonths?: number
   gender: 'male' | 'female'
   avatarIcon: string
+  birthYearMonth?: string
+  inTargetRange?: boolean
 }
 
 export interface MeasurementRecord {
   id: string
   date: string
+  measuredAt?: string
   type: MeasurementType
   grade: Grade
-  score: number
+  score?: number
   strengths: string[]
   needsWork: string[]
 }
@@ -23,11 +27,12 @@ export interface Activity {
   id: string
   title: string
   category: string
-  place: '실내' | '야외'
-  duration: string
+  place?: '실내' | '야외'
+  duration?: string
   icon: string
   description: string
-  equipment: boolean
+  equipment?: boolean
+  url?: string
 }
 
 export interface Center {
@@ -37,4 +42,40 @@ export interface Center {
   distance: string
   icon: string
   open: boolean
+  reservationUrl?: string
+  stale?: boolean
+}
+
+export interface GrowthPoint {
+  measuredAt: string
+  value: number
+  type: 'OFFICIAL' | 'SELF'
+}
+
+export interface GrowthSeries {
+  itemKey: string
+  label: string
+  unit: string
+  points: GrowthPoint[]
+}
+
+export interface GrowthData {
+  childId: string
+  series: GrowthSeries[]
+  gradeHistory: Array<{ measuredAt: string; grade: string }>
+}
+export interface RegionalInsight {
+  region: string
+  regionMeasureCount: number
+  nationalAvg: number
+  relativeLevel: string
+  percentile?: number
+  message: string
+  cta?: { type: string; label: string }
+}
+
+export interface RegionalRegion {
+  sidoSigungu: string
+  measureCount: number
+  participationRate: number
 }

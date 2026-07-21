@@ -4,7 +4,7 @@ import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayo
 import { Character } from '../components/Character'
 import { Icon } from '../components/Icon'
 import { PrimaryButton } from '../components/Button'
-import { useChild } from '../hooks/useFitnessData'
+import { useChild, useRegionalInsight, useRegionalMap } from '../hooks/useFitnessData'
 
 export function OnboardingPage() {
   const navigate = useNavigate()
@@ -323,13 +323,9 @@ function DashboardAction({
 }
 
 export function RegionalPage() {
-  const bars = [
-    ['송파구', 82],
-    ['강남구', 71],
-    ['서초구', 64],
-    ['마포구', 53],
-    ['용산구', 45],
-  ] as const
+  const { data: insight } = useRegionalInsight()
+  const { data: regionalMap = [] } = useRegionalMap()
+  const bars = regionalMap.slice(0, 5).map((region) => [region.sidoSigungu, Math.round(region.participationRate * 100)] as const)
   return (
     <AppLayout active="centers">
       <PageHeading
@@ -349,7 +345,7 @@ export function RegionalPage() {
         </div>
         <div>
           <span className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-semibold text-primary">
-            송파구 상위 1위
+            {insight?.region ?? '우리 지역'} 참여 현황
           </span>
           <h2 className="mt-3 font-display text-xl font-bold leading-tight text-primary">
             우리 동네는

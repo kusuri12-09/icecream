@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Icon } from './Icon'
+import { useAuthActions } from '../hooks/useAuth'
 
 type NavKey = 'home' | 'diagnosis' | 'records' | 'centers'
 
@@ -21,6 +22,7 @@ const navItems: Array<[NavKey, string, string, string]> = [
 export function AppLayout({ children, active, back = false, className = '' }: AppLayoutProps) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const { logout } = useAuthActions()
   return (
     <main
       id="main-content"
@@ -85,6 +87,19 @@ export function AppLayout({ children, active, back = false, className = '' }: Ap
               <Icon name="map" className="mr-2" />
               지역 인사이트
             </NavLink>
+            <button
+              type="button"
+              role="menuitem"
+              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm text-error hover:bg-error-container/40"
+              onClick={() => {
+                logout()
+                setMenuOpen(false)
+                navigate('/login', { replace: true })
+              }}
+            >
+              <Icon name="logout" className="mr-2" />
+              로그아웃
+            </button>
           </div>
         )}
       </header>
