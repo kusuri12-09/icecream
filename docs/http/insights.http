@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:8000
+@accessToken = REPLACE_WITH_ACCESS_TOKEN
+
+### 지역 인사이트
+GET {{baseUrl}}/api/v1/insights/regional?sidoSigungu=서울%20강남구
+Authorization: Bearer {{accessToken}}
+
+### 지역 인사이트 - 기본 지역
+GET {{baseUrl}}/api/v1/insights/regional
+Authorization: Bearer {{accessToken}}
+
+### 지역별 지도 및 랭킹
+GET {{baseUrl}}/api/v1/insights/regional/map
+Authorization: Bearer {{accessToken}}

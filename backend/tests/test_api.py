@@ -1,13 +1,19 @@
 import os
 
 os.environ["DATABASE_URL"] = "sqlite:///./test.sqlite3"
+os.environ["DB_USER"] = ""
+os.environ["DB_PASSWORD"] = ""
 os.environ["JWT_SECRET_KEY"] = "test-secret"
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db import Base, engine
+from app.db import Base, SessionLocal, engine
+from app.core.config import get_settings
+from app.core.security import create_access_token
+from app.external.kspo_client import ActivityRecord, CenterRecord
 from app.main import app
+from app.models import ActivityVideo, Center, Parent
 from app.services.diagnosis_engine import judge
 
 
@@ -115,3 +121,189 @@ def test_private_api_requires_bearer(client: TestClient):
     response = client.get("/api/v1/children")
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "AUTH_UNAUTHORIZED"
+
+
+def auth_headers(client: TestClient, email: str) -> dict[str, str]:
+    response = client.post("/api/v1/auth/signup", json={"email": email, "password": "password123"})
+    assert response.status_code == 201
+    return {"Authorization": f"Bearer {response.json()['data']['accessToken']}"}
+
+
+def create_child(client: TestClient, headers: dict[str, str]) -> str:
+    response = client.post(
+        "/api/v1/children",
+        headers=headers,
+        json={"nickname": "콩이", "gender": "MALE", "birthYearMonth": "2021-05"},
+    )
+    assert response.status_code == 201
+    return response.json()["data"]["id"]
+
+
+def create_fruit_measurement(client: TestClient, headers: dict[str, str], child_id: str) -> str:
+    response = client.post(
+        f"/api/v1/children/{child_id}/measurements",
+        headers=headers,
+        json={
+            "type": "OFFICIAL",
+            "measuredAt": "2026-07-19",
+            "items": [
+                {"itemKey": "CARDIO", "value": 63},
+                {"itemKey": "GRIP", "value": 53.8},
+                {"itemKey": "MUSCULAR_END", "value": 9},
+                {"itemKey": "FLEXIBILITY", "value": 12},
+                {"itemKey": "AGILITY", "value": 9.46},
+                {"itemKey": "POWER", "value": 105},
+                {"itemKey": "COORDINATION", "value": 23.21},
+            ],
+        },
+    )
+    assert response.status_code == 201
+    return response.json()["data"]["id"]
+
+
+def test_children_crud_and_measurement_ownership(client: TestClient):
+    owner_headers = auth_headers(client, "crud@example.com")
+    other_headers = auth_headers(client, "other@example.com")
+    child_id = create_child(client, owner_headers)
+
+    listed = client.get("/api/v1/children", headers=owner_headers)
+    assert listed.status_code == 200
+    assert listed.json()["data"]["totalElements"] == 1
+
+    updated = client.patch(
+        f"/api/v1/children/{child_id}",
+        headers=owner_headers,
+        json={"nickname": "수정된 콩이"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["data"]["nickname"] == "수정된 콩이"
+
+    denied = client.get(f"/api/v1/children/{child_id}", headers=other_headers)
+    assert denied.status_code == 403
+    assert denied.json()["error"]["code"] == "CHILD_ACCESS_DENIED"
+
+    measurement_id = create_fruit_measurement(client, owner_headers, child_id)
+    deleted = client.delete(f"/api/v1/children/{child_id}", headers=owner_headers)
+    assert deleted.status_code == 200
+    assert client.get(f"/api/v1/children/{child_id}", headers=owner_headers).status_code == 404
+    assert client.get(f"/api/v1/measurements/{measurement_id}", headers=owner_headers).status_code == 404
+
+
+def test_measurement_detail_growth_and_delete(client: TestClient):
+    headers = auth_headers(client, "measurement@example.com")
+    child_id = create_child(client, headers)
+    measurement_id = create_fruit_measurement(client, headers, child_id)
+
+    detail = client.get(f"/api/v1/measurements/{measurement_id}", headers=headers)
+    assert detail.status_code == 200
+    assert detail.json()["data"]["profile"]["strengths"]
+
+    growth = client.get(f"/api/v1/children/{child_id}/growth?itemKey=CARDIO", headers=headers)
+    assert growth.status_code == 200
+    assert growth.json()["data"]["series"][0]["itemKey"] == "CARDIO"
+    assert growth.json()["data"]["series"][0]["points"][0]["type"] == "OFFICIAL"
+
+    deleted = client.delete(f"/api/v1/measurements/{measurement_id}", headers=headers)
+    assert deleted.status_code == 200
+    assert client.get(f"/api/v1/measurements/{measurement_id}", headers=headers).status_code == 404
+
+
+def test_measurement_creation_rejects_invalid_age_and_duplicate_items(client: TestClient):
+    headers = auth_headers(client, "invalid-measurement@example.com")
+    child = client.post(
+        "/api/v1/children",
+        headers=headers,
+        json={"nickname": "큰이", "gender": "MALE", "birthYearMonth": "2018-01"},
+    )
+    child_id = child.json()["data"]["id"]
+    invalid_age = client.post(
+        f"/api/v1/children/{child_id}/measurements",
+        headers=headers,
+        json={"type": "SELF", "measuredAt": "2026-07-19", "items": [{"itemKey": "CARDIO", "value": 10}]},
+    )
+    assert invalid_age.status_code == 422
+    duplicate_items = client.post(
+        f"/api/v1/children/{child_id}/measurements",
+        headers=headers,
+        json={
+            "type": "SELF",
+            "measuredAt": "2022-01-19",
+            "items": [{"itemKey": "CARDIO", "value": 10}, {"itemKey": "CARDIO", "value": 11}],
+        },
+    )
+    assert duplicate_items.status_code == 422
+
+
+def test_centers_activities_and_regional_insights(client: TestClient):
+    headers = auth_headers(client, "content@example.com")
+    db = SessionLocal()
+    db.add_all(
+        [
+            Center(ext_center_id="center-1", name="강남 센터", address="서울 강남구 테헤란로 1", sido_sigungu="서울 강남구", latitude=37.5, longitude=127.0, measure_count=10),
+            Center(ext_center_id="center-2", name="부산 센터", address="부산 해운대구 센텀로 1", sido_sigungu="부산 해운대구", latitude=35.1, longitude=129.1, measure_count=2),
+        ]
+    )
+    db.add(ActivityVideo(ext_video_id="video-1", title="심폐 운동", fitness_element="CARDIO", age_group="PRESCHOOL", url="https://example.com/video"))
+    db.commit()
+    db.close()
+
+    centers = client.get("/api/v1/centers?sidoSigungu=%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%82%A8%EA%B5%AC&lat=37.5&lng=127.0", headers=headers)
+    assert centers.status_code == 200
+    assert centers.json()["data"]["items"][0]["name"] == "강남 센터"
+    assert centers.json()["data"]["items"][0]["distanceKm"] == 0
+
+    activities = client.get("/api/v1/activities?fitnessElement=CARDIO&ageGroup=PRESCHOOL", headers=headers)
+    assert activities.status_code == 200
+    assert activities.json()["data"]["items"][0]["fitnessElement"] == "CARDIO"
+
+    insight = client.get("/api/v1/insights/regional?sidoSigungu=%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%82%A8%EA%B5%AC", headers=headers)
+    assert insight.status_code == 200
+    assert insight.json()["data"]["regionMeasureCount"] == 10
+
+    region_map = client.get("/api/v1/insights/regional/map", headers=headers)
+    assert region_map.status_code == 200
+    assert region_map.json()["data"]["fallback"] is False
+
+
+def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    settings = get_settings()
+    original = (settings.kspo_api_key, settings.kspo_center_url, settings.kspo_activity_url)
+    settings.kspo_api_key = "test-key"
+    settings.kspo_center_url = "https://example.com/centers"
+    settings.kspo_activity_url = "https://example.com/activities"
+
+    class FakeKspoClient:
+        def __init__(self, api_key: str):
+            assert api_key == "test-key"
+
+        def fetch_centers(self, url: str) -> list[CenterRecord]:
+            assert url.endswith("centers")
+            return [CenterRecord("sync-center", "동기화 센터", "서울 중구 세종대로 1", "서울 중구", 37.56, 126.97)]
+
+        def fetch_activities(self, url: str) -> list[ActivityRecord]:
+            assert url.endswith("activities")
+            return [ActivityRecord("sync-video", "동기화 운동", "CARDIO", "PRESCHOOL", "https://example.com/sync")]
+
+    monkeypatch.setattr("app.api.v1.internal.KspoClient", FakeKspoClient)
+    db = SessionLocal()
+    admin = Parent(email="admin@example.com", password_hash="unused", is_admin=True)
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+    token = create_access_token(admin.id, True)
+    db.close()
+
+    try:
+        response = client.post(
+            "/api/v1/internal/sync",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"targets": ["CENTERS", "ACTIVITIES"]},
+        )
+        assert response.status_code == 200
+        assert response.json()["data"]["synced"] == {"centers": 1, "activities": 1}
+        db = SessionLocal()
+        assert db.query(Center).filter_by(ext_center_id="sync-center").count() == 1
+        assert db.query(ActivityVideo).filter_by(ext_video_id="sync-video").count() == 1
+        db.close()
+    finally:
+        settings.kspo_api_key, settings.kspo_center_url, settings.kspo_activity_url = original
