@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { MeasurementRequest } from '../types/models'
 import {
+  createMeasurement,
   getActivities,
   getCenters,
   getGrowth,
@@ -52,6 +54,17 @@ export const useRecords = () => {
 
 export const useActivities = () => useQuery({ queryKey: ['activities'], queryFn: getActivities })
 export const useCenters = () => useQuery({ queryKey: ['centers'], queryFn: getCenters })
+export function useCreateMeasurement() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { childId: string; request: MeasurementRequest }) =>
+      createMeasurement(input.childId, input.request),
+    onSuccess: (_result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['measurements', variables.childId] })
+      queryClient.invalidateQueries({ queryKey: ['growth', variables.childId] })
+    },
+  })
+}
 export const useMeasurement = (measurementId?: string) =>
   useQuery({
     queryKey: ['measurement', measurementId],

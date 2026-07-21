@@ -1,5 +1,5 @@
 import { apiRequest, unwrapData } from './client'
-import type { Activity, Center, ChildProfile, MeasurementRecord, RegionalInsight, RegionalRegion, GrowthData } from '../types/models'
+import type { Activity, Center, ChildProfile, MeasurementRecord, RegionalInsight, RegionalRegion, GrowthData, MeasurementRequest, MeasurementResult } from '../types/models'
 
 const gradeNames: Record<string, MeasurementRecord['grade']> = {
   SEED: '씨앗',
@@ -37,6 +37,13 @@ export async function getChild(childId: string) {
   return mapChild(unwrapData<unknown>(response))
 }
 
+export async function createMeasurement(childId: string, input: MeasurementRequest) {
+  const response = await apiRequest<unknown>(`/api/v1/children/${childId}/measurements`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+  return mapMeasurementResult(unwrapData<unknown>(response))
+}
 export async function getMeasurements(childId: string) {
   const response = await apiRequest<unknown>(`/api/v1/children/${childId}/measurements`)
   const data = unwrapData<{ items?: unknown[] }>(response)
@@ -94,6 +101,41 @@ function mapChild(value: unknown): ChildProfile {
   }
 }
 
+function mapMeasurementResult(value: unknown): MeasurementResult {
+  const measurement = asRecord(value)
+  const profile = asRecord(measurement.profile)
+  const grade = gradeNames[stringValue(measurement.grade).toUpperCase()] ?? '씨앗'
+  const type = stringValue(measurement.type).toUpperCase() === 'SELF' ? 'self' : 'official'
+  const items = Array.isArray(measurement.items)
+    ? measurement.items.map((item) => {
+        const mapped = asRecord(item)
+        return {
+          itemKey: stringValue(mapped.itemKey),
+          label: stringValue(mapped.label),
+          value: typeof mapped.value === 'number' ? mapped.value : 0,
+          itemGrade: gradeNames[stringValue(mapped.itemGrade).toUpperCase()],
+          isWeak: mapped.isWeak === true,
+        }
+      })
+    : []
+  const center = asRecord(measurement.center)
+  return {
+    id: stringValue(measurement.id),
+    childId: stringValue(measurement.childId),
+    type,
+    measuredAt: stringValue(measurement.measuredAt),
+    ageMonthsAtMeasure: typeof measurement.ageMonthsAtMeasure === 'number' ? measurement.ageMonthsAtMeasure : undefined,
+    grade,
+    center: measurement.center ? { id: stringValue(center.id), name: stringValue(center.name) } : null,
+    items,
+    profile: {
+      strengths: arrayOfStrings(profile.strengths),
+      weaknesses: arrayOfStrings(profile.weaknesses),
+      undecidableGrades: arrayOfStrings(profile.undecidableGrades),
+    },
+    createdAt: stringValue(measurement.createdAt),
+  }
+}
 function mapMeasurement(value: unknown): MeasurementRecord {
   const measurement = asRecord(value)
   const grade = gradeNames[stringValue(measurement.grade).toUpperCase()] ?? '씨앗'

@@ -23,6 +23,33 @@ export interface MeasurementRecord {
   needsWork: string[]
 }
 
+export interface MeasurementRequest {
+  type: 'OFFICIAL' | 'SELF'
+  measuredAt: string
+  centerId?: string | null
+  items: Array<{ itemKey: string; value: number }>
+}
+
+export interface MeasurementItemResult {
+  itemKey: string
+  label: string
+  value: number
+  itemGrade?: Grade
+  isWeak: boolean
+}
+
+export interface MeasurementResult {
+  id: string
+  childId: string
+  type: MeasurementType
+  measuredAt: string
+  ageMonthsAtMeasure?: number
+  grade: Grade
+  center?: { id: string; name: string } | null
+  items: MeasurementItemResult[]
+  profile: { strengths: string[]; weaknesses: string[]; undecidableGrades: string[] }
+  createdAt?: string
+}
 export interface Activity {
   id: string
   title: string
