@@ -1,6 +1,8 @@
 import os
 
 os.environ["DATABASE_URL"] = "sqlite:///./test.sqlite3"
+os.environ["DB_USER"] = ""
+os.environ["DB_PASSWORD"] = ""
 os.environ["JWT_SECRET_KEY"] = "test-secret"
 
 import pytest
