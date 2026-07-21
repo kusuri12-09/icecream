@@ -1,7 +1,5 @@
 # Material Symbols 사용 목록
 
-파일명은 기존 문서 경로와의 호환성을 위해 유지하고 있지만, 프로젝트 아이콘 라이브러리는 Remix Icon에서 Material Symbols Rounded로 변경했다.
-
 화면 아이콘은 `frontend/src/components/Icon.tsx`의 공통 `Icon` 컴포넌트를 통해 사용한다. 페이지에서 Material Symbols의 ligature 이름을 직접 작성하지 않고, `Icon`의 의미 있는 공통 이름을 전달한다.
 
 Material Symbols Rounded 폰트는 `frontend/src/main.tsx`에서 `material-symbols/rounded.css`로 로드한다. 폰트 파일은 `material-symbols` npm 패키지에 포함되어 Vite 빌드에 번들된다.

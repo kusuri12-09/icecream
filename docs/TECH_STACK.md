@@ -39,7 +39,7 @@
 | 데이터베이스 | PostgreSQL | 회원·자녀·측정 기록·공공데이터 저장 |
 | 마이그레이션 | Alembic | 스키마 변경 이력 관리 |
 | 인증 | 이메일/비밀번호 + JWT | PRD의 이메일 기반 회원 기능 구현 |
-| 비밀번호 보안 | Argon2id 또는 bcrypt | 비밀번호 단방향 해시 저장 |
+| 비밀번호 보안 | Argon2id | 비밀번호 단방향 해시 저장 |
 | 외부 연동 | `httpx` | 공공데이터포털 API 호출 |
 | 테스트 | Pytest / Vitest / React Testing Library | 백엔드·프론트엔드 검증 |
 | 코드 품질 | Ruff / mypy / ESLint / Prettier | 정적 검사와 일관된 포맷 (`npm run format`, `npm run format:check`) |
