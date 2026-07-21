@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Character } from '../components/Character'
+import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
 import { Icon } from '../components/Icon'
 import { PrimaryButton } from '../components/Button'
 import { useChild, useRegionalInsight, useRegionalMap, useSaveChild } from '../hooks/useFitnessData'
@@ -86,7 +87,9 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
             <Icon name="face" />
           </span>
           <div>
-            <p className="font-label text-xs font-semibold text-on-surface-variant">{child ? '프로필을 수정해요' : '처음이시라면'}</p>
+            <p className="font-label text-xs font-semibold text-on-surface-variant">
+              {child ? '프로필을 수정해요' : '처음이시라면'}
+            </p>
             <h2 className="font-display text-lg font-bold tracking-[-.06em]">아이 프로필을 등록해요</h2>
           </div>
         </div>
@@ -98,6 +101,7 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
               aria-invalid={Boolean(error && !nickname.trim())}
+              aria-describedby={error ? 'profile-error' : undefined}
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary focus:ring-4 focus:ring-primary-container/50"
               placeholder="아이 이름을 입력해주세요"
             />
@@ -131,12 +135,18 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
               type="month"
               name="birthYearMonth"
               value={birthYearMonth}
+              aria-invalid={Boolean(error && !birthYearMonth)}
+              aria-describedby={error ? 'profile-error' : undefined}
               onChange={(event) => setBirthYearMonth(event.target.value)}
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary"
             />
           </label>
           {error && (
-            <p role="alert" className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">
+            <p
+              id="profile-error"
+              role="alert"
+              className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container"
+            >
               {error}
             </p>
           )}
@@ -177,7 +187,11 @@ export function HomePage() {
         <SectionTitle
           title="최근 활동 기록"
           action={
-            <button className="font-display text-sm font-bold text-primary" onClick={() => navigate('/records')}>
+            <button
+              type="button"
+              className="font-display text-sm font-bold text-primary"
+              onClick={() => navigate('/records')}
+            >
               전체보기
             </button>
           }
@@ -243,6 +257,7 @@ export function HomePage() {
         ))}
       </div>
       <button
+        type="button"
         className="fixed bottom-24 right-[max(24px,calc(50%_-_220px))] z-20 grid size-14 place-items-center rounded-full bg-primary text-white shadow-lg"
         onClick={() => navigate('/diagnosis/input')}
       >
@@ -269,6 +284,7 @@ function ActivityTile({
 }) {
   return (
     <button
+      type="button"
       className="min-h-48 rounded-3xl border border-outline-variant/40 bg-white p-5 text-left shadow-soft"
       onClick={onClick}
     >
@@ -292,7 +308,36 @@ function ActivityTile({
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const { data: child } = useChild()
+  const { data: child, isLoading, error, refetch } = useChild()
+  if (isLoading)
+    return (
+      <AppLayout active="home">
+        <LoadingState message="대시보드를 준비하고 있어요…" />
+      </AppLayout>
+    )
+  if (error)
+    return (
+      <AppLayout active="home">
+        <ErrorState message="자녀 정보를 불러오지 못했어요." onRetry={() => void refetch()} />
+      </AppLayout>
+    )
+  if (!child)
+    return (
+      <AppLayout active="home">
+        <EmptyState
+          message="먼저 아이 프로필을 등록해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/onboarding')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              프로필 등록하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
   return (
     <AppLayout active="home">
       <section className="pt-2 text-center">
@@ -363,9 +408,31 @@ function DashboardAction({
 }
 
 export function RegionalPage() {
-  const { data: insight } = useRegionalInsight()
-  const { data: regionalMap = [] } = useRegionalMap()
-  const bars = regionalMap.slice(0, 5).map((region) => [region.sidoSigungu, Math.round(region.participationRate * 100)] as const)
+  const insightQuery = useRegionalInsight()
+  const regionalMapQuery = useRegionalMap()
+  const insight = insightQuery.data
+  const regionalMap = regionalMapQuery.data ?? []
+  if (insightQuery.isLoading || regionalMapQuery.isLoading)
+    return (
+      <AppLayout active="centers">
+        <LoadingState message="지역 참여 데이터를 불러오고 있어요…" />
+      </AppLayout>
+    )
+  if (insightQuery.error || regionalMapQuery.error)
+    return (
+      <AppLayout active="centers">
+        <ErrorState
+          message="지역 참여 데이터를 불러오지 못했어요."
+          onRetry={() => {
+            void insightQuery.refetch()
+            void regionalMapQuery.refetch()
+          }}
+        />
+      </AppLayout>
+    )
+  const bars = regionalMap
+    .slice(0, 5)
+    .map((region) => [region.sidoSigungu, Math.round(region.participationRate * 100)] as const)
   return (
     <AppLayout active="centers">
       <PageHeading
@@ -403,7 +470,10 @@ export function RegionalPage() {
         <SectionTitle
           title="지역별 참여율"
           action={
-            <button className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+            <button
+              type="button"
+              className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant"
+            >
               서울시 <Icon name="expand_more" className="text-base" />
             </button>
           }

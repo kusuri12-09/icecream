@@ -29,7 +29,11 @@ export function ActivitiesPage() {
           <br />
           해볼까요?
         </h1>
-        <div role="img" aria-label="활동 일러스트 영역" className="absolute bottom-5 right-6 size-28 rounded-full bg-white/25" />
+        <div
+          role="img"
+          aria-label="활동 일러스트 영역"
+          className="absolute bottom-5 right-6 size-28 rounded-full bg-white/25"
+        />
       </section>
       <div className="my-5 flex gap-2 overflow-x-auto pb-1">
         {fitnessFilters.map(([value, label]) => (
@@ -38,18 +42,29 @@ export function ActivitiesPage() {
           </PillButton>
         ))}
       </div>
-      <SectionTitle title={`${filterLabel} 추천`} action={<span className="text-xs text-on-surface-variant">{activities.length}개</span>} />
+      <SectionTitle
+        title={`${filterLabel} 추천`}
+        action={<span className="text-xs text-on-surface-variant">{activities.length}개</span>}
+      />
       <div className="mt-4 grid gap-3">
         {isLoading && <p className="py-8 text-center text-sm text-on-surface-variant">활동을 불러오고 있어요…</p>}
-        {error && <p className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">활동을 불러오지 못했어요.</p>}
-        {!isLoading && !error && activities.length === 0 && <p className="py-8 text-center text-sm text-on-surface-variant">추천할 활동이 아직 없어요.</p>}
+        {error && (
+          <p className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">
+            활동을 불러오지 못했어요.
+          </p>
+        )}
+        {!isLoading && !error && activities.length === 0 && (
+          <p className="py-8 text-center text-sm text-on-surface-variant">추천할 활동이 아직 없어요.</p>
+        )}
         {activities.map((activity) => (
           <Card key={activity.id} className="flex items-center gap-3 p-3">
             <div className="grid size-[86px] flex-none place-items-center rounded-2xl bg-gradient-to-br from-[#d8f2e6] to-[#f8dfc8] text-5xl">
               <Icon name={activity.icon} className="text-5xl text-primary" />
             </div>
             <div className="min-w-0 flex-1">
-              <span className="font-label text-xs text-on-surface-variant">{activity.category} · {activity.description}</span>
+              <span className="font-label text-xs text-on-surface-variant">
+                {activity.category} · {activity.description}
+              </span>
               <h3 className="mt-1 truncate font-display text-base font-bold tracking-[-.06em]">{activity.title}</h3>
               <p className="mt-2 flex items-center gap-1 text-[11px] text-on-surface-variant">
                 <Icon name="sports_score" className="text-sm" />
@@ -67,7 +82,9 @@ export function ActivitiesPage() {
                 <Icon name="open_in_new" />
               </a>
             ) : (
-              <span className="p-2 text-outline" aria-label="콘텐츠 링크 없음"><Icon name="chevron_right" /></span>
+              <span className="p-2 text-outline" aria-label="콘텐츠 링크 없음">
+                <Icon name="chevron_right" />
+              </span>
             )}
           </Card>
         ))}

@@ -18,12 +18,7 @@ import {
 export function useSaveChild() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: {
-      childId?: string
-      nickname: string
-      gender: 'MALE' | 'FEMALE'
-      birthYearMonth: string
-    }) => {
+    mutationFn: (input: { childId?: string; nickname: string; gender: 'MALE' | 'FEMALE'; birthYearMonth: string }) => {
       const { childId, nickname, gender, birthYearMonth } = input
       return childId
         ? updateChild(childId, { nickname, gender, birthYearMonth })
@@ -53,8 +48,10 @@ export const useRecords = () => {
   return { ...recordsQuery, isLoading: childQuery.isLoading || recordsQuery.isLoading }
 }
 
-export const useActivities = (params: { fitnessElement?: string; measurementId?: string } = {}) => useQuery({ queryKey: ['activities', params], queryFn: () => getActivities(params) })
-export const useCenters = (params: { lat?: number; lng?: number; radiusKm?: number; sidoSigungu?: string } = {}) => useQuery({ queryKey: ['centers', params], queryFn: () => getCenters(params) })
+export const useActivities = (params: { fitnessElement?: string; measurementId?: string } = {}) =>
+  useQuery({ queryKey: ['activities', params], queryFn: () => getActivities(params) })
+export const useCenters = (params: { lat?: number; lng?: number; radiusKm?: number; sidoSigungu?: string } = {}) =>
+  useQuery({ queryKey: ['centers', params], queryFn: () => getCenters(params) })
 export function useCreateMeasurement() {
   const queryClient = useQueryClient()
   return useMutation({

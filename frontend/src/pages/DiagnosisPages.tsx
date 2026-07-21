@@ -4,6 +4,7 @@ import { ApiError } from '../api/client'
 import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Icon } from '../components/Icon'
 import { PrimaryButton, PillButton } from '../components/Button'
+import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
 import { useChild, useCreateMeasurement } from '../hooks/useFitnessData'
 import type { MeasurementResult } from '../types/models'
 
@@ -115,6 +116,7 @@ function DiagnosisCategory({
   }
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`${wide ? 'col-span-2 min-h-44' : 'min-h-36'} rounded-[2.5rem] p-6 text-left transition hover:-translate-y-0.5 ${styles[tone]} ${active ? 'ring-4 ring-primary/20' : ''}`}
     >
@@ -147,7 +149,9 @@ export function DiagnosisResultPage() {
           {child?.name ?? '아이'}님, 무럭무럭 자라고 있어요!
         </h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
-          {result ? `${result.items.length}개 측정 항목을 바탕으로 등급을 판정했어요.` : '기초 체력이 눈에 띄게 좋아졌네요.'}
+          {result
+            ? `${result.items.length}개 측정 항목을 바탕으로 등급을 판정했어요.`
+            : '기초 체력이 눈에 띄게 좋아졌네요.'}
           <br />
           작은 습관들이 열매를 맺기 시작했어요.
         </p>
@@ -215,13 +219,44 @@ const measurementFields = [
 
 export function MeasurementInputPage() {
   const navigate = useNavigate()
-  const { data: child } = useChild()
+  const childQuery = useChild()
+  const child = childQuery.data
   const createMeasurement = useCreateMeasurement()
   const [type, setType] = useState<'official' | 'self'>('official')
   const [values, setValues] = useState<Record<string, string>>({})
   const [measuredAt, setMeasuredAt] = useState(() => new Date().toISOString().slice(0, 10))
   const [centerId, setCenterId] = useState('')
   const [error, setError] = useState('')
+
+  if (childQuery.isLoading)
+    return (
+      <AppLayout active="diagnosis">
+        <LoadingState message="아이 프로필을 불러오고 있어요…" />
+      </AppLayout>
+    )
+  if (childQuery.error)
+    return (
+      <AppLayout active="diagnosis">
+        <ErrorState message="아이 프로필을 불러오지 못했어요." onRetry={() => void childQuery.refetch()} />
+      </AppLayout>
+    )
+  if (!child)
+    return (
+      <AppLayout active="diagnosis">
+        <EmptyState
+          message="진단을 시작하려면 아이 프로필을 등록해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/onboarding')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              프로필 등록하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -267,7 +302,9 @@ export function MeasurementInputPage() {
         navigate('/login', { replace: true })
         return
       }
-      setError(cause instanceof ApiError ? cause.message : '측정 결과를 저장하지 못했습니다. 잠시 후 다시 시도해주세요.')
+      setError(
+        cause instanceof ApiError ? cause.message : '측정 결과를 저장하지 못했습니다. 잠시 후 다시 시도해주세요.',
+      )
     }
   }
 

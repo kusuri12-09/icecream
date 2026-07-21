@@ -48,7 +48,9 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
           {isSignup ? '아이의 성장을 시작해요' : '다시 만나서 반가워요'}
         </h1>
         <p className="mt-3 text-sm leading-6 text-on-surface-variant">
-          {isSignup ? '학부모 계정을 만들고 성장 기록을 시작해보세요.' : '로그인하고 우리 아이의 성장 기록을 확인해보세요.'}
+          {isSignup
+            ? '학부모 계정을 만들고 성장 기록을 시작해보세요.'
+            : '로그인하고 우리 아이의 성장 기록을 확인해보세요.'}
         </p>
         <form className="mt-8 grid gap-4" onSubmit={handleSubmit}>
           <label className="grid gap-2 text-sm font-semibold">
@@ -59,6 +61,8 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="h-[52px] rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 font-normal outline-none focus:border-primary focus:ring-4 focus:ring-primary-container/50"
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'auth-error' : undefined}
               placeholder="parent@example.com"
             />
           </label>
@@ -70,10 +74,20 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="h-[52px] rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 font-normal outline-none focus:border-primary focus:ring-4 focus:ring-primary-container/50"
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'auth-error' : undefined}
               placeholder={isSignup ? '8~64자' : '비밀번호'}
             />
           </label>
-          {error && <p className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">{error}</p>}
+          {error && (
+            <p
+              id="auth-error"
+              role="alert"
+              className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container"
+            >
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={submitting}
@@ -84,7 +98,10 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
         </form>
         <p className="mt-6 text-center text-sm text-on-surface-variant">
           {isSignup ? '이미 계정이 있나요?' : '아직 계정이 없나요?'}{' '}
-          <Link className="font-semibold text-primary underline underline-offset-4" to={isSignup ? '/login' : '/signup'}>
+          <Link
+            className="font-semibold text-primary underline underline-offset-4"
+            to={isSignup ? '/login' : '/signup'}
+          >
             {isSignup ? '로그인' : '회원가입'}
           </Link>
         </p>
