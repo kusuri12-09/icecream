@@ -1,15 +1,36 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getActivities,
   getCenters,
   getGrowth,
   getMeasurement,
   getMeasurements,
+  createChild,
   getChildren,
   getRegionalInsight,
   getRegionalMap,
+  updateChild,
 } from '../api/resources'
 
+export function useSaveChild() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: {
+      childId?: string
+      nickname: string
+      gender: 'MALE' | 'FEMALE'
+      birthYearMonth: string
+    }) => {
+      const { childId, nickname, gender, birthYearMonth } = input
+      return childId
+        ? updateChild(childId, { nickname, gender, birthYearMonth })
+        : createChild({ nickname, gender, birthYearMonth })
+    },
+    onSuccess: (child) => {
+      queryClient.setQueryData(['children'], [child])
+    },
+  })
+}
 export const useChildren = () => useQuery({ queryKey: ['children'], queryFn: getChildren })
 
 export const useChild = () =>

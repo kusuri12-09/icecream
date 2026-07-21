@@ -22,6 +22,16 @@ export async function createChild(input: { nickname: string; gender: 'MALE' | 'F
   return mapChild(unwrapData<unknown>(response))
 }
 
+export async function updateChild(
+  childId: string,
+  input: Partial<{ nickname: string; gender: 'MALE' | 'FEMALE'; birthYearMonth: string }>,
+) {
+  const response = await apiRequest<unknown>(`/api/v1/children/${childId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  })
+  return mapChild(unwrapData<unknown>(response))
+}
 export async function getChild(childId: string) {
   const response = await apiRequest<unknown>(`/api/v1/children/${childId}`)
   return mapChild(unwrapData<unknown>(response))
