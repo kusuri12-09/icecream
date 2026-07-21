@@ -37,6 +37,7 @@ dist/
 *.egg-info/
 .eggs/
 *.egg
+.uv-cache
 
 # 가상환경
 .venv/
