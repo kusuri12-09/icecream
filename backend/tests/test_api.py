@@ -208,6 +208,33 @@ def test_measurement_detail_growth_and_delete(client: TestClient):
     assert client.get(f"/api/v1/measurements/{measurement_id}", headers=headers).status_code == 404
 
 
+def test_full_parent_diagnosis_history_and_insight_flow(client: TestClient):
+    headers = auth_headers(client, "full-flow@example.com")
+    db = SessionLocal()
+    db.add_all(
+        [
+            Center(ext_center_id="flow-center-seoul", name="서울 센터", address="서울 강남구 테헤란로 1", sido_sigungu="서울 강남구", measure_count=12),
+            Center(ext_center_id="flow-center-busan", name="부산 센터", address="부산 해운대구 센텀로 1", sido_sigungu="부산 해운대구", measure_count=4),
+        ]
+    )
+    db.commit()
+    db.close()
+
+    child_id = create_child(client, headers)
+    measurement_id = create_fruit_measurement(client, headers, child_id)
+
+    detail = client.get(f"/api/v1/measurements/{measurement_id}", headers=headers)
+    history = client.get(f"/api/v1/children/{child_id}/measurements", headers=headers)
+    insight = client.get("/api/v1/insights/regional?sidoSigungu=서울%20강남구", headers=headers)
+
+    assert detail.status_code == 200
+    assert detail.json()["data"]["grade"] == "FRUIT"
+    assert history.status_code == 200
+    assert history.json()["data"]["totalElements"] == 1
+    assert insight.status_code == 200
+    assert insight.json()["data"]["regionMeasureCount"] == 12
+
+
 def test_measurement_creation_rejects_invalid_age_and_duplicate_items(client: TestClient):
     headers = auth_headers(client, "invalid-measurement@example.com")
     child = client.post(

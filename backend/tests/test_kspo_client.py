@@ -1,4 +1,32 @@
+import httpx
+
 from app.external.kspo_client import KspoClient
+
+
+def test_get_requests_json_response(monkeypatch):
+    captured: dict[str, object] = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"response": {"body": {}}}
+
+    def fake_get(url, params, timeout):
+        captured.update({"url": url, "params": params, "timeout": timeout})
+        return FakeResponse()
+
+    monkeypatch.setattr(httpx, "get", fake_get)
+
+    KspoClient("test-key")._get("https://example.com/api")
+
+    assert captured["params"] == {
+        "serviceKey": "test-key",
+        "pageNo": 1,
+        "numOfRows": 1000,
+        "resultType": "json",
+    }
 
 
 def test_fetch_centers_aggregates_monthly_measure_counts(monkeypatch):

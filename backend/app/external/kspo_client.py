@@ -159,7 +159,7 @@ class KspoClient:
         try:
             response = httpx.get(
                 url,
-                params={"serviceKey": self.api_key, "pageNo": page_no, "numOfRows": num_of_rows},
+                params={"serviceKey": self.api_key, "pageNo": page_no, "numOfRows": num_of_rows, "resultType": "json"},
                 timeout=self.timeout,
             )
             response.raise_for_status()
