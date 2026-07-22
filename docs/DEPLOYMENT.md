@@ -21,6 +21,7 @@ Vercel Production 환경에 다음 값을 등록한다.
 - `KSPO_CENTER_URL`: 센터 API 엔드포인트 전체 URL
 - `KSPO_ACTIVITY_URL`: `TODZ_VDO_TRNG_GUIDE_I` 엔드포인트 전체 URL
 - `CRON_SECRET`: Vercel Cron Authorization 검증용 무작위 시크릿
+- `CORS_ORIGINS`: 프론트엔드 배포 origin 목록(쉼표 구분, 예: `https://icecream.vercel.app,http://localhost:5173`)
 
 ## 데이터베이스 마이그레이션
 

@@ -22,11 +22,16 @@ class Settings(BaseSettings):
     kspo_center_url: str | None = None
     kspo_activity_url: str | None = None
     cron_secret: str | None = None
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
     @property
     def admin_email_set(self) -> set[str]:
         return {item.strip().lower() for item in self.admin_emails.split(",") if item.strip()}
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip().rstrip("/") for origin in self.cors_origins.split(",") if origin.strip()]
 
     @property
     def resolved_database_url(self) -> str:

@@ -11,3 +11,9 @@ def test_postgresql_url_without_driver_uses_installed_psycopg_driver():
     settings = Settings(database_url="postgresql://user:password@localhost/icecream")
 
     assert settings.resolved_database_url == "postgresql+psycopg://user:password@localhost/icecream"
+
+
+def test_cors_origins_are_parsed_and_trailing_slashes_are_removed():
+    settings = Settings(cors_origins="https://icecream.vercel.app/, http://localhost:5173")
+
+    assert settings.cors_origin_list == ["https://icecream.vercel.app", "http://localhost:5173"]
