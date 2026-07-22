@@ -1,0 +1,417 @@
+{
+  "response": {
+    "header": {
+      "resultCode": "00",
+      "resultMsg": "NORMAL SERVICE"
+    },
+    "body": {
+      "pageNo": 1,
+      "totalCount": 7970,
+      "items": {
+        "item": [
+          {
+            "center_nm": "청주",
+            "center_addr2": "1층 청주체력인증센터",
+            "row_num": 1,
+            "center_addr1": "청주시 서원구 사직대로 229 (종합운동장 북3문)",
+            "test_ym": "201702",
+            "test_cnt": 195
+          },
+          {
+            "center_nm": "오산",
+            "center_addr2": "(오산동) 오산스포츠센터 1층",
+            "row_num": 2,
+            "center_addr1": "경기도 오산시 경기동로 33 ",
+            "test_ym": "201811",
+            "test_cnt": 859
+          },
+          {
+            "center_nm": "청주",
+            "center_addr2": "1층 청주체력인증센터",
+            "row_num": 3,
+            "center_addr1": "청주시 서원구 사직대로 229 (종합운동장 북3문)",
+            "test_ym": "202009",
+            "test_cnt": 8
+          },
+          {
+            "center_nm": "서구(대전)",
+            "center_addr2": "(갈마동) 서울올림픽기념 국민생활관 3층 대전체력인증센터",
+            "row_num": 4,
+            "center_addr1": "대전광역시 서구 신갈마로230번길 77",
+            "test_ym": "201309",
+            "test_cnt": 473
+          },
+          {
+            "center_nm": "고양",
+            "center_addr2": "(대화동) 고양체육관 고양체력인증센터",
+            "row_num": 5,
+            "center_addr1": "경기도 고양시 일산서구 중앙로 1601",
+            "test_ym": "202101",
+            "test_cnt": 41
+          },
+          {
+            "center_nm": "KSPO송파",
+            "center_addr2": "평화의 광장 편익동 A-1",
+            "row_num": 6,
+            "center_addr1": "서울특별시 송파구 올림픽로 424",
+            "test_ym": "201409",
+            "test_cnt": 290
+          },
+          {
+            "center_nm": "화성",
+            "center_addr2": " 화성국민체육센터 지하1층 화성체력인증센터",
+            "row_num": 7,
+            "center_addr1": "경기도 화성시 봉담읍 동화길 18(동화리 406-1)",
+            "test_ym": "201505",
+            "test_cnt": 637
+          },
+          {
+            "center_nm": "목포",
+            "center_addr2": "(대양동) 목포국제축구센터내 다목적체육관 1층 목포체력인증센터",
+            "row_num": 8,
+            "center_addr1": "전라남도 목포시 내화마을길 89",
+            "test_ym": "201409",
+            "test_cnt": 261
+          },
+          {
+            "center_nm": "연수",
+            "center_addr2": "(연수동) 가천대학교 체육관 2층 연수체력인증센터",
+            "row_num": 9,
+            "center_addr1": "인천광역시 연수구 함박뫼로 191",
+            "test_ym": "202203",
+            "test_cnt": 77
+          },
+          {
+            "center_nm": "보은",
+            "center_addr2": " 결초보은체육관 1층 보은 체력인증센터",
+            "row_num": 10,
+            "center_addr1": "충청북도 보은군 보은읍 군청길 71",
+            "test_ym": "202210",
+            "test_cnt": 89
+          },
+          {
+            "center_nm": "의정부",
+            "center_addr2": "(녹양동) 의정부종합운동장 주경기장 기둥번호 N-51",
+            "row_num": 11,
+            "center_addr1": "경기도 의정부시 체육로 90",
+            "test_ym": "202305",
+            "test_cnt": 671
+          },
+          {
+            "center_nm": "사천",
+            "center_addr2": "사천국민체육센터 1층 사천체력인증센터",
+            "row_num": 12,
+            "center_addr1": "경상남도 사천시 용현면 대밭담로 27-21",
+            "test_ym": "201901",
+            "test_cnt": 16
+          },
+          {
+            "center_nm": "KSPO아산(출장)",
+            "center_addr2": "(풍기동) 2층 아산체력인증센터",
+            "row_num": 13,
+            "center_addr1": "충청남도 아산시 남부로 370-24",
+            "test_ym": "202107",
+            "test_cnt": 185
+          },
+          {
+            "center_nm": "삼척",
+            "center_addr2": "(교동) 강원대학교 삼척캠퍼스 학생회관 402호",
+            "row_num": 14,
+            "center_addr1": "강원도 삼척시 중앙로 346",
+            "test_ym": "202007",
+            "test_cnt": 44
+          },
+          {
+            "center_nm": "진천",
+            "center_addr2": "진천체력인증센터 (초평생활체육공원)",
+            "row_num": 15,
+            "center_addr1": "충청북도 진천군 초평면 용정길 6",
+            "test_ym": "202010",
+            "test_cnt": 112
+          },
+          {
+            "center_nm": "화성",
+            "center_addr2": " 화성국민체육센터 지하1층 화성체력인증센터",
+            "row_num": 16,
+            "center_addr1": "경기도 화성시 봉담읍 동화길 18(동화리 406-1)",
+            "test_ym": "202109",
+            "test_cnt": 81
+          },
+          {
+            "center_nm": "창원",
+            "center_addr2": "(상남동) 시민생활체육관 3층 창원체력인증센터",
+            "row_num": 17,
+            "center_addr1": "경상남도 창원시 성산구 원이대로 692",
+            "test_ym": "201902",
+            "test_cnt": 145
+          },
+          {
+            "center_nm": "중구(서울)",
+            "center_addr2": "(흥인동) 충무스포츠센터 4층 중구 체력인증센터",
+            "row_num": 18,
+            "center_addr1": "서울특별시 중구 퇴계로 387",
+            "test_ym": "202212",
+            "test_cnt": 146
+          },
+          {
+            "center_nm": "증평",
+            "center_addr2": " 증평생활체육관 2층",
+            "row_num": 19,
+            "center_addr1": "충청북도 증평군 증평읍 송산로 18",
+            "test_ym": "201805",
+            "test_cnt": 122
+          },
+          {
+            "center_nm": "연수",
+            "center_addr2": "(연수동) 가천대학교 체육관 2층 연수체력인증센터",
+            "row_num": 20,
+            "center_addr1": "인천광역시 연수구 함박뫼로 191",
+            "test_ym": "201903",
+            "test_cnt": 969
+          },
+          {
+            "center_nm": "KSPO대구",
+            "center_addr2": "(삼덕동) 육상진흥센터 1층 대구체력인증센터",
+            "row_num": 21,
+            "center_addr1": "대구광역시 수성구 미술관로 88",
+            "test_ym": "202112",
+            "test_cnt": 109
+          },
+          {
+            "center_nm": "원주",
+            "center_addr2": "(명륜동) 원주국민체육센터 지하1층 원주체력인증센터",
+            "row_num": 22,
+            "center_addr1": "강원도 원주시 남원로 551",
+            "test_ym": "201506",
+            "test_cnt": 299
+          },
+          {
+            "center_nm": "제주",
+            "center_addr2": "(오라일동1177) 제주종합경기장 전천후육상경기장 2층 제주체력인증센터",
+            "row_num": 23,
+            "center_addr1": "제주특별자치도 제주시 서광로2길 20",
+            "test_ym": "201905",
+            "test_cnt": 411
+          },
+          {
+            "center_nm": "서구(대전)",
+            "center_addr2": "(갈마동) 서울올림픽기념 국민생활관 3층 대전체력인증센터",
+            "row_num": 24,
+            "center_addr1": "대전광역시 서구 신갈마로230번길 77",
+            "test_ym": "201911",
+            "test_cnt": 672
+          },
+          {
+            "center_nm": "동구(광주)",
+            "center_addr2": "(서석동) 조선대학교 체육대학 5층  동구(광주)체력인증센터",
+            "row_num": 25,
+            "center_addr1": "광주광역시 동구 필문대로 309",
+            "test_ym": "202303",
+            "test_cnt": 282
+          },
+          {
+            "center_nm": "동구(광주)",
+            "center_addr2": "(서석동) 조선대학교 체육대학 5층  동구(광주)체력인증센터",
+            "row_num": 26,
+            "center_addr1": "광주광역시 동구 필문대로 309",
+            "test_ym": "201902",
+            "test_cnt": 181
+          },
+          {
+            "center_nm": "KSPO광주",
+            "center_addr2": "(풍암동) 광주월드컵경기장 2층 KSPO광주체력인증센터",
+            "row_num": 27,
+            "center_addr1": "광주광역시 서구 금화로 240",
+            "test_ym": "202305",
+            "test_cnt": 272
+          },
+          {
+            "center_nm": "달서",
+            "center_addr2": "(도원동) 월배국민체육센터 내 1층 달서체력인증센터",
+            "row_num": 28,
+            "center_addr1": "대구광역시 달서구 갈밭남로 76",
+            "test_ym": "202008",
+            "test_cnt": 128
+          },
+          {
+            "center_nm": "KSPO광주",
+            "center_addr2": "(풍암동) 광주월드컵경기장 2층 KSPO광주체력인증센터",
+            "row_num": 29,
+            "center_addr1": "광주광역시 서구 금화로 240",
+            "test_ym": "202211",
+            "test_cnt": 153
+          },
+          {
+            "center_nm": "구미",
+            "center_addr2": "13호관 2층 구미체력인증센터",
+            "row_num": 30,
+            "center_addr1": "경상북도 구미시 산동읍 강동로 730",
+            "test_ym": "202201",
+            "test_cnt": 42
+          },
+          {
+            "center_nm": "KSPO송파",
+            "center_addr2": "평화의 광장 편익동 A-1",
+            "row_num": 31,
+            "center_addr1": "서울특별시 송파구 올림픽로 424",
+            "test_ym": "201706",
+            "test_cnt": 494
+          },
+          {
+            "center_nm": "남원",
+            "center_addr2": "(월락동) 춘향골체육관 1층 건물안 뒷편 남원체력인증센터",
+            "row_num": 32,
+            "center_addr1": "전라북도 남원시 충정로 341",
+            "test_ym": "201709",
+            "test_cnt": 448
+          },
+          {
+            "center_nm": "서구(대전)",
+            "center_addr2": "(갈마동) 서울올림픽기념 국민생활관 3층 대전체력인증센터",
+            "row_num": 33,
+            "center_addr1": "대전광역시 서구 신갈마로230번길 77",
+            "test_ym": "201903",
+            "test_cnt": 369
+          },
+          {
+            "center_nm": "나주",
+            "center_addr2": "동신대학교 체육관 2층(202호)",
+            "row_num": 34,
+            "center_addr1": "전라남도 나주시 동신대길 113",
+            "test_ym": "202010",
+            "test_cnt": 65
+          },
+          {
+            "center_nm": "증평",
+            "center_addr2": " 증평생활체육관 2층",
+            "row_num": 35,
+            "center_addr1": "충청북도 증평군 증평읍 송산로 18",
+            "test_ym": "202201",
+            "test_cnt": 69
+          },
+          {
+            "center_nm": "스포원(금정)",
+            "center_addr2": "(두구동) 스포원파크 테니경기장 센터코트 1층",
+            "row_num": 36,
+            "center_addr1": "부산광역시 금정구 체육공원로399번길 324",
+            "test_ym": "202109",
+            "test_cnt": 137
+          },
+          {
+            "center_nm": "안동",
+            "center_addr2": "안동시민운동장 내10문",
+            "row_num": 37,
+            "center_addr1": "경상북도 안동시 운동장길 53",
+            "test_ym": "201707",
+            "test_cnt": 743
+          },
+          {
+            "center_nm": "부천",
+            "center_addr2": "오정레포츠센터 지하 1층 부천체력인증센터",
+            "row_num": 38,
+            "center_addr1": "경기도 부천시 오정구 상오정로 169 (오정동)",
+            "test_ym": "202202",
+            "test_cnt": 112
+          },
+          {
+            "center_nm": "KSPO광주(출장)",
+            "center_addr2": "(풍암동) 광주월드컵경기장 2층 KSPO광주체력인증센터",
+            "row_num": 39,
+            "center_addr1": "광주광역시 서구 금화로 240",
+            "test_ym": "202203",
+            "test_cnt": 382
+          },
+          {
+            "center_nm": "KSPO아산(출장)",
+            "center_addr2": "(풍기동) 2층 아산체력인증센터",
+            "row_num": 40,
+            "center_addr1": "충청남도 아산시 남부로 370-24",
+            "test_ym": "202105",
+            "test_cnt": 394
+          },
+          {
+            "center_nm": "천안",
+            "center_addr2": "(백석동) 천안종합운동장 내 천안체력인증센터(구 역도장)",
+            "row_num": 41,
+            "center_addr1": "충청남도 천안시 서북구 번영로 208",
+            "test_ym": "201709",
+            "test_cnt": 171
+          },
+          {
+            "center_nm": "화성",
+            "center_addr2": " 화성국민체육센터 지하1층 화성체력인증센터",
+            "row_num": 42,
+            "center_addr1": "경기도 화성시 봉담읍 동화길 18(동화리 406-1)",
+            "test_ym": "202002",
+            "test_cnt": 36
+          },
+          {
+            "center_nm": "남원",
+            "center_addr2": "(월락동) 춘향골체육관 1층 건물안 뒷편 남원체력인증센터",
+            "row_num": 43,
+            "center_addr1": "전라북도 남원시 충정로 341",
+            "test_ym": "202011",
+            "test_cnt": 66
+          },
+          {
+            "center_nm": "광산",
+            "center_addr2": "(산월동819-8) 첨단다목적체육센터 (주차장 안내 -&gt;  첨단생활체육공원 주차장 3 )",
+            "row_num": 44,
+            "center_addr1": "광주광역시 광산구 첨단강변로 76",
+            "test_ym": "201211",
+            "test_cnt": 474
+          },
+          {
+            "center_nm": "태백",
+            "center_addr2": "(문곡동) 태백시 고원 2 체육관 2층 (태백볼링장 2층)",
+            "row_num": 45,
+            "center_addr1": "강원도 태백시 태백로 1451 고원체육관2층(태백볼링장 2층)",
+            "test_ym": "202011",
+            "test_cnt": 2
+          },
+          {
+            "center_nm": "춘천",
+            "center_addr2": "(효자동) 강원대학교 백령스포츠센터 B001호, 춘천체력인증센터",
+            "row_num": 46,
+            "center_addr1": "강원도 춘천시 강원대학길 1",
+            "test_ym": "201911",
+            "test_cnt": 397
+          },
+          {
+            "center_nm": "스포원(금정)",
+            "center_addr2": "(두구동) 스포원파크 테니경기장 센터코트 1층",
+            "row_num": 47,
+            "center_addr1": "부산광역시 금정구 체육공원로399번길 324",
+            "test_ym": "201907",
+            "test_cnt": 187
+          },
+          {
+            "center_nm": "KSPO대구",
+            "center_addr2": "(삼덕동) 육상진흥센터 1층 대구체력인증센터",
+            "row_num": 48,
+            "center_addr1": "대구광역시 수성구 미술관로 88",
+            "test_ym": "202202",
+            "test_cnt": 254
+          },
+          {
+            "center_nm": "사천",
+            "center_addr2": "사천국민체육센터 1층 사천체력인증센터",
+            "row_num": 49,
+            "center_addr1": "경상남도 사천시 용현면 대밭담로 27-21",
+            "test_ym": "202205",
+            "test_cnt": 991
+          },
+          {
+            "center_nm": "영주",
+            "center_addr2": "(가흥동) 시민체육관 내 철탄체육관 1층 (영주체력인증센터)",
+            "row_num": 50,
+            "center_addr1": "경상북도 영주시 가흥로 109",
+            "test_ym": "202210",
+            "test_cnt": 293
+          }
+        ]
+      },
+      "numOfRows": 50
+    }
+  }
+}
