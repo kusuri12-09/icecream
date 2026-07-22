@@ -2,11 +2,16 @@ from dataclasses import dataclass
 import hashlib
 from math import ceil
 import re
+import time
 from typing import Any
+import logging
 
 import httpx
 
 from app.core.errors import AppError
+
+
+logger = logging.getLogger(__name__)
 
 
 class ExternalApiUnavailable(AppError):
@@ -151,21 +156,31 @@ def _stable_center_id(name: str, address: str) -> str:
 
 
 class KspoClient:
-    def __init__(self, api_key: str, timeout: float = 10.0) -> None:
+    def __init__(self, api_key: str, timeout: float = 10.0, max_retries: int = 2) -> None:
         self.api_key = api_key
         self.timeout = timeout
+        self.max_retries = max_retries
 
     def _get(self, url: str, page_no: int = 1, num_of_rows: int = 1000) -> Any:
-        try:
-            response = httpx.get(
-                url,
-                params={"serviceKey": self.api_key, "pageNo": page_no, "numOfRows": num_of_rows, "resultType": "json"},
-                timeout=self.timeout,
-            )
-            response.raise_for_status()
-            return response.json()
-        except (httpx.HTTPError, ValueError) as exc:
-            raise ExternalApiUnavailable() from exc
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = httpx.get(
+                    url,
+                    params={"serviceKey": self.api_key, "pageNo": page_no, "numOfRows": num_of_rows, "resultType": "json"},
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                header = payload.get("response", {}).get("header", {}) if isinstance(payload, dict) else {}
+                result_code = header.get("resultCode") if isinstance(header, dict) else None
+                if result_code and str(result_code) != "00":
+                    raise ExternalApiUnavailable()
+                return payload
+            except (ExternalApiUnavailable, httpx.HTTPError, ValueError) as exc:
+                if attempt >= self.max_retries:
+                    raise ExternalApiUnavailable() from exc
+                logger.warning("공공 API 요청 재시도 page=%s attempt=%s", page_no, attempt + 1)
+                time.sleep(0.25 * (attempt + 1))
 
     def fetch_centers(self, url: str) -> list[CenterRecord]:
         page_size = 1000

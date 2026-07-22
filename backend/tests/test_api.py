@@ -334,3 +334,49 @@ def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pyte
         db.close()
     finally:
         settings.kspo_api_key, settings.kspo_center_url, settings.kspo_activity_url = original
+
+
+def test_cron_sync_rejects_invalid_secret(client: TestClient):
+    settings = get_settings()
+    original = settings.cron_secret
+    settings.cron_secret = "cron-test-secret"
+    try:
+        response = client.get(
+            "/api/v1/internal/cron-sync/centers",
+            headers={"Authorization": "Bearer wrong-secret"},
+        )
+        assert response.status_code == 401
+        assert response.json()["error"]["code"] == "AUTH_UNAUTHORIZED"
+    finally:
+        settings.cron_secret = original
+
+
+def test_cron_sync_runs_target_with_secret(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    settings = get_settings()
+    original = (settings.cron_secret, settings.kspo_api_key, settings.kspo_center_url)
+    settings.cron_secret = "cron-test-secret"
+    settings.kspo_api_key = "test-key"
+    settings.kspo_center_url = "https://example.com/centers"
+
+    class FakeKspoClient:
+        def __init__(self, api_key: str):
+            assert api_key == "test-key"
+
+        def fetch_centers(self, url: str) -> list[CenterRecord]:
+            assert url.endswith("centers")
+            return [CenterRecord("cron-center", "Cron 센터", "서울 중구 세종대로 1", "서울 중구", None, None, 7)]
+
+        def fetch_activities(self, url: str) -> list[ActivityRecord]:
+            raise AssertionError(f"unexpected activity sync: {url}")
+
+    monkeypatch.setattr("app.api.v1.internal.KspoClient", FakeKspoClient)
+    try:
+        response = client.get(
+            "/api/v1/internal/cron-sync/centers",
+            headers={"Authorization": "Bearer cron-test-secret"},
+        )
+        assert response.status_code == 200
+        assert response.json()["data"]["targets"] == ["CENTERS"]
+        assert response.json()["data"]["synced"] == {"centers": 1, "activities": 0}
+    finally:
+        settings.cron_secret, settings.kspo_api_key, settings.kspo_center_url = original

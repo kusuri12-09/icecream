@@ -1,10 +1,20 @@
 from datetime import datetime, timezone
+from threading import Lock
+from typing import Literal
+import logging
 
-from sqlalchemy import select
+from sqlalchemy import select, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.external.kspo_client import ActivityRecord, CenterRecord, KspoClient
 from app.models import ActivityVideo, Center
+
+
+logger = logging.getLogger(__name__)
+SYNC_LOCK_KEY = 8_391_071
+_process_sync_lock = Lock()
+SyncLock = Literal["postgresql", "process"]
 
 
 def sync_centers(db: Session, records: list[CenterRecord]) -> int:
@@ -54,4 +64,24 @@ def sync_targets(db: Session, client: KspoClient, targets: list[str], center_url
     if "ACTIVITIES" in targets and activity_url:
         synced["activities"] = sync_activities(db, client.fetch_activities(activity_url))
     db.commit()
+    logger.info("공공 데이터 동기화 완료 targets=%s synced=%s", targets, synced)
     return synced
+
+
+def acquire_sync_lock(db: Session) -> SyncLock | None:
+    """PostgreSQL advisory lock으로 중복 배치를 막고 SQLite에서는 프로세스 락을 사용한다."""
+    dialect = db.get_bind().dialect.name
+    if dialect == "postgresql":
+        acquired = db.execute(text("SELECT pg_try_advisory_lock(:lock_key)"), {"lock_key": SYNC_LOCK_KEY}).scalar()
+        return "postgresql" if acquired else None
+    return "process" if _process_sync_lock.acquire(blocking=False) else None
+
+
+def release_sync_lock(db: Session, lock: SyncLock) -> None:
+    if lock == "postgresql":
+        try:
+            db.execute(text("SELECT pg_advisory_unlock(:lock_key)"), {"lock_key": SYNC_LOCK_KEY})
+        except SQLAlchemyError:
+            logger.exception("PostgreSQL 동기화 잠금 해제 실패")
+        return
+    _process_sync_lock.release()
