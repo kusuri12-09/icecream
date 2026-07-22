@@ -5,7 +5,7 @@ import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayo
 import { Icon } from '../components/Icon'
 import { PrimaryButton, PillButton } from '../components/Button'
 import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
-import { useChild, useCreateMeasurement } from '../hooks/useFitnessData'
+import { useChild, useCreateMeasurement, useMeasurement, useRecords } from '../hooks/useFitnessData'
 import type { MeasurementResult } from '../types/models'
 
 export function DiagnosisPage() {
@@ -85,8 +85,8 @@ export function DiagnosisPage() {
           <Icon name="sparkling" className="text-primary" />
         </p>
       </Card>
-      <PrimaryButton className="mt-8 w-full" onClick={() => navigate('/diagnosis/result')}>
-        진단 결과 저장하기
+      <PrimaryButton className="mt-8 w-full" onClick={() => navigate('/diagnosis/input')}>
+        측정값 입력하기
       </PrimaryButton>
     </AppLayout>
   )
@@ -131,10 +131,46 @@ export function DiagnosisResultPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { data: child } = useChild()
+  const recordsQuery = useRecords()
   const routeState = location.state as { measurement?: MeasurementResult } | null
-  const result = routeState?.measurement
-  const strengths = result?.profile.strengths.length ? result.profile.strengths : ['유연성']
-  const weaknesses = result?.profile.weaknesses.length ? result.profile.weaknesses : ['근력']
+  const latestMeasurementId = routeState?.measurement?.id ?? recordsQuery.data?.[0]?.id
+  const latestMeasurementQuery = useMeasurement(latestMeasurementId)
+  const result = routeState?.measurement ?? latestMeasurementQuery.data
+
+  if (recordsQuery.isLoading || latestMeasurementQuery.isLoading) {
+    return (
+      <AppLayout active="diagnosis" back>
+        <LoadingState message="진단 결과를 불러오고 있어요…" />
+      </AppLayout>
+    )
+  }
+  if (recordsQuery.error || latestMeasurementQuery.error) {
+    return (
+      <AppLayout active="diagnosis" back>
+        <ErrorState message="진단 결과를 불러오지 못했어요." onRetry={() => void recordsQuery.refetch()} />
+      </AppLayout>
+    )
+  }
+  if (!result) {
+    return (
+      <AppLayout active="diagnosis" back>
+        <EmptyState
+          message="아직 진단 결과가 없어요. 먼저 측정값을 입력해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/diagnosis/input')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              측정값 입력하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
+  }
+  const strengths = result.profile.strengths
+  const weaknesses = result.profile.weaknesses
 
   return (
     <AppLayout active="diagnosis" back>
@@ -144,16 +180,14 @@ export function DiagnosisResultPage() {
           aria-label="진단 결과 일러스트 영역"
           className="mx-auto mb-4 size-40 rounded-full border-[5px] border-primary-container bg-white shadow-[0_0_42px_rgba(181,234,215,.35)]"
         />
-        <GradeBadge dark grade={result?.grade ?? '새싹'} />
+        <GradeBadge dark grade={result.grade} />
         <h1 className="mt-4 font-display text-[27px] font-bold tracking-[-.1em]">
           {child?.name ?? '아이'}님, 무럭무럭 자라고 있어요!
         </h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
-          {result
-            ? `${result.items.length}개 측정 항목을 바탕으로 등급을 판정했어요.`
-            : '기초 체력이 눈에 띄게 좋아졌네요.'}
+          {result.items.length}개 측정 항목을 바탕으로 등급을 판정했어요.
           <br />
-          작은 습관들이 열매를 맺기 시작했어요.
+          측정 기록을 바탕으로 다음 활동을 추천해드려요.
         </p>
       </section>
       <Card className="p-7">
@@ -169,11 +203,11 @@ export function DiagnosisResultPage() {
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-[#effaf6] p-4 text-center">
             <span className="block text-sm text-primary">장점</span>
-            <b className="mt-1 block font-normal">{strengths[0]}</b>
+            <b className="mt-1 block font-normal">{strengths[0] ?? '아직 충분한 데이터가 없어요'}</b>
           </div>
           <div className="rounded-lg bg-[#fff0ef] p-4 text-center text-secondary">
             <span className="block text-sm">개선 필요</span>
-            <b className="mt-1 block font-normal">{weaknesses[0]}</b>
+            <b className="mt-1 block font-normal">{weaknesses[0] ?? '개선 항목이 없어요'}</b>
           </div>
         </div>
       </Card>
@@ -182,7 +216,9 @@ export function DiagnosisResultPage() {
           <Icon name="directions_run" />
           맞춤 활동
         </span>
-        <h2 className="mt-4 font-display text-xl tracking-[-.07em]">근력을 재미있게 키워볼까요?</h2>
+        <h2 className="mt-4 font-display text-xl tracking-[-.07em]">
+          {weaknesses[0] ? `${weaknesses[0]}을 재미있게 키워볼까요?` : '맞춤 활동을 확인해볼까요?'}
+        </h2>
         <p className="mt-2 text-sm text-on-surface-variant">아이의 현재 결과에 맞춘 놀이를 추천해드려요.</p>
         <button
           className="mt-4 inline-flex items-center gap-1 font-semibold text-primary"

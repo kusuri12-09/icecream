@@ -60,12 +60,14 @@ export interface Activity {
   description: string
   equipment?: boolean
   url?: string
+  thumbnailUrl?: string
 }
 
 export interface Center {
   id: string
   name: string
   address: string
+  region?: string
   distance: string
   icon: string
   open: boolean

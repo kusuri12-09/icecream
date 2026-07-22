@@ -5,25 +5,29 @@ import { Icon } from '../components/Icon'
 import { PillButton } from '../components/Button'
 import { useCenters } from '../hooks/useFitnessData'
 
-const areas = ['전체', '강남구', '서초구', '송파구']
-
 export function CentersPage() {
   const [area, setArea] = useState('전체')
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState('')
   const navigate = useNavigate()
-  const {
-    data: centers = [],
-    isLoading,
-    error,
-  } = useCenters(location ? { ...location, radiusKm: 10 } : { sidoSigungu: area === '전체' ? undefined : area })
+  const { data: centers = [], isLoading, error } = useCenters(location ? { ...location, radiusKm: 10 } : {})
+  const areas = useMemo(
+    () => [
+      '전체',
+      ...new Set(centers.map((center) => center.region).filter((region): region is string => Boolean(region))),
+    ],
+    [centers],
+  )
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
     return centers.filter(
-      (center) => !normalizedQuery || `${center.name} ${center.address}`.toLowerCase().includes(normalizedQuery),
+      (center) =>
+        (location || area === '전체' || center.region === area) &&
+        (!normalizedQuery ||
+          `${center.name} ${center.address} ${center.region ?? ''}`.toLowerCase().includes(normalizedQuery)),
     )
-  }, [centers, query])
+  }, [area, centers, location, query])
 
   function requestLocation() {
     if (!navigator.geolocation) {

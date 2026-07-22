@@ -18,6 +18,17 @@ const gradeNames: Record<string, MeasurementRecord['grade']> = {
   FRUIT: '열매',
 }
 
+const fitnessElementNames: Record<string, string> = {
+  CARDIO: '심폐지구력',
+  GRIP: '근력',
+  MUSCULAR_END: '근지구력',
+  FLEXIBILITY: '유연성',
+  AGILITY: '민첩성',
+  POWER: '순발력',
+  COORDINATION: '협응력',
+  BMI: '신체조성',
+}
+
 export async function getChildren() {
   const response = await apiRequest<unknown>('/api/v1/children')
   const data = unwrapData<{ items?: unknown[] }>(response)
@@ -153,8 +164,8 @@ function mapMeasurementResult(value: unknown): MeasurementResult {
     center: measurement.center ? { id: stringValue(center.id), name: stringValue(center.name) } : null,
     items,
     profile: {
-      strengths: arrayOfStrings(profile.strengths),
-      weaknesses: arrayOfStrings(profile.weaknesses),
+      strengths: arrayOfStrings(profile.strengths).map(fitnessElementName),
+      weaknesses: arrayOfStrings(profile.weaknesses).map(fitnessElementName),
       undecidableGrades: arrayOfStrings(profile.undecidableGrades),
     },
     createdAt: stringValue(measurement.createdAt),
@@ -181,13 +192,17 @@ function mapActivity(value: unknown): Activity {
   return {
     id: stringValue(activity.id),
     title: stringValue(activity.title, '추천 활동'),
-    category: stringValue(activity.fitnessElement, '활동 추천'),
+    category: fitnessElementName(stringValue(activity.fitnessElement)) || '활동 추천',
     place: undefined,
     duration: undefined,
     icon: 'run',
-    description: stringValue(activity.ageGroup, '아이와 함께 즐겨보세요.'),
+    description:
+      stringValue(activity.description) ||
+      [stringValue(activity.trainingPlace), stringValue(activity.equipment)].filter(Boolean).join(' · ') ||
+      '국민체력100 추천 콘텐츠',
     equipment: undefined,
     url: stringValue(activity.url),
+    thumbnailUrl: stringValue(activity.thumbnailUrl) || undefined,
   }
 }
 
@@ -198,6 +213,7 @@ function mapCenter(value: unknown): Center {
     id: stringValue(center.id),
     name: stringValue(center.name, '체력인증센터'),
     address: stringValue(center.address),
+    region: stringValue(center.sidoSigungu) || undefined,
     distance: distanceKm,
     icon: 'tree',
     open: true,
@@ -216,4 +232,8 @@ function stringValue(value: unknown, fallback = '') {
 
 function arrayOfStrings(value: unknown) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+}
+
+function fitnessElementName(value: string) {
+  return fitnessElementNames[value.toUpperCase()] ?? value
 }

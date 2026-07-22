@@ -6,8 +6,16 @@ import { Character } from '../components/Character'
 import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
 import { Icon } from '../components/Icon'
 import { PrimaryButton } from '../components/Button'
-import { useChild, useRegionalInsight, useRegionalMap, useSaveChild } from '../hooks/useFitnessData'
-import type { ChildProfile } from '../types/models'
+import {
+  useActivities,
+  useChild,
+  useMeasurement,
+  useRecords,
+  useRegionalInsight,
+  useRegionalMap,
+  useSaveChild,
+} from '../hooks/useFitnessData'
+import type { ChildProfile, MeasurementRecord } from '../types/models'
 
 export function OnboardingPage() {
   const { data: child, isLoading } = useChild()
@@ -132,12 +140,18 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
           <label className="block">
             <span className="mb-2 block font-label text-xs font-semibold text-on-surface-variant">생년월</span>
             <input
-              type="month"
+              type="text"
               name="birthYearMonth"
               value={birthYearMonth}
+              inputMode="numeric"
+              maxLength={7}
+              placeholder="YYYY-MM"
               aria-invalid={Boolean(error && !birthYearMonth)}
               aria-describedby={error ? 'profile-error' : undefined}
-              onChange={(event) => setBirthYearMonth(event.target.value)}
+              onChange={(event) => {
+                const digits = event.target.value.replace(/\D/g, '').slice(0, 6)
+                setBirthYearMonth(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits)
+              }}
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary"
             />
           </label>
@@ -160,32 +174,82 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
 }
 export function HomePage() {
   const navigate = useNavigate()
+  const childQuery = useChild()
+  const recordsQuery = useRecords()
+  const activitiesQuery = useActivities()
+  const child = childQuery.data
+  const records = recordsQuery.data ?? []
+  const activities = activitiesQuery.data ?? []
+  const latestRecord = records[0]
+
+  if (childQuery.isLoading || recordsQuery.isLoading || activitiesQuery.isLoading) {
+    return (
+      <AppLayout active="home">
+        <LoadingState message="성장 데이터를 불러오고 있어요…" />
+      </AppLayout>
+    )
+  }
+  if (childQuery.error || recordsQuery.error || activitiesQuery.error) {
+    return (
+      <AppLayout active="home">
+        <ErrorState
+          message="성장 데이터를 불러오지 못했어요."
+          onRetry={() => {
+            void childQuery.refetch()
+            void recordsQuery.refetch()
+            void activitiesQuery.refetch()
+          }}
+        />
+      </AppLayout>
+    )
+  }
+  if (!child) {
+    return (
+      <AppLayout active="home">
+        <EmptyState
+          message="먼저 아이 프로필을 등록해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/onboarding')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              프로필 등록하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
+  }
+
   return (
     <AppLayout active="home">
       <section className="px-1">
-        <h1 className="font-display text-[22px] tracking-[-.07em]">망고님, 오늘도 쑥쑥 자라요!</h1>
+        <h1 className="font-display text-[22px] tracking-[-.07em]">{child.name}님, 오늘도 쑥쑥 자라요!</h1>
         <p className="mt-1 text-sm text-on-surface-variant">아이의 작은 변화도 소중한 성장 기록이에요.</p>
       </section>
       <Card className="mt-5 flex min-h-48 items-center justify-between overflow-hidden bg-gradient-to-br from-white to-[#f5faf7] p-7">
         <div>
           <span className="font-label text-sm text-on-surface-variant">현재 성장 등급</span>
-          <h2 className="mt-3 flex items-center gap-2 font-display text-[22px] text-primary">
-            <span className="grid size-10 place-items-center rounded-full bg-primary-container">
-              <Icon name="seedling" />
-            </span>
-            새싹 등급
-          </h2>
-          <p className="mt-3 leading-7 text-on-surface-variant">
-            다음 등급인 ‘꽃’까지
-            <br />
-            <strong className="text-primary">12포인트</strong> 남았어요.
-          </p>
+          {latestRecord ? (
+            <>
+              <h2 className="mt-3 flex items-center gap-2 font-display text-[22px] text-primary">
+                <span className="grid size-10 place-items-center rounded-full bg-primary-container">
+                  <Icon name="seedling" />
+                </span>
+                {latestRecord.grade} 등급
+              </h2>
+              <p className="mt-3 leading-7 text-on-surface-variant">{latestRecord.date} 측정 기록이에요.</p>
+            </>
+          ) : (
+            <p className="mt-3 leading-7 text-on-surface-variant">아직 측정 기록이 없어요.</p>
+          )}
         </div>
         <Character />
       </Card>
       <section className="mt-8">
         <SectionTitle
-          title="최근 활동 기록"
+          title="최근 측정 기록"
           action={
             <button
               type="button"
@@ -196,43 +260,52 @@ export function HomePage() {
             </button>
           }
         />
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          <ActivityTile
-            icon="directions_run"
-            title="셔틀런"
-            value="15회 성공"
-            tone="coral"
-            onClick={() => navigate('/records')}
+        {records.length ? (
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            {records.slice(0, 2).map((record, index) => (
+              <RecordTile
+                key={record.id}
+                record={record}
+                tone={index === 0 ? 'coral' : 'mint'}
+                onClick={() => navigate(`/records/${record.id}`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            message="아직 측정 기록이 없어요."
+            action={
+              <button
+                type="button"
+                onClick={() => navigate('/diagnosis/input')}
+                className="rounded-full bg-primary px-4 py-2 font-semibold text-white"
+              >
+                첫 측정 시작하기
+              </button>
+            }
           />
-          <ActivityTile
-            icon="arrow_up_double"
-            title="제자리멀리뛰기"
-            value="110cm"
-            tone="mint"
-            note="지난번보다 5cm ↑"
-            onClick={() => navigate('/records')}
-          />
-        </div>
+        )}
       </section>
       <section className="mt-8">
         <h2 className="mb-4 font-display text-[21px] tracking-[-.07em]">오늘의 성장 팁</h2>
-        <Card className="border-[#ebe4ce] bg-[#f7f3e7] p-7">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm text-on-surface-variant">
-            <Icon name="lightbulb" />
-            놀이 가이드
-          </span>
-          <h3 className="mt-5 font-display text-xl tracking-[-.07em]">아이와 함께하는 ‘풍선 배구’</h3>
-          <p className="mt-3 leading-8 text-on-surface-variant">
-            실내에서 안전하게 민첩성과 협응력을 길러주세요. 풍선이 땅에 닿지 않게 주고받으며 자연스럽게 움직임을
-            유도합니다.
-          </p>
-          <PrimaryButton className="mt-1" onClick={() => navigate('/activities')}>
-            자세히 알아보기
-          </PrimaryButton>
-          <div className="mt-6 grid h-28 place-items-center rounded-3xl bg-gradient-to-br from-[#dcefdc] to-[#f5dfc7]">
-            <span aria-hidden="true" className="size-16 rounded-[38%] bg-white/25" />
-          </div>
-        </Card>
+        {activities[0] ? (
+          <Card className="border-[#ebe4ce] bg-[#f7f3e7] p-7">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm text-on-surface-variant">
+              <Icon name="lightbulb" />
+              {activities[0].category}
+            </span>
+            <h3 className="mt-5 font-display text-xl tracking-[-.07em]">{activities[0].title}</h3>
+            <p className="mt-3 leading-8 text-on-surface-variant">{activities[0].description}</p>
+            <PrimaryButton className="mt-1" onClick={() => navigate('/activities')}>
+              자세히 알아보기
+            </PrimaryButton>
+            <div className="mt-6 grid h-28 place-items-center rounded-3xl bg-gradient-to-br from-[#dcefdc] to-[#f5dfc7]">
+              <span aria-hidden="true" className="size-16 rounded-[38%] bg-white/25" />
+            </div>
+          </Card>
+        ) : (
+          <EmptyState message="추천 활동을 불러오지 못했어요." />
+        )}
       </section>
       <div className="mt-9 grid grid-cols-4 gap-2">
         {[
@@ -267,19 +340,13 @@ export function HomePage() {
   )
 }
 
-function ActivityTile({
-  icon,
-  title,
-  value,
+function RecordTile({
+  record,
   tone,
-  note,
   onClick,
 }: {
-  icon: string
-  title: string
-  value: string
+  record: MeasurementRecord
   tone: 'mint' | 'coral'
-  note?: string
   onClick: () => void
 }) {
   return (
@@ -291,34 +358,41 @@ function ActivityTile({
       <span
         className={`mb-5 grid size-12 place-items-center rounded-full ${tone === 'mint' ? 'bg-[#e1f7ef] text-primary' : 'bg-[#ffe1df] text-secondary'}`}
       >
-        <Icon name={icon} />
+        <Icon name="analytics" />
       </span>
-      <h3 className="font-display text-base font-medium tracking-[-.06em]">{title}</h3>
-      <p className="mt-2 text-sm">{value}</p>
-      {note ? (
-        <span className="mt-4 block text-sm leading-6 text-primary">↗ {note}</span>
-      ) : (
-        <span className="mt-4 block h-1 rounded-full bg-surface-container-high">
-          <span className="block h-full w-3/4 rounded-full bg-secondary" />
-        </span>
-      )}
+      <h3 className="font-display text-base font-medium tracking-[-.06em]">{record.date}</h3>
+      <p className="mt-2 text-sm">{record.grade} 등급</p>
+      <span className="mt-4 block text-sm leading-6 text-primary">
+        {record.type === 'official' ? '정식 측정' : '자가측정'}
+      </span>
     </button>
   )
 }
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const { data: child, isLoading, error, refetch } = useChild()
-  if (isLoading)
+  const childQuery = useChild()
+  const recordsQuery = useRecords()
+  const latestRecord = recordsQuery.data?.[0]
+  const latestMeasurementQuery = useMeasurement(latestRecord?.id)
+  const child = childQuery.data
+
+  if (childQuery.isLoading || recordsQuery.isLoading || latestMeasurementQuery.isLoading)
     return (
       <AppLayout active="home">
         <LoadingState message="대시보드를 준비하고 있어요…" />
       </AppLayout>
     )
-  if (error)
+  if (childQuery.error || recordsQuery.error || latestMeasurementQuery.error)
     return (
       <AppLayout active="home">
-        <ErrorState message="자녀 정보를 불러오지 못했어요." onRetry={() => void refetch()} />
+        <ErrorState
+          message="대시보드 데이터를 불러오지 못했어요."
+          onRetry={() => {
+            void childQuery.refetch()
+            void recordsQuery.refetch()
+          }}
+        />
       </AppLayout>
     )
   if (!child)
@@ -345,10 +419,14 @@ export function DashboardPage() {
           <Character large />
         </div>
         <div className="-mt-1">
-          <GradeBadge />
-          <h1 className="mt-2 font-display text-[28px] font-bold tracking-[-.09em]">
-            {child?.name ?? '망고'}의 성장 일기
-          </h1>
+          {latestRecord ? (
+            <GradeBadge grade={latestRecord.grade} />
+          ) : (
+            <span className="inline-flex rounded-full bg-surface-container-low px-4 py-2 text-sm text-on-surface-variant">
+              아직 진단 전
+            </span>
+          )}
+          <h1 className="mt-2 font-display text-[28px] font-bold tracking-[-.09em]">{child.name}의 성장 일기</h1>
           <p className="mt-2 text-base text-on-surface-variant">건강하게 쑥쑥 자라나고 있어요!</p>
         </div>
       </section>
@@ -356,24 +434,48 @@ export function DashboardPage() {
         <div className="flex items-start justify-between">
           <div>
             <h2 className="font-display text-2xl font-bold tracking-[-.08em]">최근 진단 기록</h2>
-            <p className="mt-2 text-[17px] text-on-surface-variant">2023년 10월 24일 측정</p>
+            {latestRecord ? (
+              <p className="mt-2 text-[17px] text-on-surface-variant">{latestRecord.date} 측정</p>
+            ) : (
+              <p className="mt-2 text-[17px] text-on-surface-variant">아직 측정 기록이 없어요.</p>
+            )}
           </div>
           <Icon name="analytics" className="text-primary" />
         </div>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary-container px-4 py-2 text-sm text-primary">
-            <Icon name="flashlight" className="text-base" />
-            순발력 왕
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary-container px-4 py-2 text-sm text-primary">
-            <Icon name="run" className="text-base" />
-            유연성 최고
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#ffd9d5] px-4 py-2 text-sm text-secondary">
-            <Icon name="fitness_center" className="text-base" />
-            근력 부족
-          </span>
-        </div>
+        {latestMeasurementQuery.data ? (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {latestMeasurementQuery.data.profile.strengths.map((strength) => (
+              <span
+                key={`strength-${strength}`}
+                className="inline-flex items-center gap-1 rounded-full bg-primary-container px-4 py-2 text-sm text-primary"
+              >
+                <Icon name="trending_up" className="text-base" />
+                {strength}
+              </span>
+            ))}
+            {latestMeasurementQuery.data.profile.weaknesses.map((weakness) => (
+              <span
+                key={`weakness-${weakness}`}
+                className="inline-flex items-center gap-1 rounded-full bg-[#ffd9d5] px-4 py-2 text-sm text-secondary"
+              >
+                <Icon name="fitness_center" className="text-base" />
+                {weakness} 개선 필요
+              </span>
+            ))}
+            {!latestMeasurementQuery.data.profile.strengths.length &&
+              !latestMeasurementQuery.data.profile.weaknesses.length && (
+                <span className="text-sm text-on-surface-variant">프로필을 분석할 데이터가 부족해요.</span>
+              )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => navigate('/diagnosis/input')}
+            className="mt-5 rounded-full bg-primary-container px-4 py-2 text-sm font-semibold text-primary"
+          >
+            첫 측정 시작하기
+          </button>
+        )}
       </Card>
       <div className="mt-7 grid gap-3.5">
         <DashboardAction icon="fitness_center" text="체력 진단하기" onClick={() => navigate('/diagnosis')} />
@@ -433,11 +535,18 @@ export function RegionalPage() {
   const bars = regionalMap
     .slice(0, 5)
     .map((region) => [region.sidoSigungu, Math.round(region.participationRate * 100)] as const)
+  const regionName = insight?.region ?? regionalMap[0]?.sidoSigungu ?? '전국'
+  const relativeMessage =
+    insight?.relativeLevel === 'ABOVE_AVG'
+      ? '참여가 활발해요!'
+      : insight?.relativeLevel === 'BELOW_AVG'
+        ? '참여를 시작해보세요.'
+        : '전국 평균과 비슷해요.'
   return (
     <AppLayout active="centers">
       <PageHeading
         eyebrow="우리 동네 데이터"
-        title="서울시 참여율 랭킹"
+        title={`${regionName} 참여율 랭킹`}
         description={
           <>
             아이들이 건강하게 자라는 동네,
@@ -457,12 +566,10 @@ export function RegionalPage() {
           <h2 className="mt-3 font-display text-xl font-bold leading-tight text-primary">
             우리 동네는
             <br />
-            <strong>참여가 활발해요!</strong>
+            <strong>{relativeMessage}</strong>
           </h2>
           <p className="mt-2 text-xs leading-5 text-primary">
-            전국 평균보다 18% 높은
-            <br />
-            측정 참여율을 보이고 있어요.
+            {insight?.message ?? '지역 측정 데이터를 확인해보세요.'}
           </p>
         </div>
       </Card>
@@ -470,12 +577,9 @@ export function RegionalPage() {
         <SectionTitle
           title="지역별 참여율"
           action={
-            <button
-              type="button"
-              className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant"
-            >
-              서울시 <Icon name="expand_more" className="text-base" />
-            </button>
+            <span className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              {regionName}
+            </span>
           }
         />
         <div className="mt-6 grid gap-4">
@@ -493,20 +597,24 @@ export function RegionalPage() {
       </Card>
       <Card className="mt-5 p-5">
         <SectionTitle title="지역별 관심도 분포" action={<Icon name="map" className="text-primary" />} />
-        <div className="relative mt-4 h-56 overflow-hidden rounded-2xl bg-gradient-to-br from-[#dff4e8] to-[#fff3e2]">
-          <div className="absolute left-0 top-0 h-24 w-32 rounded-[14px_38px_18px_25px] bg-[#c8ebdc] p-8 text-xs">
-            강북구
-          </div>
-          <div className="absolute left-24 top-6 h-24 w-24 rotate-6 bg-[#e9f5df] p-8 text-xs">종로구</div>
-          <div className="absolute right-2 top-2 h-20 w-24 rounded-[40px_14px_28px_16px] bg-[#ffddca] p-7 text-xs">
-            중구
-          </div>
-          <div className="absolute bottom-[-10px] left-12 h-24 w-32 rounded-[42px_15px_10px_40px] bg-[#9bd9bb] p-8 text-xs">
-            강남구
-          </div>
-          <div className="absolute bottom-5 right-[-10px] h-20 w-28 rounded-[18px_55px_20px_12px] bg-[#f2c8bc] p-8 text-xs">
-            송파구
-          </div>
+        <div className="mt-4 grid gap-3">
+          {regionalMap.slice(0, 5).map((region) => (
+            <div key={region.sidoSigungu} className="grid grid-cols-[1fr_52px] items-center gap-3 text-xs">
+              <div>
+                <div className="mb-1 flex justify-between gap-3">
+                  <span>{region.sidoSigungu}</span>
+                  <span className="text-on-surface-variant">{region.measureCount.toLocaleString()}건</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-surface-container">
+                  <i
+                    className="block h-full rounded-full bg-primary"
+                    style={{ width: `${Math.round(region.participationRate * 100)}%` }}
+                  />
+                </div>
+              </div>
+              <strong className="text-right text-primary">{Math.round(region.participationRate * 100)}%</strong>
+            </div>
+          ))}
         </div>
       </Card>
     </AppLayout>

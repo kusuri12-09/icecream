@@ -10,6 +10,17 @@ const queryMocks = vi.hoisted(() => ({
     error: new Error('network failure'),
     refetch: vi.fn(),
   },
+  records: {
+    data: [],
+    isLoading: false,
+    error: undefined,
+    refetch: vi.fn(),
+  },
+  measurement: {
+    data: undefined,
+    isLoading: false,
+    error: undefined,
+  },
 }))
 
 vi.mock('../hooks/useAuth', () => ({
@@ -18,6 +29,8 @@ vi.mock('../hooks/useAuth', () => ({
 
 vi.mock('../hooks/useFitnessData', () => ({
   useChild: () => queryMocks.child,
+  useRecords: () => queryMocks.records,
+  useMeasurement: () => queryMocks.measurement,
   useRegionalInsight: () => ({ data: undefined }),
   useRegionalMap: () => ({ data: [] }),
   useSaveChild: () => ({ mutateAsync: vi.fn(), isPending: false }),
@@ -31,7 +44,7 @@ describe('DashboardPage', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('alert')).toHaveTextContent('자녀 정보를 불러오지 못했어요.')
+    expect(screen.getByRole('alert')).toHaveTextContent('대시보드 데이터를 불러오지 못했어요.')
     fireEvent.click(screen.getByRole('button', { name: '다시 시도' }))
     expect(queryMocks.child.refetch).toHaveBeenCalledOnce()
   })
