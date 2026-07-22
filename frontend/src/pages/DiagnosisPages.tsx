@@ -1,8 +1,12 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, type FormEvent } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ApiError } from '../api/client'
 import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Icon } from '../components/Icon'
 import { PrimaryButton, PillButton } from '../components/Button'
+import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
+import { useChild, useCreateMeasurement } from '../hooks/useFitnessData'
+import type { MeasurementResult } from '../types/models'
 
 export function DiagnosisPage() {
   const navigate = useNavigate()
@@ -112,6 +116,7 @@ function DiagnosisCategory({
   }
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`${wide ? 'col-span-2 min-h-44' : 'min-h-36'} rounded-[2.5rem] p-6 text-left transition hover:-translate-y-0.5 ${styles[tone]} ${active ? 'ring-4 ring-primary/20' : ''}`}
     >
@@ -124,6 +129,13 @@ function DiagnosisCategory({
 
 export function DiagnosisResultPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { data: child } = useChild()
+  const routeState = location.state as { measurement?: MeasurementResult } | null
+  const result = routeState?.measurement
+  const strengths = result?.profile.strengths.length ? result.profile.strengths : ['유연성']
+  const weaknesses = result?.profile.weaknesses.length ? result.profile.weaknesses : ['근력']
+
   return (
     <AppLayout active="diagnosis" back>
       <section className="px-2 pb-9 text-center">
@@ -132,10 +144,14 @@ export function DiagnosisResultPage() {
           aria-label="진단 결과 일러스트 영역"
           className="mx-auto mb-4 size-40 rounded-full border-[5px] border-primary-container bg-white shadow-[0_0_42px_rgba(181,234,215,.35)]"
         />
-        <GradeBadge dark />
-        <h1 className="mt-4 font-display text-[27px] font-bold tracking-[-.1em]">망고님, 무럭무럭 자라고 있어요!</h1>
+        <GradeBadge dark grade={result?.grade ?? '새싹'} />
+        <h1 className="mt-4 font-display text-[27px] font-bold tracking-[-.1em]">
+          {child?.name ?? '아이'}님, 무럭무럭 자라고 있어요!
+        </h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
-          기초 체력이 눈에 띄게 좋아졌네요.
+          {result
+            ? `${result.items.length}개 측정 항목을 바탕으로 등급을 판정했어요.`
+            : '기초 체력이 눈에 띄게 좋아졌네요.'}
           <br />
           작은 습관들이 열매를 맺기 시작했어요.
         </p>
@@ -153,11 +169,11 @@ export function DiagnosisResultPage() {
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-[#effaf6] p-4 text-center">
             <span className="block text-sm text-primary">장점</span>
-            <b className="mt-1 block font-normal">유연성</b>
+            <b className="mt-1 block font-normal">{strengths[0]}</b>
           </div>
           <div className="rounded-lg bg-[#fff0ef] p-4 text-center text-secondary">
             <span className="block text-sm">개선 필요</span>
-            <b className="mt-1 block font-normal">근력</b>
+            <b className="mt-1 block font-normal">{weaknesses[0]}</b>
           </div>
         </div>
       </Card>
@@ -178,7 +194,6 @@ export function DiagnosisResultPage() {
     </AppLayout>
   )
 }
-
 function RadarFigure() {
   return (
     <div className="relative mx-auto my-4 h-80 max-w-[310px] rounded-full bg-[repeating-radial-gradient(circle_at_center,transparent_0_41px,rgba(108,128,118,.16)_42px_44px),linear-gradient(rgba(108,128,118,.14),rgba(108,128,118,.14))_center/1px_100%_no-repeat,linear-gradient(90deg,rgba(108,128,118,.14),rgba(108,128,118,.14))_center/100%_1px_no-repeat]">
@@ -191,23 +206,116 @@ function RadarFigure() {
   )
 }
 
+const measurementFields = [
+  { itemKey: 'CARDIO', group: '심폐지구력', label: '10m 왕복 오래달리기', unit: '회', icon: 'directions_run' },
+  { itemKey: 'GRIP', group: '근력', label: '상대악력', unit: '%', icon: 'fitness_center' },
+  { itemKey: 'MUSCULAR_END', group: '근지구력', label: '윗몸 말아올리기', unit: '회', icon: 'self_improvement' },
+  { itemKey: 'FLEXIBILITY', group: '유연성', label: '앉아 윗몸 앞으로 굽히기', unit: 'cm', icon: 'straighten' },
+  { itemKey: 'AGILITY', group: '민첩성', label: '5m × 4 왕복달리기', unit: '초', icon: 'directions_run' },
+  { itemKey: 'POWER', group: '순발력', label: '제자리 멀리뛰기', unit: 'cm', icon: 'bolt' },
+  { itemKey: 'COORDINATION', group: '협응력', label: '3×3 버튼 누르기', unit: '초', icon: 'touch_app' },
+  { itemKey: 'BMI', group: '신체조성', label: 'BMI', unit: '', icon: 'monitor_weight' },
+] as const
+
 export function MeasurementInputPage() {
   const navigate = useNavigate()
+  const childQuery = useChild()
+  const child = childQuery.data
+  const createMeasurement = useCreateMeasurement()
   const [type, setType] = useState<'official' | 'self'>('official')
-  const fields = [
-    ['심폐지구력', '10m 왕복 오래달리기', '회', 'air'],
-    ['근력', '상대악력', '%', 'fitness_center'],
-    ['근지구력', '윗몸 말아올리기', '회', 'self_improvement'],
-    ['유연성', '앉아 윗몸 앞으로 굽히기', 'cm', 'straighten'],
-    ['민첩성', '5m × 4 왕복달리기', '초', 'directions_run'],
-    ['순발력', '제자리 멀리뛰기', 'cm', 'bolt'],
-    ['협응력', '3×3 버튼 누르기', '초', 'touch_app'],
-    ['신체조성', 'BMI', '', 'monitor_weight'],
-  ]
+  const [values, setValues] = useState<Record<string, string>>({})
+  const [measuredAt, setMeasuredAt] = useState(() => new Date().toISOString().slice(0, 10))
+  const [centerId, setCenterId] = useState('')
+  const [error, setError] = useState('')
+
+  if (childQuery.isLoading)
+    return (
+      <AppLayout active="diagnosis">
+        <LoadingState message="아이 프로필을 불러오고 있어요…" />
+      </AppLayout>
+    )
+  if (childQuery.error)
+    return (
+      <AppLayout active="diagnosis">
+        <ErrorState message="아이 프로필을 불러오지 못했어요." onRetry={() => void childQuery.refetch()} />
+      </AppLayout>
+    )
+  if (!child)
+    return (
+      <AppLayout active="diagnosis">
+        <EmptyState
+          message="진단을 시작하려면 아이 프로필을 등록해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/onboarding')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              프로필 등록하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+    if (!child?.id) {
+      setError('먼저 아이 프로필을 등록해주세요.')
+      return
+    }
+    if (!measuredAt) {
+      setError('측정일을 선택해주세요.')
+      return
+    }
+
+    const items: Array<{ itemKey: string; value: number }> = []
+    for (const field of measurementFields) {
+      const rawValue = values[field.itemKey]?.trim()
+      if (!rawValue) continue
+      const value = Number(rawValue)
+      if (!Number.isFinite(value) || value < 0) {
+        setError(`${field.group} 측정값을 0 이상의 숫자로 입력해주세요.`)
+        return
+      }
+      items.push({ itemKey: field.itemKey, value })
+    }
+    if (items.length === 0) {
+      setError('측정값을 하나 이상 입력해주세요.')
+      return
+    }
+
+    try {
+      const result = await createMeasurement.mutateAsync({
+        childId: child.id,
+        request: {
+          type: type === 'official' ? 'OFFICIAL' : 'SELF',
+          measuredAt,
+          centerId: type === 'official' ? centerId.trim() || null : null,
+          items,
+        },
+      })
+      navigate('/diagnosis/result', { replace: true, state: { measurement: result } })
+    } catch (cause) {
+      if (cause instanceof ApiError && cause.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
+      setError(
+        cause instanceof ApiError ? cause.message : '측정 결과를 저장하지 못했습니다. 잠시 후 다시 시도해주세요.',
+      )
+    }
+  }
+
+  function updateValue(itemKey: string, value: string) {
+    setValues((current) => ({ ...current, [itemKey]: value }))
+  }
+
   return (
     <AppLayout active="diagnosis">
       <section className="px-2 pb-5">
-        <span className="font-label text-sm font-semibold text-on-surface-variant">망고의 오늘</span>
+        <span className="font-label text-sm font-semibold text-on-surface-variant">{child?.name ?? '아이'}의 오늘</span>
         <h1 className="mt-2 font-display text-[28px] tracking-[-.09em]">체력 측정 입력</h1>
         <p className="mt-3 text-base leading-7 text-on-surface-variant">
           측정 결과를 입력하면 성장 등급과
@@ -215,45 +323,79 @@ export function MeasurementInputPage() {
           항목별 강점을 확인할 수 있어요.
         </p>
       </section>
-      <div className="mb-4 flex gap-1 rounded-full bg-surface-container-low p-1">
-        <PillButton className="flex-1 border-0" active={type === 'official'} onClick={() => setType('official')}>
-          정식 측정
-        </PillButton>
-        <PillButton className="flex-1 border-0" active={type === 'self'} onClick={() => setType('self')}>
-          자가측정
-        </PillButton>
-      </div>
-      {type === 'self' && (
-        <div className="mb-4 flex items-center gap-2 rounded-2xl bg-[#e9f7f1] p-4 text-sm text-primary">
-          <Icon name="info" />
-          <span>자가측정 결과는 참고용으로만 활용돼요.</span>
+      <form className="grid gap-4" onSubmit={handleSubmit}>
+        <div className="flex gap-1 rounded-full bg-surface-container-low p-1">
+          <PillButton className="flex-1 border-0" active={type === 'official'} onClick={() => setType('official')}>
+            정식 측정
+          </PillButton>
+          <PillButton className="flex-1 border-0" active={type === 'self'} onClick={() => setType('self')}>
+            자가측정
+          </PillButton>
         </div>
-      )}
-      <div className="grid gap-2.5">
-        {fields.map(([group, label, unit, icon], index) => (
-          <label
-            key={group}
-            className="flex min-h-[82px] items-center gap-3 rounded-[22px] border border-outline-variant/40 bg-white p-3 shadow-soft"
-          >
-            <span
-              className={`grid size-11 flex-none place-items-center rounded-xl ${index % 3 === 1 ? 'bg-[#ffe2df] text-secondary' : index % 3 === 2 ? 'bg-tertiary-container text-[#625f4e]' : 'bg-primary-container text-primary'}`}
-            >
-              <Icon name={icon} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <b className="block text-base">{group}</b>
-              <small className="mt-1 block truncate text-[11px] text-on-surface-variant">{label}</small>
-            </span>
-            <span className="flex h-11 items-center rounded-full bg-surface-container-low pl-3 pr-2">
-              <input className="w-14 bg-transparent text-right outline-none" placeholder="00.0" inputMode="decimal" />
-              <em className="text-[11px] not-italic text-on-surface-variant">{unit}</em>
-            </span>
+        {type === 'self' && (
+          <div className="flex items-center gap-2 rounded-2xl bg-[#e9f7f1] p-4 text-sm text-primary">
+            <Icon name="info" />
+            <span>자가측정 결과는 참고용으로만 활용돼요.</span>
+          </div>
+        )}
+        <label className="grid gap-2 text-sm font-semibold">
+          측정일
+          <input
+            type="date"
+            value={measuredAt}
+            onChange={(event) => setMeasuredAt(event.target.value)}
+            className="h-[52px] rounded-full border border-outline-variant/50 bg-white px-5 font-normal outline-none focus:border-primary"
+          />
+        </label>
+        {type === 'official' && (
+          <label className="grid gap-2 text-sm font-semibold">
+            센터 ID <span className="font-normal text-on-surface-variant">(선택)</span>
+            <input
+              value={centerId}
+              onChange={(event) => setCenterId(event.target.value)}
+              className="h-[52px] rounded-full border border-outline-variant/50 bg-white px-5 font-normal outline-none focus:border-primary"
+              placeholder="center_45"
+            />
           </label>
-        ))}
-      </div>
-      <PrimaryButton className="mt-6 w-full" onClick={() => navigate('/diagnosis/result')}>
-        진단 결과 확인하기
-      </PrimaryButton>
+        )}
+        <div className="grid gap-2.5">
+          {measurementFields.map((field, index) => (
+            <label
+              key={field.itemKey}
+              className="flex min-h-[82px] items-center gap-3 rounded-[22px] border border-outline-variant/40 bg-white p-3 shadow-soft"
+            >
+              <span
+                className={`grid size-11 flex-none place-items-center rounded-xl ${index % 3 === 1 ? 'bg-[#ffe2df] text-secondary' : index % 3 === 2 ? 'bg-tertiary-container text-[#625f4e]' : 'bg-primary-container text-primary'}`}
+              >
+                <Icon name={field.icon} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <b className="block text-base">{field.group}</b>
+                <small className="mt-1 block truncate text-[11px] text-on-surface-variant">{field.label}</small>
+              </span>
+              <span className="flex h-11 items-center rounded-full bg-surface-container-low pl-3 pr-2">
+                <input
+                  value={values[field.itemKey] ?? ''}
+                  onChange={(event) => updateValue(field.itemKey, event.target.value)}
+                  className="w-14 bg-transparent text-right outline-none"
+                  placeholder="00.0"
+                  inputMode="decimal"
+                  aria-label={`${field.group} 측정값`}
+                />
+                <em className="text-[11px] not-italic text-on-surface-variant">{field.unit}</em>
+              </span>
+            </label>
+          ))}
+        </div>
+        {error && (
+          <p role="alert" className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">
+            {error}
+          </p>
+        )}
+        <PrimaryButton type="submit" className="w-full" disabled={createMeasurement.isPending}>
+          {createMeasurement.isPending ? '결과를 저장하고 있어요…' : '진단 결과 확인하기'}
+        </PrimaryButton>
+      </form>
     </AppLayout>
   )
 }

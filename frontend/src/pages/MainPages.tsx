@@ -1,14 +1,66 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ApiError } from '../api/client'
 import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Character } from '../components/Character'
+import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
 import { Icon } from '../components/Icon'
 import { PrimaryButton } from '../components/Button'
-import { useChild } from '../hooks/useFitnessData'
+import { useChild, useRegionalInsight, useRegionalMap, useSaveChild } from '../hooks/useFitnessData'
+import type { ChildProfile } from '../types/models'
 
 export function OnboardingPage() {
+  const { data: child, isLoading } = useChild()
+  if (isLoading) {
+    return (
+      <AppLayout className="pb-10">
+        <div className="grid min-h-[50vh] place-items-center text-sm text-on-surface-variant" role="status">
+          프로필을 준비하고 있어요…
+        </div>
+      </AppLayout>
+    )
+  }
+  return <OnboardingForm key={child?.id ?? 'new'} child={child ?? null} />
+}
+
+function OnboardingForm({ child }: { child: ChildProfile | null }) {
   const navigate = useNavigate()
-  const [gender, setGender] = useState<'male' | 'female'>('male')
+  const saveChild = useSaveChild()
+  const [nickname, setNickname] = useState(child?.name ?? '')
+  const [gender, setGender] = useState<'male' | 'female'>(child?.gender ?? 'male')
+  const [birthYearMonth, setBirthYearMonth] = useState(child?.birthYearMonth ?? '')
+  const [error, setError] = useState('')
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const trimmedNickname = nickname.trim()
+    setError('')
+    if (!trimmedNickname) {
+      setError('아이 이름을 입력해주세요.')
+      return
+    }
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(birthYearMonth)) {
+      setError('생년월을 올바르게 선택해주세요.')
+      return
+    }
+
+    try {
+      await saveChild.mutateAsync({
+        childId: child?.id,
+        nickname: trimmedNickname,
+        gender: gender === 'female' ? 'FEMALE' : 'MALE',
+        birthYearMonth,
+      })
+      navigate('/dashboard', { replace: true })
+    } catch (cause) {
+      if (cause instanceof ApiError && cause.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
+      setError(cause instanceof ApiError ? cause.message : '프로필을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.')
+    }
+  }
+
   return (
     <AppLayout className="pb-10">
       <section className="px-2 pb-7 text-center">
@@ -35,39 +87,23 @@ export function OnboardingPage() {
             <Icon name="face" />
           </span>
           <div>
-            <p className="font-label text-xs font-semibold text-on-surface-variant">처음이시라면</p>
+            <p className="font-label text-xs font-semibold text-on-surface-variant">
+              {child ? '프로필을 수정해요' : '처음이시라면'}
+            </p>
             <h2 className="font-display text-lg font-bold tracking-[-.06em]">아이 프로필을 등록해요</h2>
           </div>
         </div>
-        <div className="mb-5 flex gap-2">
-          <button className="flex items-center gap-1.5 rounded-full border-2 border-primary bg-primary-container py-1.5 pl-1.5 pr-3 text-sm font-semibold text-primary">
-            <span className="grid size-8 place-items-center rounded-full bg-[#ffd7c9] text-primary">
-              <span aria-hidden="true" className="size-4 rounded-full bg-white/55" />
-            </span>
-            망고
-          </button>
-          <button className="flex items-center gap-1.5 rounded-full border border-outline-variant bg-white py-1.5 pl-1.5 pr-3 text-sm text-on-surface-variant">
-            <span className="grid size-8 place-items-center rounded-full bg-[#ffd8dd] text-secondary">
-              <span aria-hidden="true" className="size-4 rounded-full bg-white/55" />
-            </span>
-            하윤
-          </button>
-          <button className="grid size-11 place-items-center rounded-full border border-dashed border-outline text-outline">
-            <Icon name="add" />
-          </button>
-        </div>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            navigate('/dashboard')
-          }}
-          className="space-y-4"
-        >
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <label className="block">
             <span className="mb-2 block font-label text-xs font-semibold text-on-surface-variant">아이 이름</span>
             <input
+              name="nickname"
+              value={nickname}
+              onChange={(event) => setNickname(event.target.value)}
+              aria-invalid={Boolean(error && !nickname.trim())}
+              aria-describedby={error ? 'profile-error' : undefined}
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary focus:ring-4 focus:ring-primary-container/50"
-              defaultValue="망고"
+              placeholder="아이 이름을 입력해주세요"
             />
           </label>
           <div>
@@ -75,6 +111,7 @@ export function OnboardingPage() {
             <div className="flex gap-1 rounded-full bg-surface-container-low p-1">
               <button
                 type="button"
+                aria-pressed={gender === 'male'}
                 onClick={() => setGender('male')}
                 className={`flex h-11 flex-1 items-center justify-center gap-1 rounded-full font-label text-sm ${gender === 'male' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant'}`}
               >
@@ -83,6 +120,7 @@ export function OnboardingPage() {
               </button>
               <button
                 type="button"
+                aria-pressed={gender === 'female'}
                 onClick={() => setGender('female')}
                 className={`flex h-11 flex-1 items-center justify-center gap-1 rounded-full font-label text-sm ${gender === 'female' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant'}`}
               >
@@ -95,19 +133,31 @@ export function OnboardingPage() {
             <span className="mb-2 block font-label text-xs font-semibold text-on-surface-variant">생년월</span>
             <input
               type="month"
+              name="birthYearMonth"
+              value={birthYearMonth}
+              aria-invalid={Boolean(error && !birthYearMonth)}
+              aria-describedby={error ? 'profile-error' : undefined}
+              onChange={(event) => setBirthYearMonth(event.target.value)}
               className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary"
-              defaultValue="2021-09"
             />
           </label>
-          <PrimaryButton type="submit" className="mt-2 w-full">
-            성장 기록 시작하기
+          {error && (
+            <p
+              id="profile-error"
+              role="alert"
+              className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container"
+            >
+              {error}
+            </p>
+          )}
+          <PrimaryButton type="submit" className="mt-2 w-full" disabled={saveChild.isPending}>
+            {saveChild.isPending ? '저장하고 있어요…' : child ? '프로필 저장하기' : '성장 기록 시작하기'}
           </PrimaryButton>
         </form>
       </Card>
     </AppLayout>
   )
 }
-
 export function HomePage() {
   const navigate = useNavigate()
   return (
@@ -137,7 +187,11 @@ export function HomePage() {
         <SectionTitle
           title="최근 활동 기록"
           action={
-            <button className="font-display text-sm font-bold text-primary" onClick={() => navigate('/records')}>
+            <button
+              type="button"
+              className="font-display text-sm font-bold text-primary"
+              onClick={() => navigate('/records')}
+            >
               전체보기
             </button>
           }
@@ -203,6 +257,7 @@ export function HomePage() {
         ))}
       </div>
       <button
+        type="button"
         className="fixed bottom-24 right-[max(24px,calc(50%_-_220px))] z-20 grid size-14 place-items-center rounded-full bg-primary text-white shadow-lg"
         onClick={() => navigate('/diagnosis/input')}
       >
@@ -229,6 +284,7 @@ function ActivityTile({
 }) {
   return (
     <button
+      type="button"
       className="min-h-48 rounded-3xl border border-outline-variant/40 bg-white p-5 text-left shadow-soft"
       onClick={onClick}
     >
@@ -252,7 +308,36 @@ function ActivityTile({
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const { data: child } = useChild()
+  const { data: child, isLoading, error, refetch } = useChild()
+  if (isLoading)
+    return (
+      <AppLayout active="home">
+        <LoadingState message="대시보드를 준비하고 있어요…" />
+      </AppLayout>
+    )
+  if (error)
+    return (
+      <AppLayout active="home">
+        <ErrorState message="자녀 정보를 불러오지 못했어요." onRetry={() => void refetch()} />
+      </AppLayout>
+    )
+  if (!child)
+    return (
+      <AppLayout active="home">
+        <EmptyState
+          message="먼저 아이 프로필을 등록해주세요."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/onboarding')}
+              className="rounded-full bg-primary px-5 py-3 font-semibold text-white"
+            >
+              프로필 등록하기
+            </button>
+          }
+        />
+      </AppLayout>
+    )
   return (
     <AppLayout active="home">
       <section className="pt-2 text-center">
@@ -323,13 +408,31 @@ function DashboardAction({
 }
 
 export function RegionalPage() {
-  const bars = [
-    ['송파구', 82],
-    ['강남구', 71],
-    ['서초구', 64],
-    ['마포구', 53],
-    ['용산구', 45],
-  ] as const
+  const insightQuery = useRegionalInsight()
+  const regionalMapQuery = useRegionalMap()
+  const insight = insightQuery.data
+  const regionalMap = regionalMapQuery.data ?? []
+  if (insightQuery.isLoading || regionalMapQuery.isLoading)
+    return (
+      <AppLayout active="centers">
+        <LoadingState message="지역 참여 데이터를 불러오고 있어요…" />
+      </AppLayout>
+    )
+  if (insightQuery.error || regionalMapQuery.error)
+    return (
+      <AppLayout active="centers">
+        <ErrorState
+          message="지역 참여 데이터를 불러오지 못했어요."
+          onRetry={() => {
+            void insightQuery.refetch()
+            void regionalMapQuery.refetch()
+          }}
+        />
+      </AppLayout>
+    )
+  const bars = regionalMap
+    .slice(0, 5)
+    .map((region) => [region.sidoSigungu, Math.round(region.participationRate * 100)] as const)
   return (
     <AppLayout active="centers">
       <PageHeading
@@ -349,7 +452,7 @@ export function RegionalPage() {
         </div>
         <div>
           <span className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-semibold text-primary">
-            송파구 상위 1위
+            {insight?.region ?? '우리 지역'} 참여 현황
           </span>
           <h2 className="mt-3 font-display text-xl font-bold leading-tight text-primary">
             우리 동네는
@@ -367,7 +470,10 @@ export function RegionalPage() {
         <SectionTitle
           title="지역별 참여율"
           action={
-            <button className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+            <button
+              type="button"
+              className="rounded-full bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant"
+            >
               서울시 <Icon name="expand_more" className="text-base" />
             </button>
           }
