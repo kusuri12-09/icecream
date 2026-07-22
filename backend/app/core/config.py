@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     kspo_api_key: str | None = None
     kspo_center_url: str | None = None
     kspo_activity_url: str | None = None
+    cron_secret: str | None = None
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
     @property
@@ -30,7 +31,9 @@ class Settings(BaseSettings):
     @property
     def resolved_database_url(self) -> str:
         if self.database_url:
-            return self.database_url
+            return self.database_url.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1).replace(
+                "postgresql://", "postgresql+psycopg://", 1
+            )
         if self.db_user and self.db_password:
             user = quote_plus(self.db_user)
             password = quote_plus(self.db_password)

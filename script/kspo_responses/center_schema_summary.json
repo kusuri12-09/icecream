@@ -1,0 +1,18 @@
+{
+  "fetched_at": "2026-07-21T20:23:51.347595",
+  "base": "https://apis.data.go.kr/B551014/SRVC_TODZ_NFA_TEST_CENTER_CNT",
+  "endpoint": "TODZ_NFA_TEST_CENTER_CNT",
+  "item_count": 50,
+  "fields": [
+    "center_addr1",
+    "center_addr2",
+    "center_nm",
+    "row_num",
+    "test_cnt",
+    "test_ym"
+  ],
+  "region_candidate_fields": [
+    "center_addr1",
+    "center_addr2"
+  ]
+}

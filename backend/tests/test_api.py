@@ -208,6 +208,33 @@ def test_measurement_detail_growth_and_delete(client: TestClient):
     assert client.get(f"/api/v1/measurements/{measurement_id}", headers=headers).status_code == 404
 
 
+def test_full_parent_diagnosis_history_and_insight_flow(client: TestClient):
+    headers = auth_headers(client, "full-flow@example.com")
+    db = SessionLocal()
+    db.add_all(
+        [
+            Center(ext_center_id="flow-center-seoul", name="서울 센터", address="서울 강남구 테헤란로 1", sido_sigungu="서울 강남구", measure_count=12),
+            Center(ext_center_id="flow-center-busan", name="부산 센터", address="부산 해운대구 센텀로 1", sido_sigungu="부산 해운대구", measure_count=4),
+        ]
+    )
+    db.commit()
+    db.close()
+
+    child_id = create_child(client, headers)
+    measurement_id = create_fruit_measurement(client, headers, child_id)
+
+    detail = client.get(f"/api/v1/measurements/{measurement_id}", headers=headers)
+    history = client.get(f"/api/v1/children/{child_id}/measurements", headers=headers)
+    insight = client.get("/api/v1/insights/regional?sidoSigungu=서울%20강남구", headers=headers)
+
+    assert detail.status_code == 200
+    assert detail.json()["data"]["grade"] == "FRUIT"
+    assert history.status_code == 200
+    assert history.json()["data"]["totalElements"] == 1
+    assert insight.status_code == 200
+    assert insight.json()["data"]["regionMeasureCount"] == 12
+
+
 def test_measurement_creation_rejects_invalid_age_and_duplicate_items(client: TestClient):
     headers = auth_headers(client, "invalid-measurement@example.com")
     child = client.post(
@@ -307,3 +334,49 @@ def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pyte
         db.close()
     finally:
         settings.kspo_api_key, settings.kspo_center_url, settings.kspo_activity_url = original
+
+
+def test_cron_sync_rejects_invalid_secret(client: TestClient):
+    settings = get_settings()
+    original = settings.cron_secret
+    settings.cron_secret = "cron-test-secret"
+    try:
+        response = client.get(
+            "/api/v1/internal/cron-sync/centers",
+            headers={"Authorization": "Bearer wrong-secret"},
+        )
+        assert response.status_code == 401
+        assert response.json()["error"]["code"] == "AUTH_UNAUTHORIZED"
+    finally:
+        settings.cron_secret = original
+
+
+def test_cron_sync_runs_target_with_secret(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    settings = get_settings()
+    original = (settings.cron_secret, settings.kspo_api_key, settings.kspo_center_url)
+    settings.cron_secret = "cron-test-secret"
+    settings.kspo_api_key = "test-key"
+    settings.kspo_center_url = "https://example.com/centers"
+
+    class FakeKspoClient:
+        def __init__(self, api_key: str):
+            assert api_key == "test-key"
+
+        def fetch_centers(self, url: str) -> list[CenterRecord]:
+            assert url.endswith("centers")
+            return [CenterRecord("cron-center", "Cron 센터", "서울 중구 세종대로 1", "서울 중구", None, None, 7)]
+
+        def fetch_activities(self, url: str) -> list[ActivityRecord]:
+            raise AssertionError(f"unexpected activity sync: {url}")
+
+    monkeypatch.setattr("app.api.v1.internal.KspoClient", FakeKspoClient)
+    try:
+        response = client.get(
+            "/api/v1/internal/cron-sync/centers",
+            headers={"Authorization": "Bearer cron-test-secret"},
+        )
+        assert response.status_code == 200
+        assert response.json()["data"]["targets"] == ["CENTERS"]
+        assert response.json()["data"]["synced"] == {"centers": 1, "activities": 0}
+    finally:
+        settings.cron_secret, settings.kspo_api_key, settings.kspo_center_url = original

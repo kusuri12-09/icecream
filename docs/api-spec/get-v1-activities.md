@@ -2,7 +2,7 @@
 
 ## 설명
 
-자녀의 약점 체력 요소에 맞는 운동 콘텐츠를 추천합니다. 공공 API(15108846)의 캐시를 조회하며, `measurementId`가 지정되면 해당 측정의 `weaknesses`를 기준으로 필터링합니다.
+자녀의 약점 체력 요소에 맞는 운동 콘텐츠를 추천합니다. 공공 API(15108846)의 `TODZ_VDO_TRNG_GUIDE_I` 응답을 캐시한 데이터를 조회하며, `measurementId`가 지정되면 해당 측정의 약점을 기준으로 필터링합니다.
 
 ## REQUEST
 
@@ -28,8 +28,16 @@
         "id": "video_88",
         "title": "순발력 키우기 점프 놀이",
         "fitnessElement": "POWER",
+        "fitnessElements": ["POWER"],
         "ageGroup": "PRESCHOOL",
-        "url": "https://.../video"
+        "url": "https://.../video.mp4",
+        "description": "운동처방 가이드 설명",
+        "thumbnailUrl": "https://.../image.jpeg",
+        "fitnessLevel": "초급",
+        "equipment": "매트",
+        "trainingPlace": "실내",
+        "musclePart": "하체",
+        "durationSeconds": 91
       }
     ],
     "page": 1,

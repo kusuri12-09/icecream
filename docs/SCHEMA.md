@@ -121,15 +121,27 @@
 | `ix_center_sido_sigungu` | sido_sigungu | INDEX | 지역별 참여율 집계 |
 | `ix_center_lat_lng` | (latitude, longitude) | INDEX | 근처 센터 검색(선택, 소규모는 앱 계산 가능) |
 
+> 센터 API(15114286)의 실제 응답은 `center_nm`·`center_addr1` 기준 센터별 월별(`test_ym`) 측정건수 행이다. 시군구·위도·경도 필드는 제공되지 않으므로 기본 주소 앞 두 토큰으로 `sido_sigungu`를 파생하고, 센터명·기본 주소의 안정적인 해시를 `ext_center_id`로 사용한다. 동기화 시 모든 월의 `test_cnt`를 센터별로 합산해 `measure_count`에 저장한다.
+
 ## 6. activity_video (운동처방 동영상, 공공 API 캐시)
 | 컬럼 | 타입 | 제약 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `id` | BIGINT | PK, AUTO_INCREMENT | 내부 기본키 |
 | `ext_video_id` | VARCHAR(50) | UNIQUE, NOT NULL | 원본 동영상 식별자 |
 | `title` | VARCHAR(200) | NOT NULL | 콘텐츠 제목 |
-| `fitness_element` | VARCHAR(20) | NULLABLE | 대상 체력요소(약점 매칭 키) |
-| `age_group` | VARCHAR(20) | NULLABLE | 대상 연령대 |
+| `fitness_element` | VARCHAR(20) | NULLABLE | 대표 정규화 체력요소(약점 매칭 호환 키) |
+| `fitness_elements` | JSON | NULLABLE | 원본 체력요인에서 정규화한 복수 매칭 키 |
+| `age_group` | VARCHAR(20) | NULLABLE | 정규화 대상 연령대(`유소년` → `PRESCHOOL`) |
 | `url` | VARCHAR(500) | NOT NULL | 동영상 링크 |
+| `description` | TEXT | NULLABLE | `vdo_desc` 운동 설명 |
+| `thumbnail_url` | VARCHAR(500) | NULLABLE | `img_file_url`과 `img_file_nm`으로 조합한 썸네일 링크 |
+| `fitness_level` | VARCHAR(20) | NULLABLE | `ftns_lvl_nm` 운동 난이도 |
+| `equipment` | VARCHAR(100) | NULLABLE | `tool_nm` 사용 도구 |
+| `training_place` | VARCHAR(50) | NULLABLE | `trng_plc_nm` 운동 장소 |
+| `muscle_part` | VARCHAR(255) | NULLABLE | `trng_mscl_part` 운동 부위 |
+| `duration_seconds` | INTEGER | NULLABLE | `vdo_len` 영상 길이(초) |
+| `source_fitness_factor` | VARCHAR(50) | NULLABLE | 원본 `ftns_fctr_nm` 값 보존 |
+| `source_age_group` | VARCHAR(20) | NULLABLE | 원본 `aggrp_nm` 값 보존 |
 | `synced_at` | TIMESTAMP | NOT NULL | 마지막 동기화 시각 |
 | `created_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 생성 시각 |
 | `updated_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 최종 수정 시각 |
@@ -137,8 +149,10 @@
 ### 인덱스
 | 이름 | 컬럼 | 종류 | 목적 |
 | :--- | :--- | :--- | :--- |
-| `uq_video_ext_id` | ext_video_id | UNIQUE | 동기화 upsert 키 |
+| `uq_video_ext_id` | ext_video_id | UNIQUE | `file_nm` 기준 동기화 upsert 키 및 프레임 중복 제거 |
 | `ix_video_element` | (fitness_element, age_group) | INDEX | 약점 요소별 콘텐츠 조회 |
+
+> 동영상 API `01_trng_guide` 응답은 한 영상의 프레임마다 행이 반복된다. 동기화 시 `file_nm`을 영상 식별자로 사용해 하나의 영상만 저장하고, `file_url + file_nm` 및 `img_file_url + img_file_nm`으로 실제 리소스 URL을 조합한다.
 
 ## 캐싱 전략
 | 대상 | 방식 | 주기/무효화 | 이유 |

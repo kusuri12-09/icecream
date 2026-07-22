@@ -23,5 +23,9 @@ def list_recommendations(
     if not rows:
         raise AppError("EXTERNAL_API_UNAVAILABLE", "외부 데이터를 일시적으로 사용할 수 없습니다.", 503)
     if requested:
-        rows = [row for row in rows if row.fitness_element in requested]
+        rows = [
+            row
+            for row in rows
+            if requested.intersection(row.fitness_elements or ([row.fitness_element] if row.fitness_element else []))
+        ]
     return rows

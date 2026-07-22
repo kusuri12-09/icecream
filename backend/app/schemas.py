@@ -196,8 +196,16 @@ class ActivityOut(APIModel):
     id: str
     title: str
     fitness_element: FitnessElement | None
+    fitness_elements: list[FitnessElement] = Field(default_factory=list)
     age_group: str | None
     url: str
+    description: str | None = None
+    thumbnail_url: str | None = None
+    fitness_level: str | None = None
+    equipment: str | None = None
+    training_place: str | None = None
+    muscle_part: str | None = None
+    duration_seconds: int | None = None
 
 
 class SeriesPoint(APIModel):

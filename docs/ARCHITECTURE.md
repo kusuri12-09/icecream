@@ -1,7 +1,8 @@
 # 아이쑥크림(icecream) 시스템 아키텍처
 
 > 유아기 체력 진단·연계·추적 서비스의 시스템 구성, 레이어 설계, 프로젝트 구조, 데이터 흐름 정의.
-> 스택: FastAPI + PostgreSQL(백엔드) / React + TypeScript + Vite(프론트) / Docker.
+> 스택: FastAPI + PostgreSQL(Neon, 백엔드) / React + TypeScript + Vite(프론트) / Vercel 배포.
+> 로컬 개발에서는 Docker Compose 또는 로컬 PostgreSQL을 사용할 수 있다.
 
 ## 1. 아키텍처 개요
 
@@ -101,7 +102,7 @@ flowchart LR
 icecream/
 ├─ backend/
 │  ├─ app/
-│  │  ├─ main.py                  # FastAPI 앱 진입점
+│  │  ├─ main.py                  # FastAPI 앱 진입점(로컬/ASGI)
 │  │  ├─ core/
 │  │  │  ├─ config.py             # 환경설정(Pydantic Settings)
 │  │  │  ├─ security.py           # JWT, 비밀번호 해시(Argon2id)
@@ -109,14 +110,16 @@ icecream/
 │  │  │  ├─ response.py           # 공통 응답 래퍼
 │  │  │  ├─ errors.py             # 에러 코드·예외
 │  │  │  └─ ids.py                # {resource}_{id} 인코딩/디코딩
-│  │  ├─ api/v1/
-│  │  │  ├─ auth.py
-│  │  │  ├─ children.py
-│  │  │  ├─ measurements.py
-│  │  │  ├─ centers.py
-│  │  │  ├─ activities.py
-│  │  │  ├─ insights.py
-│  │  │  └─ internal.py
+│  │  ├─ api/
+│  │  │  ├─ common.py             # 공통 응답·페이지네이션
+│  │  │  └─ v1/
+│  │  │     ├─ auth.py
+│  │  │     ├─ children.py
+│  │  │     ├─ measurements.py
+│  │  │     ├─ centers.py
+│  │  │     ├─ activities.py
+│  │  │     ├─ insights.py
+│  │  │     └─ internal.py
 │  │  ├─ services/
 │  │  │  ├─ auth_service.py
 │  │  │  ├─ child_service.py
@@ -132,20 +135,9 @@ icecream/
 │  │  │  ├─ measurement_repo.py
 │  │  │  ├─ center_repo.py
 │  │  │  └─ activity_repo.py
-│  │  ├─ models/                  # SQLAlchemy ORM 모델
-│  │  │  ├─ parent.py
-│  │  │  ├─ child.py
-│  │  │  ├─ measurement.py
-│  │  │  ├─ measurement_item.py
-│  │  │  ├─ center.py
-│  │  │  └─ activity_video.py
-│  │  ├─ schemas/                 # Pydantic 요청/응답 DTO
-│  │  │  ├─ auth.py
-│  │  │  ├─ child.py
-│  │  │  ├─ measurement.py
-│  │  │  ├─ center.py
-│  │  │  ├─ activity.py
-│  │  │  └─ insight.py
+│  │  ├─ models/
+│  │  │  └─ entities.py            # SQLAlchemy ORM 모델 6종
+│  │  ├─ schemas.py                # Pydantic 요청/응답 DTO
 │  │  ├─ external/
 │  │  │  └─ kspo_client.py        # 공공 API httpx 클라이언트
 │  │  └─ resources/
@@ -154,6 +146,7 @@ icecream/
 │  ├─ tests/
 │  │  ├─ test_diagnosis_engine.py # 판정 로직 단위 테스트
 │  │  └─ ...
+│  ├─ index.py                     # Vercel FastAPI 진입점
 │  ├─ pyproject.toml
 │  └─ Dockerfile
 ├─ frontend/
@@ -212,11 +205,11 @@ icecream/
 
 ### 5.3 데이터 동기화 (배치)
 ```
-[SyncService] (스케줄/수동 트리거)
+[SyncService] (Vercel Cron/수동 트리거)
    ▼
-[kspo_client(httpx)] 공공 API 15114286/15108846 호출
+[kspo_client(httpx)] 공공 API 15114286 및 15108846 호출
    ▼
-extId 기준 upsert · 센터 주소 → sidoSigungu 파싱
+센터 API 월별 행을 센터별 측정건수로 합산 · 영상 프레임을 extId(`file_nm`) 기준 중복 제거 · 원본 분류값 정규화
    ▼
 [center/activity_video 테이블] 갱신, syncedAt 기록
 ```
@@ -231,7 +224,7 @@ extId 기준 upsert · 센터 주소 → sidoSigungu 파싱
 | 등급 저장 | measurement.grade 스냅샷 | 기준표 개정돼도 측정 당시 등급 보존 |
 | 공공 API | DB 캐시 + 배치 동기화 | 외부 장애 격리, 응답 속도 |
 | 외부 노출 ID | {resource}_{id} 인코딩 | Auto Increment 직접 노출 회피 |
-| 배포 | 모놀리식 + Docker | 시제품 운영 단순화 |
+| 배포 | Vercel + Neon PostgreSQL | 프론트·FastAPI 배포 단순화와 관리형 DB 활용 |
 
 ## 7. 인증·보안
 
@@ -246,6 +239,8 @@ extId 기준 upsert · 센터 주소 → sidoSigungu 파싱
 - OpenAPI 문서 자동 제공(`/docs`).
 - 헬스체크 엔드포인트(`/health`)로 컨테이너 상태 확인.
 - DB 마이그레이션은 Alembic으로 버전 관리.
+- 운영 동기화는 Vercel Cron이 인증된 배치 엔드포인트를 호출하는 방식으로 구성한다.
+- Cron 요청과 관리자 수동 동기화는 별도 인증 수단으로 분리한다.
 
 ## 9. 확장 고려사항 (시제품 이후)
 

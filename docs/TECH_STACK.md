@@ -36,7 +36,7 @@
 | 백엔드 | Python 3.12 + FastAPI | 타입 기반 비동기 API 서버 |
 | API 스키마 | Pydantic v2 | 요청·응답 검증 및 문서화 |
 | ORM | SQLAlchemy 2.x | 데이터베이스 모델과 쿼리 관리 |
-| 데이터베이스 | PostgreSQL | 회원·자녀·측정 기록·공공데이터 저장 |
+| 데이터베이스 | PostgreSQL (Neon) | 회원·자녀·측정 기록·공공데이터 저장 |
 | 마이그레이션 | Alembic | 스키마 변경 이력 관리 |
 | 인증 | 이메일/비밀번호 + JWT | PRD의 이메일 기반 회원 기능 구현 |
 | 비밀번호 보안 | Argon2id | 비밀번호 단방향 해시 저장 |
@@ -44,7 +44,7 @@
 | 테스트 | Pytest / Vitest / React Testing Library | 백엔드·프론트엔드 검증 |
 | 코드 품질 | Ruff / mypy / ESLint / Prettier | 정적 검사와 일관된 포맷 (`npm run format`, `npm run format:check`) |
 | 개발 환경 | Docker Compose | 로컬 PostgreSQL 등 개발환경 표준화 |
-| 배포 | Docker 기반 클라우드 환경 | 배포 플랫폼에 종속되지 않는 운영 기반 |
+| 배포 | Vercel | 프론트엔드 웹 애플리케이션 및 FastAPI 백엔드(Python Function) 배포·운영 |
 
 ### 3.2 초기에는 선택하지 않는 기술
 
@@ -52,6 +52,12 @@
 - Celery/RQ: 공공데이터 정기 동기화 작업이 생길 때 검토한다. MVP에서는 별도 관리 명령 또는 단순 스케줄러로 시작할 수 있다.
 - 상태관리 라이브러리(Redux 등): 서버 상태는 TanStack Query로 관리하고, 작은 UI 상태는 React 기본 기능으로 처리한다.
 - 네이티브 앱: 이번 MVP 범위는 반응형 웹이므로 제외한다.
+
+### 3.3 배포 및 호스팅
+
+- 프론트엔드와 FastAPI 백엔드는 Vercel에 배포한다. 백엔드는 `backend/index.py`의 FastAPI 앱을 Vercel Python Function으로 실행한다.
+- 운영 데이터베이스는 Neon에서 제공하는 PostgreSQL을 사용한다.
+- Neon 연결 문자열은 환경변수로 관리하고 저장소에 포함하지 않는다.
 
 ## 4. 프론트엔드 화면 구현 규칙
 
