@@ -214,9 +214,9 @@ icecream/
 ```
 [SyncService] (스케줄/수동 트리거)
    ▼
-[kspo_client(httpx)] 공공 API 15114286/15108846 호출
+[kspo_client(httpx)] 공공 API 15114286 및 15108846의 `TODZ_VDO_TRNG_GUIDE_I` 호출
    ▼
-extId 기준 upsert · 센터 주소 → sidoSigungu 파싱
+extId(`file_nm`) 기준 upsert · 영상 프레임 중복 제거 · 원본 분류값 정규화
    ▼
 [center/activity_video 테이블] 갱신, syncedAt 기록
 ```

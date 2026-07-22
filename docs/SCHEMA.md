@@ -127,9 +127,19 @@
 | `id` | BIGINT | PK, AUTO_INCREMENT | 내부 기본키 |
 | `ext_video_id` | VARCHAR(50) | UNIQUE, NOT NULL | 원본 동영상 식별자 |
 | `title` | VARCHAR(200) | NOT NULL | 콘텐츠 제목 |
-| `fitness_element` | VARCHAR(20) | NULLABLE | 대상 체력요소(약점 매칭 키) |
-| `age_group` | VARCHAR(20) | NULLABLE | 대상 연령대 |
+| `fitness_element` | VARCHAR(20) | NULLABLE | 대표 정규화 체력요소(약점 매칭 호환 키) |
+| `fitness_elements` | JSON | NULLABLE | 원본 체력요인에서 정규화한 복수 매칭 키 |
+| `age_group` | VARCHAR(20) | NULLABLE | 정규화 대상 연령대(`유소년` → `PRESCHOOL`) |
 | `url` | VARCHAR(500) | NOT NULL | 동영상 링크 |
+| `description` | TEXT | NULLABLE | `vdo_desc` 운동 설명 |
+| `thumbnail_url` | VARCHAR(500) | NULLABLE | `img_file_url`과 `img_file_nm`으로 조합한 썸네일 링크 |
+| `fitness_level` | VARCHAR(20) | NULLABLE | `ftns_lvl_nm` 운동 난이도 |
+| `equipment` | VARCHAR(100) | NULLABLE | `tool_nm` 사용 도구 |
+| `training_place` | VARCHAR(50) | NULLABLE | `trng_plc_nm` 운동 장소 |
+| `muscle_part` | VARCHAR(255) | NULLABLE | `trng_mscl_part` 운동 부위 |
+| `duration_seconds` | INTEGER | NULLABLE | `vdo_len` 영상 길이(초) |
+| `source_fitness_factor` | VARCHAR(50) | NULLABLE | 원본 `ftns_fctr_nm` 값 보존 |
+| `source_age_group` | VARCHAR(20) | NULLABLE | 원본 `aggrp_nm` 값 보존 |
 | `synced_at` | TIMESTAMP | NOT NULL | 마지막 동기화 시각 |
 | `created_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 생성 시각 |
 | `updated_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 최종 수정 시각 |
@@ -137,8 +147,10 @@
 ### 인덱스
 | 이름 | 컬럼 | 종류 | 목적 |
 | :--- | :--- | :--- | :--- |
-| `uq_video_ext_id` | ext_video_id | UNIQUE | 동기화 upsert 키 |
+| `uq_video_ext_id` | ext_video_id | UNIQUE | `file_nm` 기준 동기화 upsert 키 및 프레임 중복 제거 |
 | `ix_video_element` | (fitness_element, age_group) | INDEX | 약점 요소별 콘텐츠 조회 |
+
+> 동영상 API `01_trng_guide` 응답은 한 영상의 프레임마다 행이 반복된다. 동기화 시 `file_nm`을 영상 식별자로 사용해 하나의 영상만 저장하고, `file_url + file_nm` 및 `img_file_url + img_file_nm`으로 실제 리소스 URL을 조합한다.
 
 ## 캐싱 전략
 | 대상 | 방식 | 주기/무효화 | 이유 |
