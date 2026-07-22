@@ -1,6 +1,52 @@
 from app.external.kspo_client import KspoClient
 
 
+def test_fetch_centers_aggregates_monthly_measure_counts(monkeypatch):
+    payload = {
+        "response": {
+            "body": {
+                "totalCount": 3,
+                "items": {
+                    "item": [
+                        {
+                            "center_nm": "청주",
+                            "center_addr1": "청주시 서원구 사직대로 229",
+                            "center_addr2": "1층 청주체력인증센터",
+                            "test_ym": "201702",
+                            "test_cnt": 195,
+                        },
+                        {
+                            "center_nm": "청주",
+                            "center_addr1": "청주시 서원구 사직대로 229",
+                            "center_addr2": "1층 청주체력인증센터",
+                            "test_ym": "202009",
+                            "test_cnt": 8,
+                        },
+                        {
+                            "center_nm": "오산",
+                            "center_addr1": "경기도 오산시 경기동로 33",
+                            "center_addr2": "오산스포츠센터 1층",
+                            "test_ym": "201811",
+                            "test_cnt": 859,
+                        },
+                    ]
+                },
+            }
+        }
+    }
+
+    client = KspoClient("test-key")
+    monkeypatch.setattr(client, "_get", lambda url, page_no=1, num_of_rows=1000: payload)
+
+    records = client.fetch_centers("https://example.com/api")
+
+    assert len(records) == 2
+    cheongju = next(record for record in records if record.name == "청주")
+    assert cheongju.measure_count == 203
+    assert cheongju.sido_sigungu == "청주시 서원구"
+    assert cheongju.ext_center_id.startswith("kspo_center_")
+
+
 def test_fetch_activities_maps_trng_guide_fields_and_deduplicates_frames(monkeypatch):
     payload = {
         "response": {

@@ -207,9 +207,9 @@ icecream/
 ```
 [SyncService] (Vercel Cron/수동 트리거)
    ▼
-[kspo_client(httpx)] 공공 API 15114286 및 15108846의 `TODZ_VDO_TRNG_GUIDE_I` 호출
+[kspo_client(httpx)] 공공 API 15114286 및 15108846 호출
    ▼
-extId(`file_nm`) 기준 upsert · 영상 프레임 중복 제거 · 원본 분류값 정규화
+센터 API 월별 행을 센터별 측정건수로 합산 · 영상 프레임을 extId(`file_nm`) 기준 중복 제거 · 원본 분류값 정규화
    ▼
 [center/activity_video 테이블] 갱신, syncedAt 기록
 ```

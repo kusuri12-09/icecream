@@ -18,6 +18,7 @@ def sync_centers(db: Session, records: list[CenterRecord]) -> int:
         center.sido_sigungu = record.sido_sigungu
         center.latitude = record.latitude
         center.longitude = record.longitude
+        center.measure_count = record.measure_count
         center.synced_at = datetime.now(timezone.utc)
     return len(records)
 

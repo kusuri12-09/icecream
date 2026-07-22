@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import hashlib
 from math import ceil
 import re
 from typing import Any
@@ -21,6 +22,7 @@ class CenterRecord:
     sido_sigungu: str | None
     latitude: float | None
     longitude: float | None
+    measure_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -135,6 +137,19 @@ def parse_sido_sigungu(address: str) -> str | None:
     return " ".join(parts[:2]) if len(parts) >= 2 else None
 
 
+def _total_count(payload: Any) -> int | None:
+    if not isinstance(payload, dict):
+        return None
+    response = payload.get("response")
+    body = response.get("body") if isinstance(response, dict) else None
+    return _integer(_first(body, "totalCount", "total_count")) if isinstance(body, dict) else None
+
+
+def _stable_center_id(name: str, address: str) -> str:
+    source = f"{name.strip()}|{address.strip()}".encode("utf-8")
+    return f"kspo_center_{hashlib.sha256(source).hexdigest()[:32]}"
+
+
 class KspoClient:
     def __init__(self, api_key: str, timeout: float = 10.0) -> None:
         self.api_key = api_key
@@ -153,28 +168,53 @@ class KspoClient:
             raise ExternalApiUnavailable() from exc
 
     def fetch_centers(self, url: str) -> list[CenterRecord]:
-        result = []
-        for item in _items(self._get(url)):
-            address = str(_first(item, "address", "addr", "roadAddr", "refineRoadnmAddr") or "")
-            ext_id = _first(item, "extCenterId", "centerId", "fcltyNo", "id")
-            if not ext_id:
-                continue
-            result.append(CenterRecord(
-                ext_center_id=str(ext_id),
-                name=str(_first(item, "name", "centerName", "fcltyNm") or "이름 없는 센터"),
-                address=address,
-                sido_sigungu=str(_first(item, "sidoSigungu", "sidoNm") or parse_sido_sigungu(address) or "") or None,
-                latitude=_number(_first(item, "latitude", "lat", "la")),
-                longitude=_number(_first(item, "longitude", "lng", "lo")),
-            ))
-        return result
+        page_size = 1000
+        first_page = self._get(url, page_no=1, num_of_rows=page_size)
+        payloads = [first_page]
+        total_count = _total_count(first_page)
+        total_pages = ceil(total_count / page_size) if total_count else 1
+        for page_no in range(2, total_pages + 1):
+            payloads.append(self._get(url, page_no=page_no, num_of_rows=page_size))
+
+        records: dict[str, CenterRecord] = {}
+        for payload in payloads:
+            for item in _items(payload):
+                name = str(_first(item, "center_nm", "name", "centerName", "fcltyNm") or "이름 없는 센터")
+                base_address = str(_first(item, "center_addr1", "address", "addr", "roadAddr", "refineRoadnmAddr") or "")
+                detail_address = str(_first(item, "center_addr2", "detailAddress") or "")
+                address = " ".join(part for part in (base_address, detail_address) if part).strip()
+                ext_id = _first(item, "extCenterId", "centerId", "fcltyNo", "id")
+                ext_id = str(ext_id or _stable_center_id(name, base_address))
+                measure_count = _integer(_first(item, "test_cnt", "measureCount", "measure_count")) or 0
+                current = records.get(ext_id)
+                if current is None:
+                    records[ext_id] = CenterRecord(
+                        ext_center_id=ext_id,
+                        name=name,
+                        address=address,
+                        sido_sigungu=str(_first(item, "sidoSigungu", "sidoNm") or parse_sido_sigungu(base_address) or "") or None,
+                        latitude=_number(_first(item, "latitude", "lat", "la")),
+                        longitude=_number(_first(item, "longitude", "lng", "lo")),
+                        measure_count=measure_count,
+                    )
+                    continue
+                records[ext_id] = CenterRecord(
+                    ext_center_id=current.ext_center_id,
+                    name=current.name,
+                    address=current.address,
+                    sido_sigungu=current.sido_sigungu,
+                    latitude=current.latitude,
+                    longitude=current.longitude,
+                    measure_count=current.measure_count + measure_count,
+                )
+        return list(records.values())
 
     def fetch_activities(self, url: str) -> list[ActivityRecord]:
         page_size = 1000
         first_page = self._get(url, page_no=1, num_of_rows=page_size)
         payloads = [first_page]
-        total_count = _first(first_page.get("response", {}).get("body", {}), "totalCount")
-        total_pages = ceil(int(total_count) / page_size) if total_count else 1
+        total_count = _total_count(first_page)
+        total_pages = ceil(total_count / page_size) if total_count else 1
         for page_no in range(2, total_pages + 1):
             payloads.append(self._get(url, page_no=page_no, num_of_rows=page_size))
 

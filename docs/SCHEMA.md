@@ -35,6 +35,8 @@
 | `created_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 생성 시각 |
 | `updated_at` | TIMESTAMP | NOT NULL, DEFAULT now() | 최종 수정 시각 |
 
+> 센터 API(15114286)의 실제 응답은 `center_nm`·`center_addr1` 기준 센터별 월별(`test_ym`) 측정건수 행이다. 시군구·위도·경도 필드는 제공되지 않으므로 기본 주소 앞 두 토큰으로 `sido_sigungu`를 파생하고, 센터명·기본 주소의 안정적인 해시를 `ext_center_id`로 사용한다. 동기화 시 모든 월의 `test_cnt`를 센터별로 합산해 `measure_count`에 저장한다.
+
 ### 인덱스
 | 이름 | 컬럼 | 종류 | 목적 |
 | :--- | :--- | :--- | :--- |
