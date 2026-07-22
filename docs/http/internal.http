@@ -28,3 +28,12 @@ Content-Type: application/json
 {
   "targets": ["ACTIVITIES"]
 }
+
+### 동영상 100개 단위 페이지 동기화
+POST {{baseUrl}}/api/v1/internal/sync?page=1&page_size=100
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "targets": ["ACTIVITIES"]
+}

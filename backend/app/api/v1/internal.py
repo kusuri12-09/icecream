@@ -7,7 +7,7 @@ from app.api.common import DbDep, ParentDep, success
 from app.core.config import get_settings
 from app.external.kspo_client import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, ExternalApiUnavailable, KspoClient
 from app.schemas import SyncRequest
-from app.services.sync_service import acquire_sync_lock, release_sync_lock, sync_targets
+from app.services.sync_service import acquire_sync_lock, release_sync_lock, sync_activity_page, sync_targets
 
 
 router = APIRouter(prefix="/api/v1/internal", tags=["internal"])
@@ -60,6 +60,7 @@ def sync(
     parent: ParentDep,
     db: DbDep,
     page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    page: int | None = Query(default=None, ge=1),
 ) -> dict:
     from app.core.errors import AppError
 
@@ -72,10 +73,22 @@ def sync(
         raise ExternalApiUnavailable()
     if "ACTIVITIES" in payload.targets and not settings.kspo_activity_url:
         raise ExternalApiUnavailable()
+    if page is not None and payload.targets != ["ACTIVITIES"]:
+        raise AppError("INVALID_REQUEST_BODY", "페이지 단위 동기화는 ACTIVITIES만 지원합니다.", 422)
     lock = acquire_sync_lock(db)
     if lock is None:
         raise AppError("SYNC_IN_PROGRESS", "동기화가 이미 실행 중입니다.", 409)
     try:
+        if page is not None:
+            assert settings.kspo_activity_url is not None
+            result = sync_activity_page(
+                db,
+                KspoClient(settings.kspo_api_key),
+                settings.kspo_activity_url,
+                page,
+                page_size,
+            )
+            return success({**result, "syncedAt": datetime.now(timezone.utc).isoformat()})
         synced = sync_targets(
             db,
             KspoClient(settings.kspo_api_key),

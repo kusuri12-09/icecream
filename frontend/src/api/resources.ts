@@ -96,8 +96,11 @@ export async function getActivities(params: { fitnessElement?: string; measureme
   return (data.items ?? []).map(mapActivity)
 }
 
-export async function getCenters(
-  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string; size?: number } = {},
+const CENTER_PAGE_SIZE = 100
+
+async function getCenterPage(
+  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string },
+  page: number,
 ) {
   const query = new URLSearchParams()
   if (params.lat != null) query.set('lat', String(params.lat))
@@ -105,11 +108,24 @@ export async function getCenters(
   if (params.radiusKm != null) query.set('radiusKm', String(params.radiusKm))
   if (params.sido) query.set('sido', params.sido)
   if (params.sidoSigungu) query.set('sidoSigungu', params.sidoSigungu)
-  query.set('size', String(params.size ?? 1000))
+  query.set('page', String(page))
+  query.set('size', String(CENTER_PAGE_SIZE))
   const queryString = query.toString()
   const response = await apiRequest<unknown>('/api/v1/centers' + (queryString ? '?' + queryString : ''))
-  const data = unwrapData<{ items?: unknown[] }>(response)
-  return (data.items ?? []).map(mapCenter)
+  return unwrapData<{ items?: unknown[]; totalPages?: number }>(response)
+}
+
+export async function getCenters(
+  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string } = {},
+) {
+  const firstPage = await getCenterPage(params, 1)
+  const totalPages = Math.max(1, firstPage.totalPages ?? 1)
+  const items = [...(firstPage.items ?? [])]
+  for (let page = 2; page <= totalPages; page += 1) {
+    const nextPage = await getCenterPage(params, page)
+    items.push(...(nextPage.items ?? []))
+  }
+  return items.map(mapCenter)
 }
 
 export async function getRegionalInsight(sidoSigungu?: string) {

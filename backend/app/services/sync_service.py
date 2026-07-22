@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from math import ceil
 from threading import Lock
 from typing import Literal
 import logging
@@ -14,14 +15,38 @@ logger = logging.getLogger(__name__)
 SYNC_LOCK_KEY = 8_391_071
 _process_sync_lock = Lock()
 SyncLock = Literal["postgresql", "process"]
+SYNC_LOOKUP_CHUNK_SIZE = 100
+
+
+def _existing_centers(db: Session, records: list[CenterRecord]) -> dict[str, Center]:
+    existing: dict[str, Center] = {}
+    ext_ids = [record.ext_center_id for record in records]
+    for offset in range(0, len(ext_ids), SYNC_LOOKUP_CHUNK_SIZE):
+        chunk = ext_ids[offset : offset + SYNC_LOOKUP_CHUNK_SIZE]
+        rows = db.scalars(select(Center).where(Center.ext_center_id.in_(chunk))).all()
+        existing.update({center.ext_center_id: center for center in rows})
+    return existing
+
+
+def _existing_activities(db: Session, records: list[ActivityRecord]) -> dict[str, ActivityVideo]:
+    existing: dict[str, ActivityVideo] = {}
+    ext_ids = [record.ext_video_id for record in records]
+    for offset in range(0, len(ext_ids), SYNC_LOOKUP_CHUNK_SIZE):
+        chunk = ext_ids[offset : offset + SYNC_LOOKUP_CHUNK_SIZE]
+        rows = db.scalars(select(ActivityVideo).where(ActivityVideo.ext_video_id.in_(chunk))).all()
+        existing.update({video.ext_video_id: video for video in rows})
+    return existing
 
 
 def sync_centers(db: Session, records: list[CenterRecord]) -> int:
+    existing = _existing_centers(db, records)
+    synced_at = datetime.now(timezone.utc)
     for record in records:
-        center = db.scalar(select(Center).where(Center.ext_center_id == record.ext_center_id))
+        center = existing.get(record.ext_center_id)
         if center is None:
             center = Center(ext_center_id=record.ext_center_id, name=record.name, address=record.address)
             db.add(center)
+            existing[record.ext_center_id] = center
         center.name = record.name
         center.address = record.address
         center.sido = record.sido
@@ -29,16 +54,19 @@ def sync_centers(db: Session, records: list[CenterRecord]) -> int:
         center.latitude = record.latitude
         center.longitude = record.longitude
         center.measure_count = record.measure_count
-        center.synced_at = datetime.now(timezone.utc)
+        center.synced_at = synced_at
     return len(records)
 
 
 def sync_activities(db: Session, records: list[ActivityRecord]) -> int:
+    existing = _existing_activities(db, records)
+    synced_at = datetime.now(timezone.utc)
     for record in records:
-        video = db.scalar(select(ActivityVideo).where(ActivityVideo.ext_video_id == record.ext_video_id))
+        video = existing.get(record.ext_video_id)
         if video is None:
             video = ActivityVideo(ext_video_id=record.ext_video_id, title=record.title, url=record.url)
             db.add(video)
+            existing[record.ext_video_id] = video
         video.title = record.title
         video.fitness_element = record.fitness_element
         video.fitness_elements = list(record.fitness_elements) or ([record.fitness_element] if record.fitness_element else None)
@@ -53,7 +81,7 @@ def sync_activities(db: Session, records: list[ActivityRecord]) -> int:
         video.duration_seconds = record.duration_seconds
         video.source_fitness_factor = record.source_fitness_factor
         video.source_age_group = record.source_age_group
-        video.synced_at = datetime.now(timezone.utc)
+        video.synced_at = synced_at
     return len(records)
 
 
@@ -73,6 +101,26 @@ def sync_targets(
     db.commit()
     logger.info("공공 데이터 동기화 완료 targets=%s synced=%s", targets, synced)
     return synced
+
+
+def sync_activity_page(
+    db: Session,
+    client: KspoClient,
+    activity_url: str,
+    page_no: int,
+    page_size: int = DEFAULT_PAGE_SIZE,
+) -> dict[str, int | bool]:
+    records, total_count = client.fetch_activities_page(activity_url, page_no, page_size)
+    synced = sync_activities(db, records)
+    db.commit()
+    total_pages = ceil(total_count / page_size) if total_count else 1
+    logger.info(
+        "공공 활동 데이터 페이지 동기화 완료 page=%s/%s synced=%s",
+        page_no,
+        total_pages,
+        synced,
+    )
+    return {"page": page_no, "pageSize": page_size, "totalPages": total_pages, "synced": synced, "hasNext": page_no < total_pages}
 
 
 def acquire_sync_lock(db: Session) -> SyncLock | None:

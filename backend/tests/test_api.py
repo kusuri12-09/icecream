@@ -371,6 +371,48 @@ def test_cron_sync_rejects_invalid_secret(client: TestClient):
         settings.cron_secret = original
 
 
+def test_admin_activity_page_sync_commits_one_page(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    settings = get_settings()
+    original = (settings.kspo_api_key, settings.kspo_activity_url)
+    settings.kspo_api_key = "test-key"
+    settings.kspo_activity_url = "https://example.com/activities"
+
+    class FakeKspoClient:
+        def __init__(self, api_key: str):
+            assert api_key == "test-key"
+
+        def fetch_activities_page(self, url: str, page_no: int, page_size: int):
+            assert url.endswith("activities")
+            assert page_no == 2
+            assert page_size == 100
+            return [ActivityRecord("page-video", "페이지 운동", "CARDIO", "PRESCHOOL", "https://example.com/page")], 201
+
+    monkeypatch.setattr("app.api.v1.internal.KspoClient", FakeKspoClient)
+    db = SessionLocal()
+    admin = Parent(email="page-admin@example.com", password_hash="unused", is_admin=True)
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+    token = create_access_token(admin.id, True)
+    db.close()
+
+    try:
+        response = client.post(
+            "/api/v1/internal/sync?page=2&page_size=100",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"targets": ["ACTIVITIES"]},
+        )
+        assert response.status_code == 200
+        assert response.json()["data"]["page"] == 2
+        assert response.json()["data"]["totalPages"] == 3
+        assert response.json()["data"]["hasNext"] is True
+        db = SessionLocal()
+        assert db.query(ActivityVideo).filter_by(ext_video_id="page-video").count() == 1
+        db.close()
+    finally:
+        settings.kspo_api_key, settings.kspo_activity_url = original
+
+
 def test_cron_sync_runs_target_with_secret(client: TestClient, monkeypatch: pytest.MonkeyPatch):
     settings = get_settings()
     original = (settings.cron_secret, settings.kspo_api_key, settings.kspo_center_url)

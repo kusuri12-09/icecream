@@ -13,7 +13,7 @@
 | `lat`, `lng`, `radiusKm` | 좌표 기반 근처 검색(거리순) |
 | `sido` | 시·도 단위 지역 필터(예: `경기도`) |
 | `sidoSigungu` | 시·도·시군구 단위 지역 필터 |
-| `page`, `size` | 페이지네이션 |
+| `page`, `size` | 페이지네이션(`size` 최대 100) |
 
 ## RESPONSE
 

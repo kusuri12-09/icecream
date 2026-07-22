@@ -237,14 +237,8 @@ class KspoClient:
                 )
         return list(records.values())
 
-    def fetch_activities(self, url: str, page_size: int = DEFAULT_PAGE_SIZE) -> list[ActivityRecord]:
-        first_page = self._get(url, page_no=1, num_of_rows=page_size)
-        payloads = [first_page]
-        total_count = _total_count(first_page)
-        total_pages = ceil(total_count / page_size) if total_count else 1
-        for page_no in range(2, total_pages + 1):
-            payloads.append(self._get(url, page_no=page_no, num_of_rows=page_size))
-
+    @staticmethod
+    def _parse_activity_payloads(payloads: list[Any]) -> list[ActivityRecord]:
         records: dict[str, ActivityRecord] = {}
         for payload in payloads:
             for item in _items(payload):
@@ -278,3 +272,18 @@ class KspoClient:
                 )
                 records.setdefault(str(source_file_name), record)
         return list(records.values())
+
+    def fetch_activities_page(
+        self, url: str, page_no: int, page_size: int = DEFAULT_PAGE_SIZE
+    ) -> tuple[list[ActivityRecord], int | None]:
+        payload = self._get(url, page_no=page_no, num_of_rows=page_size)
+        return self._parse_activity_payloads([payload]), _total_count(payload)
+
+    def fetch_activities(self, url: str, page_size: int = DEFAULT_PAGE_SIZE) -> list[ActivityRecord]:
+        first_page = self._get(url, page_no=1, num_of_rows=page_size)
+        payloads = [first_page]
+        total_count = _total_count(first_page)
+        total_pages = ceil(total_count / page_size) if total_count else 1
+        for page_no in range(2, total_pages + 1):
+            payloads.append(self._get(url, page_no=page_no, num_of_rows=page_size))
+        return self._parse_activity_payloads(payloads)
