@@ -29,6 +29,35 @@ const fitnessElementNames: Record<string, string> = {
   BMI: '신체조성',
 }
 
+const sidoAliases: Record<string, string> = {
+  서울: '서울특별시',
+  서울시: '서울특별시',
+  부산: '부산광역시',
+  부산시: '부산광역시',
+  대구: '대구광역시',
+  대구시: '대구광역시',
+  인천: '인천광역시',
+  인천시: '인천광역시',
+  광주: '광주광역시',
+  광주시: '광주광역시',
+  대전: '대전광역시',
+  대전시: '대전광역시',
+  울산: '울산광역시',
+  울산시: '울산광역시',
+  세종: '세종특별자치시',
+  경기: '경기도',
+  강원: '강원특별자치도',
+  강원도: '강원특별자치도',
+  충북: '충청북도',
+  충남: '충청남도',
+  전북: '전북특별자치도',
+  전라북도: '전북특별자치도',
+  전남: '전라남도',
+  경북: '경상북도',
+  경남: '경상남도',
+  제주: '제주특별자치도',
+}
+
 export async function getChildren() {
   const response = await apiRequest<unknown>('/api/v1/children')
   const data = unwrapData<{ items?: unknown[] }>(response)
@@ -99,13 +128,14 @@ export async function getActivities(params: { fitnessElement?: string; measureme
 const CENTER_PAGE_SIZE = 100
 
 async function getCenterPage(
-  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string },
+  params: { lat?: number; lng?: number; radiusKm?: number; name?: string; sido?: string; sidoSigungu?: string },
   page: number,
 ) {
   const query = new URLSearchParams()
   if (params.lat != null) query.set('lat', String(params.lat))
   if (params.lng != null) query.set('lng', String(params.lng))
   if (params.radiusKm != null) query.set('radiusKm', String(params.radiusKm))
+  if (params.name) query.set('name', params.name)
   if (params.sido) query.set('sido', params.sido)
   if (params.sidoSigungu) query.set('sidoSigungu', params.sidoSigungu)
   query.set('page', String(page))
@@ -116,7 +146,7 @@ async function getCenterPage(
 }
 
 export async function getCenters(
-  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string } = {},
+  params: { lat?: number; lng?: number; radiusKm?: number; name?: string; sido?: string; sidoSigungu?: string } = {},
 ) {
   const firstPage = await getCenterPage(params, 1)
   const totalPages = Math.max(1, firstPage.totalPages ?? 1)
@@ -228,19 +258,32 @@ function mapActivity(value: unknown): Activity {
 
 function mapCenter(value: unknown): Center {
   const center = asRecord(value)
+  const address = stringValue(center.address)
+  const sido = normalizeSido(stringValue(center.sido) || address.split(' ')[0] || '')
+  const region = normalizeSidoSigungu(stringValue(center.sidoSigungu))
   const distanceKm = typeof center.distanceKm === 'number' ? `${center.distanceKm.toFixed(1)}km` : '거리 정보 없음'
   return {
     id: stringValue(center.id),
     name: stringValue(center.name, '체력인증센터'),
-    address: stringValue(center.address),
-    sido: stringValue(center.sido) || stringValue(center.address).split(' ')[0] || undefined,
-    region: stringValue(center.sidoSigungu) || undefined,
+    address,
+    sido: sido || undefined,
+    region: region || undefined,
     distance: distanceKm,
     icon: 'tree',
     open: true,
     reservationUrl: stringValue(center.reservationUrl),
     stale: center.stale === true,
   }
+}
+
+function normalizeSido(value: string) {
+  const normalized = value.trim()
+  return sidoAliases[normalized] ?? normalized
+}
+
+function normalizeSidoSigungu(value: string) {
+  const parts = value.trim().split(/\s+/).filter(Boolean)
+  return parts.length > 0 ? [normalizeSido(parts[0]), ...parts.slice(1)].join(' ') : ''
 }
 
 function asRecord(value: unknown): Record<string, unknown> {

@@ -71,6 +71,36 @@ AGE_GROUP_MAP = {
 }
 
 
+SIDO_ALIASES = {
+    "서울": "서울특별시",
+    "서울시": "서울특별시",
+    "부산": "부산광역시",
+    "부산시": "부산광역시",
+    "대구": "대구광역시",
+    "대구시": "대구광역시",
+    "인천": "인천광역시",
+    "인천시": "인천광역시",
+    "광주": "광주광역시",
+    "광주시": "광주광역시",
+    "대전": "대전광역시",
+    "대전시": "대전광역시",
+    "울산": "울산광역시",
+    "울산시": "울산광역시",
+    "세종": "세종특별자치시",
+    "경기": "경기도",
+    "강원": "강원특별자치도",
+    "강원도": "강원특별자치도",
+    "충북": "충청북도",
+    "충남": "충청남도",
+    "전북": "전북특별자치도",
+    "전라북도": "전북특별자치도",
+    "전남": "전라남도",
+    "경북": "경상북도",
+    "경남": "경상남도",
+    "제주": "제주특별자치도",
+}
+
+
 def _first(item: dict[str, Any], *keys: str) -> Any:
     for key in keys:
         value = item.get(key)
@@ -142,14 +172,26 @@ def normalize_age_group(value: Any) -> str | None:
     return AGE_GROUP_MAP.get(raw.upper(), AGE_GROUP_MAP.get(raw, raw))
 
 
+def normalize_sido(value: str) -> str:
+    normalized = value.strip()
+    return SIDO_ALIASES.get(normalized, normalized)
+
+
+def normalize_sido_sigungu(value: str) -> str:
+    parts = value.split()
+    if not parts:
+        return ""
+    return " ".join((normalize_sido(parts[0]), *parts[1:]))
+
+
 def parse_sido_sigungu(address: str) -> str | None:
     parts = address.split()
-    return " ".join(parts[:2]) if len(parts) >= 2 else None
+    return normalize_sido_sigungu(" ".join(parts[:2])) if len(parts) >= 2 else None
 
 
 def parse_sido(address: str) -> str | None:
     parts = address.split()
-    return parts[0] if parts else None
+    return normalize_sido(parts[0]) if parts else None
 
 
 def _total_count(payload: Any) -> int | None:
@@ -211,6 +253,8 @@ class KspoClient:
                 ext_id = str(ext_id or _stable_center_id(name, base_address))
                 measure_count = _integer(_first(item, "test_cnt", "measureCount", "measure_count")) or 0
                 sido_sigungu = str(_first(item, "sidoSigungu", "sidoNm") or parse_sido_sigungu(base_address) or "") or None
+                if sido_sigungu:
+                    sido_sigungu = normalize_sido_sigungu(sido_sigungu)
                 sido = parse_sido(base_address) or parse_sido(sido_sigungu or "")
                 current = records.get(ext_id)
                 if current is None:

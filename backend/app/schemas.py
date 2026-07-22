@@ -76,6 +76,15 @@ class AuthData(APIModel):
     token_type: str = "bearer"
 
 
+MIN_CHILD_BIRTH_YEAR = 2019
+
+
+def validate_child_birth_year_month(value: date) -> date:
+    if value.year < MIN_CHILD_BIRTH_YEAR or value.year >= date.today().year:
+        raise ValueError(f"생년월은 {MIN_CHILD_BIRTH_YEAR}년부터 지난해까지 입력할 수 있습니다.")
+    return value
+
+
 class ChildCreate(APIModel):
     nickname: str = Field(min_length=1, max_length=50)
     gender: Gender
@@ -90,7 +99,7 @@ class ChildCreate(APIModel):
             value = date.fromisoformat(value)
         if value.day != 1:
             raise ValueError("birthYearMonth는 YYYY-MM 형식이어야 합니다.")
-        return value
+        return validate_child_birth_year_month(value)
 
 
 class ChildUpdate(APIModel):
@@ -107,7 +116,7 @@ class ChildUpdate(APIModel):
             value = date.fromisoformat(value)
         if value is not None and value.day != 1:
             raise ValueError("birthYearMonth는 YYYY-MM 형식이어야 합니다.")
-        return value
+        return validate_child_birth_year_month(value) if value is not None else None
 
 
 class ChildOut(APIModel):

@@ -24,13 +24,14 @@ def centers(
     lat: float | None = Query(None, ge=-90, le=90),
     lng: float | None = Query(None, ge=-180, le=180),
     radius_km: float = Query(10, ge=0.1, le=500, alias="radiusKm"),
+    name: str | None = Query(None, min_length=1, max_length=100),
     sido: str | None = Query(None),
     sido_sigungu: str | None = Query(None, alias="sidoSigungu"),
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
 ) -> dict:
     del parent
-    result = center_service.search(db, lat, lng, radius_km, sido, sido_sigungu)
+    result = center_service.search(db, lat, lng, radius_km, name, sido, sido_sigungu)
     total = len(result)
     selected = result[(page - 1) * size : (page - 1) * size + size]
     items = [

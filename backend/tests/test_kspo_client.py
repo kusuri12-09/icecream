@@ -1,10 +1,16 @@
 import httpx
 
-from app.external.kspo_client import KspoClient, _resource_url, parse_sido
+from app.external.kspo_client import KspoClient, _resource_url, normalize_sido_sigungu, parse_sido
 
 
 def test_parse_sido_uses_the_first_address_token():
     assert parse_sido("경기도 오산시 경기동로 33") == "경기도"
+
+
+def test_parse_sido_normalizes_short_metropolitan_city_names():
+    assert parse_sido("서울 강남구 테헤란로 1") == "서울특별시"
+    assert parse_sido("서울특별시 강남구 테헤란로 1") == "서울특별시"
+    assert normalize_sido_sigungu("서울 강남구") == "서울특별시 강남구"
 
 
 def test_resource_url_normalizes_http_media_url_to_https():

@@ -17,6 +17,10 @@ import {
 } from '../hooks/useFitnessData'
 import type { ChildProfile, MeasurementRecord } from '../types/models'
 
+const MIN_CHILD_BIRTH_YEAR = 2019
+const MAX_CHILD_BIRTH_YEAR = new Date().getFullYear() - 1
+const MAX_CHILD_BIRTH_MONTH = `${MAX_CHILD_BIRTH_YEAR}-12`
+
 export function OnboardingPage() {
   const { data: child, isLoading } = useChild()
   if (isLoading) {
@@ -47,8 +51,13 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
       setError('아이 이름을 입력해주세요.')
       return
     }
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(birthYearMonth)) {
-      setError('생년월을 올바르게 선택해주세요.')
+    const birthYear = Number(birthYearMonth.slice(0, 4))
+    if (
+      !/^\d{4}-(0[1-9]|1[0-2])$/.test(birthYearMonth) ||
+      birthYear < MIN_CHILD_BIRTH_YEAR ||
+      birthYear > MAX_CHILD_BIRTH_YEAR
+    ) {
+      setError(`생년월은 ${MIN_CHILD_BIRTH_YEAR}년부터 ${MAX_CHILD_BIRTH_YEAR}년까지 입력할 수 있어요.`)
       return
     }
 
@@ -75,7 +84,7 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
         <div
           role="img"
           aria-label="프로필 일러스트 영역"
-          className="mx-auto mb-6 size-40 rounded-full bg-[radial-gradient(circle_at_30%_30%,#fff_0_28%,#e1f6ec_29%_53%,#b5ead7_54%_55%,#faf9f5_56%)]"
+          className="mx-auto mb-6 size-40 shrink-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,#fff_0_28%,#e1f6ec_29%_53%,#b5ead7_54%_55%,#faf9f5_56%)]"
         />
         <span className="font-label text-sm font-semibold text-on-surface-variant">우리 아이의 건강한 성장 기록</span>
         <h1 className="mt-2 font-display text-[28px] font-bold leading-tight tracking-[-.08em]">
@@ -137,24 +146,39 @@ function OnboardingForm({ child }: { child: ChildProfile | null }) {
               </button>
             </div>
           </div>
-          <label className="block">
+          <div className="block">
             <span className="mb-2 block font-label text-xs font-semibold text-on-surface-variant">생년월</span>
-            <input
-              type="text"
-              name="birthYearMonth"
-              value={birthYearMonth}
-              inputMode="numeric"
-              maxLength={7}
-              placeholder="YYYY-MM"
-              aria-invalid={Boolean(error && !birthYearMonth)}
-              aria-describedby={error ? 'profile-error' : undefined}
-              onChange={(event) => {
-                const digits = event.target.value.replace(/\D/g, '').slice(0, 6)
-                setBirthYearMonth(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits)
-              }}
-              className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 outline-none focus:border-primary"
-            />
-          </label>
+            <div className="relative">
+              <input
+                type="text"
+                name="birthYearMonth"
+                value={birthYearMonth}
+                inputMode="numeric"
+                maxLength={7}
+                placeholder="YYYY-MM"
+                aria-invalid={Boolean(error && !birthYearMonth)}
+                aria-describedby={error ? 'profile-error' : undefined}
+                onChange={(event) => {
+                  const digits = event.target.value.replace(/\D/g, '').slice(0, 6)
+                  setBirthYearMonth(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits)
+                }}
+                className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-[#fffdf5] px-5 pr-14 outline-none focus:border-primary"
+              />
+              <label className="absolute right-1 top-1 grid size-12 place-items-center rounded-full text-primary hover:bg-primary-container">
+                <Icon name="calendar_month" />
+                <span className="sr-only">달력에서 생년월 선택</span>
+                <input
+                  type="month"
+                  value={birthYearMonth}
+                  min={`${MIN_CHILD_BIRTH_YEAR}-01`}
+                  max={MAX_CHILD_BIRTH_MONTH}
+                  aria-label="달력에서 생년월 선택"
+                  onChange={(event) => setBirthYearMonth(event.target.value)}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                />
+              </label>
+            </div>
+          </div>
           {error && (
             <p
               id="profile-error"

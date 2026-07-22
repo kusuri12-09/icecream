@@ -2,7 +2,7 @@
 
 ## 설명
 
-자녀의 `nickname`, `gender`, `birthYearMonth`를 부분 수정합니다.
+자녀의 `nickname`, `gender`, `birthYearMonth`를 부분 수정합니다. `birthYearMonth`는 2019년 1월부터 현재 연도 전년 12월까지만 허용합니다.
 
 ## REQUEST
 

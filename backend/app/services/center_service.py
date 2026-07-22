@@ -24,6 +24,7 @@ def search(
     lat: float | None,
     lng: float | None,
     radius_km: float,
+    name: str | None,
     sido: str | None,
     sido_sigungu: str | None,
 ) -> list[tuple[Center, float | None]]:
@@ -34,6 +35,8 @@ def search(
         raise AppError("CENTER_NOT_FOUND", "체력인증센터를 찾을 수 없습니다.", 404)
     result: list[tuple[Center, float | None]] = []
     for center in rows:
+        if name and name.casefold() not in center.name.casefold():
+            continue
         if sido and (center.sido or "") != sido:
             continue
         if sido_sigungu and (center.sido_sigungu or "") != sido_sigungu:

@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 os.environ["DATABASE_URL"] = "sqlite:///./test.sqlite3"
 os.environ["DB_USER"] = ""
@@ -115,6 +116,17 @@ def test_auth_child_and_measurement_flow(client: TestClient):
     listed = client.get(f"/api/v1/children/{child_data['id']}/measurements", headers=headers)
     assert listed.status_code == 200
     assert listed.json()["data"]["totalElements"] == 1
+
+
+def test_child_birth_year_month_rejects_non_preschool_range(client: TestClient):
+    headers = auth_headers(client, "birth-range@example.com")
+    for birth_year_month in ("2018-12", f"{date.today().year}-01"):
+        response = client.post(
+            "/api/v1/children",
+            headers=headers,
+            json={"nickname": "범위 테스트", "gender": "MALE", "birthYearMonth": birth_year_month},
+        )
+        assert response.status_code == 422
 
 
 def test_private_api_requires_bearer(client: TestClient):
@@ -249,7 +261,7 @@ def test_measurement_creation_rejects_invalid_age_and_duplicate_items(client: Te
     child = client.post(
         "/api/v1/children",
         headers=headers,
-        json={"nickname": "큰이", "gender": "MALE", "birthYearMonth": "2018-01"},
+        json={"nickname": "큰이", "gender": "MALE", "birthYearMonth": "2019-01"},
     )
     child_id = child.json()["data"]["id"]
     invalid_age = client.post(
@@ -287,6 +299,10 @@ def test_centers_activities_and_regional_insights(client: TestClient):
     assert centers.status_code == 200
     assert centers.json()["data"]["items"][0]["name"] == "강남 센터"
     assert centers.json()["data"]["items"][0]["distanceKm"] == 0
+
+    name_search = client.get("/api/v1/centers?name=%EA%B0%95%EB%82%A8", headers=headers)
+    assert name_search.status_code == 200
+    assert [item["name"] for item in name_search.json()["data"]["items"]] == ["강남 센터"]
 
     activities = client.get("/api/v1/activities?fitnessElement=CARDIO&ageGroup=PRESCHOOL", headers=headers)
     assert activities.status_code == 200

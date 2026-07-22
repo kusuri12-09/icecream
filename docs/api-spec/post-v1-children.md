@@ -2,7 +2,7 @@
 
 ## 설명
 
-로그인한 학부모에게 자녀를 등록합니다. `ageMonths`는 현재 시점에 계산되며, 48~83개월 밖이어도 등록할 수 있고 `inTargetRange`가 `false`가 됩니다.
+로그인한 학부모에게 자녀를 등록합니다. `birthYearMonth`는 유아 대상 서비스 정책에 따라 2019년 1월부터 현재 연도 전년 12월까지만 허용합니다. `ageMonths`는 현재 시점에 계산되며, 48~83개월 밖이면 `inTargetRange`가 `false`가 됩니다.
 
 ## REQUEST
 

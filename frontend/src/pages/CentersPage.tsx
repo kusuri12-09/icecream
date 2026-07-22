@@ -5,11 +5,14 @@ import { Icon } from '../components/Icon'
 import { PillButton } from '../components/Button'
 import { useCenters } from '../hooks/useFitnessData'
 
+const PAGE_SIZE = 6
+
 export function CentersPage() {
   const [sido, setSido] = useState('전체')
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState('')
+  const [page, setPage] = useState(1)
   const navigate = useNavigate()
   const { data: centers = [], isLoading, error } = useCenters(location ? { ...location, radiusKm: 10 } : {})
   const areas = useMemo(
@@ -23,15 +26,23 @@ export function CentersPage() {
   )
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
-    return centers.filter(
-      (center) =>
+    return centers.filter((center) => {
+      const addressPrefix = center.address.trim().split(/\s+/).slice(0, 4).join(' ')
+      const searchableText = `${center.name} ${center.sido ?? ''} ${center.region ?? ''} ${addressPrefix}`
+      return (
         (location || sido === '전체' || center.sido === sido) &&
-        (!normalizedQuery ||
-          `${center.name} ${center.address} ${center.sido ?? ''} ${center.region ?? ''}`
-            .toLowerCase()
-            .includes(normalizedQuery)),
-    )
+        (!normalizedQuery || searchableText.toLowerCase().includes(normalizedQuery))
+      )
+    })
   }, [centers, location, query, sido])
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const visibleCenters = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const pageNumbers = useMemo(() => {
+    const firstPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4))
+    const lastPage = Math.min(totalPages, firstPage + 4)
+    return Array.from({ length: lastPage - firstPage + 1 }, (_, index) => firstPage + index)
+  }, [currentPage, totalPages])
 
   function requestLocation() {
     if (!navigator.geolocation) {
@@ -41,6 +52,7 @@ export function CentersPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocation({ lat: position.coords.latitude, lng: position.coords.longitude })
+        setPage(1)
         setLocationError('')
       },
       () => setLocationError('현재 위치를 확인할 수 없어요. 지역 검색을 이용해주세요.'),
@@ -63,7 +75,10 @@ export function CentersPage() {
         <input
           aria-label="센터 검색"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value)
+            setPage(1)
+          }}
           className="w-full bg-transparent text-sm outline-none"
           placeholder="지역이나 센터명을 검색해보세요"
         />
@@ -76,6 +91,7 @@ export function CentersPage() {
             onClick={() => {
               setLocation(null)
               setSido(item)
+              setPage(1)
             }}
           >
             {item}
@@ -105,7 +121,7 @@ export function CentersPage() {
           title="가까운 센터"
           action={<span className="text-xs text-on-surface-variant">{filtered.length}곳</span>}
         />
-        <div className="mt-3 grid gap-2.5">
+        <div className="mx-auto mt-3 grid w-full max-w-[420px] min-w-0 gap-2.5">
           {isLoading && <p className="py-8 text-center text-sm text-on-surface-variant">센터를 찾고 있어요…</p>}
           {error && (
             <p className="rounded-2xl bg-error-container px-4 py-3 text-sm text-on-error-container">
@@ -115,10 +131,13 @@ export function CentersPage() {
           {!isLoading && !error && filtered.length === 0 && (
             <p className="py-8 text-center text-sm text-on-surface-variant">조건에 맞는 센터가 없어요.</p>
           )}
-          {filtered.map((center) => (
-            <Card key={center.id} className="flex min-h-[102px] items-center gap-3 p-2.5 shadow-soft">
-              <div className="grid size-[76px] flex-none place-items-center rounded-2xl bg-gradient-to-br from-[#e0f1e3] to-[#f6dfc9] text-4xl">
-                <Icon name={center.icon} className="text-4xl text-primary" />
+          {visibleCenters.map((center) => (
+            <Card
+              key={center.id}
+              className="mx-auto flex min-h-[102px] w-full min-w-0 max-w-full items-center gap-2 overflow-hidden p-2.5 shadow-soft"
+            >
+              <div className="grid size-16 flex-none place-items-center rounded-2xl bg-gradient-to-br from-[#e0f1e3] to-[#f6dfc9] text-3xl">
+                <Icon name={center.icon} className="text-3xl text-primary" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm font-bold tracking-[-.06em]">{center.name}</h3>
@@ -130,7 +149,7 @@ export function CentersPage() {
               </div>
               <button
                 type="button"
-                className="rounded-full bg-primary-container px-3 py-2 text-[11px] font-semibold text-primary"
+                className="shrink-0 rounded-full bg-primary-container px-2.5 py-2 text-[11px] font-semibold text-primary"
                 onClick={() => navigate(`/centers/nearby?centerId=${encodeURIComponent(center.id)}`)}
               >
                 상세보기
@@ -138,6 +157,44 @@ export function CentersPage() {
             </Card>
           ))}
         </div>
+        {!isLoading && !error && filtered.length > 0 && totalPages > 1 && (
+          <nav className="mt-5 flex items-center justify-center gap-1" aria-label="센터 목록 페이지">
+            <button
+              type="button"
+              aria-label="이전 페이지"
+              disabled={currentPage === 1}
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
+              className="grid size-10 place-items-center rounded-full text-on-surface-variant transition hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Icon name="chevron_left" />
+            </button>
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                type="button"
+                aria-label={`${pageNumber}페이지`}
+                aria-current={currentPage === pageNumber ? 'page' : undefined}
+                onClick={() => setPage(pageNumber)}
+                className={`grid size-10 place-items-center rounded-full text-sm transition ${
+                  currentPage === pageNumber
+                    ? 'bg-primary text-white'
+                    : 'text-on-surface-variant hover:bg-surface-container-low'
+                }`}
+              >
+                {pageNumber}
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-label="다음 페이지"
+              disabled={currentPage === totalPages}
+              onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+              className="grid size-10 place-items-center rounded-full text-on-surface-variant transition hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Icon name="chevron_right" />
+            </button>
+          </nav>
+        )}
       </section>
     </AppLayout>
   )

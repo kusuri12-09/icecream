@@ -51,8 +51,14 @@ export const useRecords = () => {
 export const useActivities = (params: { fitnessElement?: string; measurementId?: string } = {}) =>
   useQuery({ queryKey: ['activities', params], queryFn: () => getActivities(params) })
 export const useCenters = (
-  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string } = {},
+  params: { lat?: number; lng?: number; radiusKm?: number; name?: string; sido?: string; sidoSigungu?: string } = {},
 ) => useQuery({ queryKey: ['centers', params], queryFn: () => getCenters(params) })
+export const useCenterSearch = (name: string) =>
+  useQuery({
+    queryKey: ['center-search', name],
+    queryFn: () => getCenters({ name }),
+    enabled: name.trim().length >= 2,
+  })
 export function useCreateMeasurement() {
   const queryClient = useQueryClient()
   return useMutation({

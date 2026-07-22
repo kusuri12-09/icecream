@@ -1,12 +1,12 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { AppLayout, Card, GradeBadge, SectionTitle } from '../components/AppLayout'
 import { Icon } from '../components/Icon'
 import { PrimaryButton, PillButton } from '../components/Button'
 import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState'
-import { useChild, useCreateMeasurement, useMeasurement, useRecords } from '../hooks/useFitnessData'
-import type { MeasurementResult } from '../types/models'
+import { useCenterSearch, useChild, useCreateMeasurement, useMeasurement, useRecords } from '../hooks/useFitnessData'
+import type { Center, MeasurementResult } from '../types/models'
 
 export function DiagnosisPage() {
   const navigate = useNavigate()
@@ -261,8 +261,16 @@ export function MeasurementInputPage() {
   const [type, setType] = useState<'official' | 'self'>('official')
   const [values, setValues] = useState<Record<string, string>>({})
   const [measuredAt, setMeasuredAt] = useState(() => new Date().toISOString().slice(0, 10))
-  const [centerId, setCenterId] = useState('')
+  const [centerSearch, setCenterSearch] = useState('')
+  const [debouncedCenterSearch, setDebouncedCenterSearch] = useState('')
+  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null)
   const [error, setError] = useState('')
+  const centerSearchQuery = useCenterSearch(debouncedCenterSearch)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedCenterSearch(centerSearch.trim()), 250)
+    return () => window.clearTimeout(timer)
+  }, [centerSearch])
 
   if (childQuery.isLoading)
     return (
@@ -305,6 +313,10 @@ export function MeasurementInputPage() {
       setError('측정일을 선택해주세요.')
       return
     }
+    if (type === 'official' && centerSearch.trim() && !selectedCenter) {
+      setError('센터 검색 결과에서 센터를 선택해주세요.')
+      return
+    }
 
     const items: Array<{ itemKey: string; value: number }> = []
     for (const field of measurementFields) {
@@ -328,7 +340,7 @@ export function MeasurementInputPage() {
         request: {
           type: type === 'official' ? 'OFFICIAL' : 'SELF',
           measuredAt,
-          centerId: type === 'official' ? centerId.trim() || null : null,
+          centerId: type === 'official' ? (selectedCenter?.id ?? null) : null,
           items,
         },
       })
@@ -385,13 +397,62 @@ export function MeasurementInputPage() {
         </label>
         {type === 'official' && (
           <label className="grid gap-2 text-sm font-semibold">
-            센터 ID <span className="font-normal text-on-surface-variant">(선택)</span>
-            <input
-              value={centerId}
-              onChange={(event) => setCenterId(event.target.value)}
-              className="h-[52px] rounded-full border border-outline-variant/50 bg-white px-5 font-normal outline-none focus:border-primary"
-              placeholder="center_45"
-            />
+            측정 센터 <span className="font-normal text-on-surface-variant">(선택)</span>
+            <div className="relative">
+              <Icon
+                name="search"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant"
+              />
+              <input
+                value={centerSearch}
+                onChange={(event) => {
+                  setCenterSearch(event.target.value)
+                  setSelectedCenter(null)
+                }}
+                className="h-[52px] w-full rounded-full border border-outline-variant/50 bg-white pl-11 pr-5 font-normal outline-none focus:border-primary"
+                placeholder="센터 이름을 입력해보세요"
+                autoComplete="off"
+                role="combobox"
+                aria-expanded={Boolean(debouncedCenterSearch && !selectedCenter)}
+                aria-controls="center-search-results"
+              />
+              {!selectedCenter && debouncedCenterSearch.length >= 2 && (
+                <div
+                  id="center-search-results"
+                  role="listbox"
+                  className="absolute left-0 right-0 top-[58px] z-20 grid max-h-56 overflow-y-auto rounded-2xl border border-outline-variant/50 bg-white p-1 shadow-lg"
+                >
+                  {centerSearchQuery.isFetching && (
+                    <p className="px-4 py-3 text-xs font-normal text-on-surface-variant">센터를 찾고 있어요…</p>
+                  )}
+                  {!centerSearchQuery.isFetching && centerSearchQuery.data?.length === 0 && (
+                    <p className="px-4 py-3 text-xs font-normal text-on-surface-variant">검색 결과가 없어요.</p>
+                  )}
+                  {!centerSearchQuery.isFetching &&
+                    centerSearchQuery.data?.map((center) => (
+                      <button
+                        key={center.id}
+                        type="button"
+                        role="option"
+                        onClick={() => {
+                          setSelectedCenter(center)
+                          setCenterSearch(center.name)
+                        }}
+                        className="grid gap-1 rounded-xl px-3 py-2 text-left font-normal hover:bg-primary-container"
+                      >
+                        <span className="text-sm font-semibold text-on-surface">{center.name}</span>
+                        <span className="truncate text-xs text-on-surface-variant">{center.address}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+            {selectedCenter && (
+              <span className="flex items-center gap-1 text-xs font-normal text-primary">
+                <Icon name="check_circle" className="text-base" />
+                {selectedCenter.name} 선택됨
+              </span>
+            )}
           </label>
         )}
         <div className="grid gap-2.5">
