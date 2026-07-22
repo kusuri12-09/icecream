@@ -129,6 +129,15 @@ def auth_headers(client: TestClient, email: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {response.json()['data']['accessToken']}"}
 
 
+def test_centers_return_not_found_when_cache_is_empty(client: TestClient):
+    headers = auth_headers(client, "empty-centers@example.com")
+
+    response = client.get("/api/v1/centers", headers=headers)
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "CENTER_NOT_FOUND"
+
+
 def create_child(client: TestClient, headers: dict[str, str]) -> str:
     response = client.post(
         "/api/v1/children",

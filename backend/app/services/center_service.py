@@ -1,3 +1,8 @@
+"""체력인증센터 DB 캐시 조회 서비스.
+
+공공데이터 API 호출과 캐시 갱신은 ``sync_service``의 관리자·Cron 동기화 경로에서만 수행한다.
+"""
+
 from math import asin, cos, radians, sin, sqrt
 
 from sqlalchemy.orm import Session
@@ -25,7 +30,7 @@ def search(
         raise AppError("INVALID_REQUEST_BODY", "lat과 lng은 함께 입력해야 합니다.", 422)
     rows = center_repository.list_all(db)
     if not rows:
-        raise AppError("EXTERNAL_API_UNAVAILABLE", "외부 데이터를 일시적으로 사용할 수 없습니다.", 503)
+        raise AppError("CENTER_NOT_FOUND", "체력인증센터를 찾을 수 없습니다.", 404)
     result: list[tuple[Center, float | None]] = []
     for center in rows:
         if sido_sigungu and (center.sido_sigungu or "") != sido_sigungu:

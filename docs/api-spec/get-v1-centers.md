@@ -48,5 +48,5 @@
 | errorcode | 메시지 | 설명 |
 | --- | --- | --- |
 | `AUTH_UNAUTHORIZED` | 인증이 필요합니다. | 토큰이 없거나 만료됨, 401 |
-| `EXTERNAL_API_UNAVAILABLE` | 외부 데이터를 일시적으로 사용할 수 없습니다. | 공공 API 장애 및 캐시 데이터 없음, 503 |
+| `CENTER_NOT_FOUND` | 체력인증센터를 찾을 수 없습니다. | 조건에 맞는 센터 캐시 데이터가 없음, 404 |
 | `INVALID_REQUEST_BODY` | 요청 파라미터가 올바르지 않습니다. | 검색 조건 검증 실패, 422 |
