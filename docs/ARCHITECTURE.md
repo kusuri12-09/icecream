@@ -146,7 +146,7 @@ icecream/
 │  ├─ tests/
 │  │  ├─ test_diagnosis_engine.py # 판정 로직 단위 테스트
 │  │  └─ ...
-│  ├─ index.py                     # Vercel FastAPI 진입점(예정)
+│  ├─ index.py                     # Vercel FastAPI 진입점
 │  ├─ pyproject.toml
 │  └─ Dockerfile
 ├─ frontend/
