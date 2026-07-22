@@ -30,8 +30,18 @@ def sync_activities(db: Session, records: list[ActivityRecord]) -> int:
             db.add(video)
         video.title = record.title
         video.fitness_element = record.fitness_element
+        video.fitness_elements = list(record.fitness_elements) or ([record.fitness_element] if record.fitness_element else None)
         video.age_group = record.age_group
         video.url = record.url
+        video.description = record.description
+        video.thumbnail_url = record.thumbnail_url
+        video.fitness_level = record.fitness_level
+        video.equipment = record.equipment
+        video.training_place = record.training_place
+        video.muscle_part = record.muscle_part
+        video.duration_seconds = record.duration_seconds
+        video.source_fitness_factor = record.source_fitness_factor
+        video.source_age_group = record.source_age_group
         video.synced_at = datetime.now(timezone.utc)
     return len(records)
 

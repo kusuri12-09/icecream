@@ -19,6 +19,15 @@ def parse_fitness_element(value: str | None) -> FitnessElement | None:
         return None
 
 
+def parse_fitness_elements(values: list[str]) -> list[FitnessElement]:
+    parsed: list[FitnessElement] = []
+    for value in values:
+        element = parse_fitness_element(value)
+        if element is not None:
+            parsed.append(element)
+    return parsed
+
+
 @router.get("")
 def activities(
     parent: ParentDep,
@@ -38,8 +47,16 @@ def activities(
                 id=encode_id("video", row.id),
                 title=row.title,
                 fitness_element=parse_fitness_element(row.fitness_element),
+                fitness_elements=parse_fitness_elements(row.fitness_elements or []),
                 age_group=row.age_group,
                 url=row.url,
+                description=row.description,
+                thumbnail_url=row.thumbnail_url,
+                fitness_level=row.fitness_level,
+                equipment=row.equipment,
+                training_place=row.training_place,
+                muscle_part=row.muscle_part,
+                duration_seconds=row.duration_seconds,
             )
         )
         for row in selected

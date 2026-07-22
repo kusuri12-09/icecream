@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from math import ceil
+import re
 from typing import Any
 
 import httpx
@@ -28,6 +30,35 @@ class ActivityRecord:
     fitness_element: str | None
     age_group: str | None
     url: str
+    description: str | None = None
+    thumbnail_url: str | None = None
+    fitness_level: str | None = None
+    equipment: str | None = None
+    training_place: str | None = None
+    muscle_part: str | None = None
+    duration_seconds: int | None = None
+    source_fitness_factor: str | None = None
+    source_age_group: str | None = None
+    fitness_elements: tuple[str, ...] = ()
+
+
+FITNESS_FACTOR_MAP: dict[str, tuple[str, ...]] = {
+    "심폐지구력": ("CARDIO",),
+    "근력": ("GRIP",),
+    "근지구력": ("MUSCULAR_END",),
+    "근력/근지구력": ("GRIP", "MUSCULAR_END"),
+    "유연성": ("FLEXIBILITY",),
+    "민첩성": ("AGILITY",),
+    "순발력": ("POWER",),
+    "협응력": ("COORDINATION",),
+}
+
+
+AGE_GROUP_MAP = {
+    "유소년": "PRESCHOOL",
+    "유아": "PRESCHOOL",
+    "PRESCHOOL": "PRESCHOOL",
+}
 
 
 def _first(item: dict[str, Any], *keys: str) -> Any:
@@ -43,7 +74,7 @@ def _items(body: Any) -> list[dict[str, Any]]:
         return [item for item in body if isinstance(item, dict)]
     if not isinstance(body, dict):
         return []
-    for key in ("items", "data", "item"):
+    for key in ("response", "body", "items", "data", "item"):
         value = body.get(key)
         if isinstance(value, list):
             return [item for item in value if isinstance(item, dict)]
@@ -51,9 +82,6 @@ def _items(body: Any) -> list[dict[str, Any]]:
             nested = _items(value)
             if nested:
                 return nested
-    response = body.get("response")
-    if response:
-        return _items(response)
     return []
 
 
@@ -62,6 +90,44 @@ def _number(value: Any) -> float | None:
         return float(str(value).replace(",", "")) if value not in (None, "") else None
     except (TypeError, ValueError):
         return None
+
+
+def _integer(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    match = re.search(r"\d+", str(value))
+    return int(match.group()) if match else None
+
+
+def _resource_url(base_url: Any, file_name: Any = None) -> str | None:
+    if base_url in (None, ""):
+        return None
+    base = str(base_url)
+    if file_name in (None, "") or base.endswith(str(file_name)):
+        return base
+    return f"{base.rstrip('/')}/{str(file_name).lstrip('/')}"
+
+
+def normalize_fitness_elements(value: Any) -> tuple[str, ...]:
+    raw = str(value or "").strip()
+    if not raw:
+        return ()
+    if raw in FITNESS_FACTOR_MAP:
+        return FITNESS_FACTOR_MAP[raw]
+    elements: list[str] = []
+    for part in re.split(r"[/,·]+", raw):
+        mapped = FITNESS_FACTOR_MAP.get(part.strip(), ())
+        for element in mapped:
+            if element not in elements:
+                elements.append(element)
+    return tuple(elements)
+
+
+def normalize_age_group(value: Any) -> str | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    return AGE_GROUP_MAP.get(raw.upper(), AGE_GROUP_MAP.get(raw, raw))
 
 
 def parse_sido_sigungu(address: str) -> str | None:
@@ -74,9 +140,13 @@ class KspoClient:
         self.api_key = api_key
         self.timeout = timeout
 
-    def _get(self, url: str) -> Any:
+    def _get(self, url: str, page_no: int = 1, num_of_rows: int = 1000) -> Any:
         try:
-            response = httpx.get(url, params={"serviceKey": self.api_key, "pageNo": 1, "numOfRows": 1000}, timeout=self.timeout)
+            response = httpx.get(
+                url,
+                params={"serviceKey": self.api_key, "pageNo": page_no, "numOfRows": num_of_rows},
+                timeout=self.timeout,
+            )
             response.raise_for_status()
             return response.json()
         except (httpx.HTTPError, ValueError) as exc:
@@ -100,17 +170,44 @@ class KspoClient:
         return result
 
     def fetch_activities(self, url: str) -> list[ActivityRecord]:
-        result = []
-        for item in _items(self._get(url)):
-            ext_id = _first(item, "extVideoId", "videoId", "contentId", "id")
-            target_url = _first(item, "url", "videoUrl", "link")
-            if not ext_id or not target_url:
-                continue
-            result.append(ActivityRecord(
-                ext_video_id=str(ext_id),
-                title=str(_first(item, "title", "videoTitle", "contentTitle") or "운동 활동"),
-                fitness_element=str(_first(item, "fitnessElement", "element") or "") or None,
-                age_group=str(_first(item, "ageGroup", "targetAge") or "") or None,
-                url=str(target_url),
-            ))
-        return result
+        page_size = 1000
+        first_page = self._get(url, page_no=1, num_of_rows=page_size)
+        payloads = [first_page]
+        total_count = _first(first_page.get("response", {}).get("body", {}), "totalCount")
+        total_pages = ceil(int(total_count) / page_size) if total_count else 1
+        for page_no in range(2, total_pages + 1):
+            payloads.append(self._get(url, page_no=page_no, num_of_rows=page_size))
+
+        records: dict[str, ActivityRecord] = {}
+        for payload in payloads:
+            for item in _items(payload):
+                source_file_name = _first(item, "file_nm", "extVideoId", "videoId", "contentId", "id")
+                if not source_file_name:
+                    continue
+                video_url = _resource_url(_first(item, "file_url"), source_file_name) or _resource_url(
+                    _first(item, "url", "videoUrl", "link")
+                )
+                if not video_url:
+                    continue
+                source_factor = _first(item, "ftns_fctr_nm", "fitnessElement", "element")
+                fitness_elements = normalize_fitness_elements(source_factor)
+                source_age_group = _first(item, "aggrp_nm", "ageGroup", "targetAge")
+                record = ActivityRecord(
+                    ext_video_id=str(source_file_name),
+                    title=str(_first(item, "vdo_ttl_nm", "trng_nm", "title", "videoTitle", "contentTitle") or "운동 활동"),
+                    fitness_element=fitness_elements[0] if fitness_elements else None,
+                    fitness_elements=fitness_elements,
+                    age_group=normalize_age_group(source_age_group),
+                    source_age_group=str(source_age_group) if source_age_group else None,
+                    source_fitness_factor=str(source_factor) if source_factor else None,
+                    url=video_url,
+                    description=str(_first(item, "vdo_desc", "description") or "") or None,
+                    thumbnail_url=_resource_url(_first(item, "img_file_url", "thumbnailUrl"), _first(item, "img_file_nm")),
+                    fitness_level=str(_first(item, "ftns_lvl_nm", "fitnessLevel") or "") or None,
+                    equipment=str(_first(item, "tool_nm", "equipment") or "") or None,
+                    training_place=str(_first(item, "trng_plc_nm", "trainingPlace") or "") or None,
+                    muscle_part=str(_first(item, "trng_mscl_part", "musclePart") or "") or None,
+                    duration_seconds=_integer(_first(item, "vdo_len", "durationSeconds")),
+                )
+                records.setdefault(str(source_file_name), record)
+        return list(records.values())

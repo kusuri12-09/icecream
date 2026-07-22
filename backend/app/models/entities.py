@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, Numeric, String, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, JSON, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -95,8 +95,18 @@ class ActivityVideo(TimestampMixin, Base):
     ext_video_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     fitness_element: Mapped[str | None] = mapped_column(String(20), index=True)
+    fitness_elements: Mapped[list[str] | None] = mapped_column(JSON)
     age_group: Mapped[str | None] = mapped_column(String(20), index=True)
     url: Mapped[str] = mapped_column(String(500), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    thumbnail_url: Mapped[str | None] = mapped_column(String(500))
+    fitness_level: Mapped[str | None] = mapped_column(String(20))
+    equipment: Mapped[str | None] = mapped_column(String(100))
+    training_place: Mapped[str | None] = mapped_column(String(50))
+    muscle_part: Mapped[str | None] = mapped_column(String(255))
+    duration_seconds: Mapped[int | None] = mapped_column(Integer)
+    source_fitness_factor: Mapped[str | None] = mapped_column(String(50))
+    source_age_group: Mapped[str | None] = mapped_column(String(20))
     synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     __table_args__ = (Index("ix_video_element_age", "fitness_element", "age_group"),)
 
