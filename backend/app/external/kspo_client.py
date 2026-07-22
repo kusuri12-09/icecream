@@ -12,6 +12,8 @@ from app.core.errors import AppError
 
 
 logger = logging.getLogger(__name__)
+DEFAULT_PAGE_SIZE = 100
+MAX_PAGE_SIZE = 1000
 
 
 class ExternalApiUnavailable(AppError):
@@ -163,7 +165,7 @@ class KspoClient:
         self.timeout = timeout
         self.max_retries = max_retries
 
-    def _get(self, url: str, page_no: int = 1, num_of_rows: int = 1000) -> Any:
+    def _get(self, url: str, page_no: int = 1, num_of_rows: int = DEFAULT_PAGE_SIZE) -> Any:
         for attempt in range(self.max_retries + 1):
             try:
                 response = httpx.get(
@@ -184,8 +186,7 @@ class KspoClient:
                 logger.warning("공공 API 요청 재시도 page=%s attempt=%s", page_no, attempt + 1)
                 time.sleep(0.25 * (attempt + 1))
 
-    def fetch_centers(self, url: str) -> list[CenterRecord]:
-        page_size = 1000
+    def fetch_centers(self, url: str, page_size: int = DEFAULT_PAGE_SIZE) -> list[CenterRecord]:
         first_page = self._get(url, page_no=1, num_of_rows=page_size)
         payloads = [first_page]
         total_count = _total_count(first_page)
@@ -226,8 +227,7 @@ class KspoClient:
                 )
         return list(records.values())
 
-    def fetch_activities(self, url: str) -> list[ActivityRecord]:
-        page_size = 1000
+    def fetch_activities(self, url: str, page_size: int = DEFAULT_PAGE_SIZE) -> list[ActivityRecord]:
         first_page = self._get(url, page_no=1, num_of_rows=page_size)
         payloads = [first_page]
         total_count = _total_count(first_page)

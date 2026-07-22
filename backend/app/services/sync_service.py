@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from app.external.kspo_client import ActivityRecord, CenterRecord, KspoClient
+from app.external.kspo_client import DEFAULT_PAGE_SIZE, ActivityRecord, CenterRecord, KspoClient
 from app.models import ActivityVideo, Center
 
 
@@ -56,12 +56,19 @@ def sync_activities(db: Session, records: list[ActivityRecord]) -> int:
     return len(records)
 
 
-def sync_targets(db: Session, client: KspoClient, targets: list[str], center_url: str | None, activity_url: str | None) -> dict[str, int]:
+def sync_targets(
+    db: Session,
+    client: KspoClient,
+    targets: list[str],
+    center_url: str | None,
+    activity_url: str | None,
+    page_size: int = DEFAULT_PAGE_SIZE,
+) -> dict[str, int]:
     synced = {"centers": 0, "activities": 0}
     if "CENTERS" in targets and center_url:
-        synced["centers"] = sync_centers(db, client.fetch_centers(center_url))
+        synced["centers"] = sync_centers(db, client.fetch_centers(center_url, page_size=page_size))
     if "ACTIVITIES" in targets and activity_url:
-        synced["activities"] = sync_activities(db, client.fetch_activities(activity_url))
+        synced["activities"] = sync_activities(db, client.fetch_activities(activity_url, page_size=page_size))
     db.commit()
     logger.info("공공 데이터 동기화 완료 targets=%s synced=%s", targets, synced)
     return synced

@@ -30,7 +30,7 @@ def test_get_requests_json_response(monkeypatch):
     assert captured["params"] == {
         "serviceKey": "test-key",
         "pageNo": 1,
-        "numOfRows": 1000,
+        "numOfRows": 100,
         "resultType": "json",
     }
 

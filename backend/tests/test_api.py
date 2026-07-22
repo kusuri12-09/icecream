@@ -312,11 +312,11 @@ def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pyte
         def __init__(self, api_key: str):
             assert api_key == "test-key"
 
-        def fetch_centers(self, url: str) -> list[CenterRecord]:
+        def fetch_centers(self, url: str, page_size: int = 100) -> list[CenterRecord]:
             assert url.endswith("centers")
             return [CenterRecord("sync-center", "동기화 센터", "서울 중구 세종대로 1", "서울 중구", 37.56, 126.97)]
 
-        def fetch_activities(self, url: str) -> list[ActivityRecord]:
+        def fetch_activities(self, url: str, page_size: int = 100) -> list[ActivityRecord]:
             assert url.endswith("activities")
             return [ActivityRecord("sync-video", "동기화 운동", "CARDIO", "PRESCHOOL", "https://example.com/sync")]
 
@@ -371,11 +371,11 @@ def test_cron_sync_runs_target_with_secret(client: TestClient, monkeypatch: pyte
         def __init__(self, api_key: str):
             assert api_key == "test-key"
 
-        def fetch_centers(self, url: str) -> list[CenterRecord]:
+        def fetch_centers(self, url: str, page_size: int = 100) -> list[CenterRecord]:
             assert url.endswith("centers")
             return [CenterRecord("cron-center", "Cron 센터", "서울 중구 세종대로 1", "서울 중구", None, None, 7)]
 
-        def fetch_activities(self, url: str) -> list[ActivityRecord]:
+        def fetch_activities(self, url: str, page_size: int = 100) -> list[ActivityRecord]:
             raise AssertionError(f"unexpected activity sync: {url}")
 
     monkeypatch.setattr("app.api.v1.internal.KspoClient", FakeKspoClient)
