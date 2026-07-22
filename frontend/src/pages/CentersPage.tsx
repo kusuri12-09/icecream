@@ -6,7 +6,7 @@ import { PillButton } from '../components/Button'
 import { useCenters } from '../hooks/useFitnessData'
 
 export function CentersPage() {
-  const [area, setArea] = useState('전체')
+  const [sido, setSido] = useState('전체')
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState('')
@@ -15,7 +15,9 @@ export function CentersPage() {
   const areas = useMemo(
     () => [
       '전체',
-      ...new Set(centers.map((center) => center.region).filter((region): region is string => Boolean(region))),
+      ...Array.from(
+        new Set(centers.map((center) => center.sido).filter((region): region is string => Boolean(region))),
+      ).sort((left, right) => left.localeCompare(right, 'ko')),
     ],
     [centers],
   )
@@ -23,11 +25,13 @@ export function CentersPage() {
     const normalizedQuery = query.trim().toLowerCase()
     return centers.filter(
       (center) =>
-        (location || area === '전체' || center.region === area) &&
+        (location || sido === '전체' || center.sido === sido) &&
         (!normalizedQuery ||
-          `${center.name} ${center.address} ${center.region ?? ''}`.toLowerCase().includes(normalizedQuery)),
+          `${center.name} ${center.address} ${center.sido ?? ''} ${center.region ?? ''}`
+            .toLowerCase()
+            .includes(normalizedQuery)),
     )
-  }, [area, centers, location, query])
+  }, [centers, location, query, sido])
 
   function requestLocation() {
     if (!navigator.geolocation) {
@@ -64,14 +68,14 @@ export function CentersPage() {
           placeholder="지역이나 센터명을 검색해보세요"
         />
       </label>
-      <div className="my-4 flex gap-2 overflow-x-auto">
+      <div className="my-4 flex max-w-full gap-2 overflow-x-auto px-1 pb-1" aria-label="시도 선택">
         {areas.map((item) => (
           <PillButton
             key={item}
-            active={!location && area === item}
+            active={!location && sido === item}
             onClick={() => {
               setLocation(null)
-              setArea(item)
+              setSido(item)
             }}
           >
             {item}

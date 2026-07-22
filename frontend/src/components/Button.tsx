@@ -29,7 +29,8 @@ export function PillButton({ children, active = false, className = '', ...props 
   return (
     <button
       type="button"
-      className={`min-h-11 rounded-full border px-4 text-label transition ${active ? 'border-primary bg-primary-container text-on-primary-container' : 'border-outline-variant bg-surface-container-low text-on-surface-variant hover:bg-surface-container'} ${className}`}
+      aria-pressed={active}
+      className={`min-h-11 shrink-0 whitespace-nowrap rounded-full border px-4 text-label transition ${active ? 'border-primary bg-primary-container text-on-primary-container' : 'border-outline-variant bg-surface-container-low text-on-surface-variant hover:bg-surface-container'} ${className}`}
       {...props}
     >
       {children}

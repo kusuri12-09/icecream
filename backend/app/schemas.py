@@ -184,6 +184,7 @@ class CenterOut(APIModel):
     id: str
     name: str
     address: str
+    sido: str | None
     sido_sigungu: str | None
     latitude: float | None
     longitude: float | None

@@ -30,6 +30,7 @@ class CenterRecord:
     latitude: float | None
     longitude: float | None
     measure_count: int = 0
+    sido: str | None = None
 
 
 @dataclass(frozen=True)
@@ -146,6 +147,11 @@ def parse_sido_sigungu(address: str) -> str | None:
     return " ".join(parts[:2]) if len(parts) >= 2 else None
 
 
+def parse_sido(address: str) -> str | None:
+    parts = address.split()
+    return parts[0] if parts else None
+
+
 def _total_count(payload: Any) -> int | None:
     if not isinstance(payload, dict):
         return None
@@ -204,16 +210,19 @@ class KspoClient:
                 ext_id = _first(item, "extCenterId", "centerId", "fcltyNo", "id")
                 ext_id = str(ext_id or _stable_center_id(name, base_address))
                 measure_count = _integer(_first(item, "test_cnt", "measureCount", "measure_count")) or 0
+                sido_sigungu = str(_first(item, "sidoSigungu", "sidoNm") or parse_sido_sigungu(base_address) or "") or None
+                sido = parse_sido(base_address) or parse_sido(sido_sigungu or "")
                 current = records.get(ext_id)
                 if current is None:
                     records[ext_id] = CenterRecord(
                         ext_center_id=ext_id,
                         name=name,
                         address=address,
-                        sido_sigungu=str(_first(item, "sidoSigungu", "sidoNm") or parse_sido_sigungu(base_address) or "") or None,
+                        sido_sigungu=sido_sigungu,
                         latitude=_number(_first(item, "latitude", "lat", "la")),
                         longitude=_number(_first(item, "longitude", "lng", "lo")),
                         measure_count=measure_count,
+                        sido=sido,
                     )
                     continue
                 records[ext_id] = CenterRecord(
@@ -224,6 +233,7 @@ class KspoClient:
                     latitude=current.latitude,
                     longitude=current.longitude,
                     measure_count=current.measure_count + measure_count,
+                    sido=current.sido,
                 )
         return list(records.values())
 

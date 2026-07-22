@@ -106,6 +106,7 @@
 | `ext_center_id` | VARCHAR(50) | UNIQUE, NOT NULL | 원본 센터 식별자(동기화 중복 방지) |
 | `name` | VARCHAR(100) | NOT NULL | 센터명 |
 | `address` | VARCHAR(255) | NOT NULL | 기본 주소 |
+| `sido` | VARCHAR(50) | NULLABLE | 주소 첫 토큰으로 파싱한 시·도(센터 필터용) |
 | `sido_sigungu` | VARCHAR(50) | NULLABLE | 주소 파싱한 시도·시군구(지역 인사이트 키) |
 | `latitude` | NUMERIC(9,6) | NULLABLE | 위도 |
 | `longitude` | NUMERIC(9,6) | NULLABLE | 경도 |
@@ -118,10 +119,11 @@
 | 이름 | 컬럼 | 종류 | 목적 |
 | :--- | :--- | :--- | :--- |
 | `uq_center_ext_id` | ext_center_id | UNIQUE | 동기화 upsert 키 |
+| `ix_center_sido` | sido | INDEX | 시·도별 센터 검색 |
 | `ix_center_sido_sigungu` | sido_sigungu | INDEX | 지역별 참여율 집계 |
 | `ix_center_lat_lng` | (latitude, longitude) | INDEX | 근처 센터 검색(선택, 소규모는 앱 계산 가능) |
 
-> 센터 API(15114286)의 실제 응답은 `center_nm`·`center_addr1` 기준 센터별 월별(`test_ym`) 측정건수 행이다. 시군구·위도·경도 필드는 제공되지 않으므로 기본 주소 앞 두 토큰으로 `sido_sigungu`를 파생하고, 센터명·기본 주소의 안정적인 해시를 `ext_center_id`로 사용한다. 동기화 시 모든 월의 `test_cnt`를 센터별로 합산해 `measure_count`에 저장한다.
+> 센터 API(15114286)의 실제 응답은 `center_nm`·`center_addr1` 기준 센터별 월별(`test_ym`) 측정건수 행이다. 시군구·위도·경도 필드는 제공되지 않으므로 기본 주소 첫 토큰으로 `sido`, 앞 두 토큰으로 `sido_sigungu`를 파생하고, 센터명·기본 주소의 안정적인 해시를 `ext_center_id`로 사용한다. 동기화 시 모든 월의 `test_cnt`를 센터별로 합산해 `measure_count`에 저장한다.
 
 ## 6. activity_video (운동처방 동영상, 공공 API 캐시)
 | 컬럼 | 타입 | 제약 | 설명 |

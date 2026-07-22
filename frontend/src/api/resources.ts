@@ -96,12 +96,16 @@ export async function getActivities(params: { fitnessElement?: string; measureme
   return (data.items ?? []).map(mapActivity)
 }
 
-export async function getCenters(params: { lat?: number; lng?: number; radiusKm?: number; sidoSigungu?: string } = {}) {
+export async function getCenters(
+  params: { lat?: number; lng?: number; radiusKm?: number; sido?: string; sidoSigungu?: string; size?: number } = {},
+) {
   const query = new URLSearchParams()
   if (params.lat != null) query.set('lat', String(params.lat))
   if (params.lng != null) query.set('lng', String(params.lng))
   if (params.radiusKm != null) query.set('radiusKm', String(params.radiusKm))
+  if (params.sido) query.set('sido', params.sido)
   if (params.sidoSigungu) query.set('sidoSigungu', params.sidoSigungu)
+  query.set('size', String(params.size ?? 1000))
   const queryString = query.toString()
   const response = await apiRequest<unknown>('/api/v1/centers' + (queryString ? '?' + queryString : ''))
   const data = unwrapData<{ items?: unknown[] }>(response)
@@ -213,6 +217,7 @@ function mapCenter(value: unknown): Center {
     id: stringValue(center.id),
     name: stringValue(center.name, '체력인증센터'),
     address: stringValue(center.address),
+    sido: stringValue(center.sido) || stringValue(center.address).split(' ')[0] || undefined,
     region: stringValue(center.sidoSigungu) || undefined,
     distance: distanceKm,
     icon: 'tree',

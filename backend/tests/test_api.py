@@ -314,7 +314,17 @@ def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pyte
 
         def fetch_centers(self, url: str, page_size: int = 100) -> list[CenterRecord]:
             assert url.endswith("centers")
-            return [CenterRecord("sync-center", "동기화 센터", "서울 중구 세종대로 1", "서울 중구", 37.56, 126.97)]
+            return [
+                CenterRecord(
+                    "sync-center",
+                    "동기화 센터",
+                    "서울 중구 세종대로 1",
+                    "서울 중구",
+                    37.56,
+                    126.97,
+                    sido="서울특별시",
+                )
+            ]
 
         def fetch_activities(self, url: str, page_size: int = 100) -> list[ActivityRecord]:
             assert url.endswith("activities")
@@ -338,7 +348,8 @@ def test_admin_sync_upserts_external_cache(client: TestClient, monkeypatch: pyte
         assert response.status_code == 200
         assert response.json()["data"]["synced"] == {"centers": 1, "activities": 1}
         db = SessionLocal()
-        assert db.query(Center).filter_by(ext_center_id="sync-center").count() == 1
+        center = db.query(Center).filter_by(ext_center_id="sync-center").one()
+        assert center.sido == "서울특별시"
         assert db.query(ActivityVideo).filter_by(ext_video_id="sync-video").count() == 1
         db.close()
     finally:

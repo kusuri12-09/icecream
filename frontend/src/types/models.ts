@@ -67,6 +67,7 @@ export interface Center {
   id: string
   name: string
   address: string
+  sido?: string
   region?: string
   distance: string
   icon: string

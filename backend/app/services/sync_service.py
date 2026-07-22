@@ -24,6 +24,7 @@ def sync_centers(db: Session, records: list[CenterRecord]) -> int:
             db.add(center)
         center.name = record.name
         center.address = record.address
+        center.sido = record.sido
         center.sido_sigungu = record.sido_sigungu
         center.latitude = record.latitude
         center.longitude = record.longitude

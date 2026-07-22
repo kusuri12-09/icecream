@@ -11,7 +11,8 @@
 | 파라미터 | 설명 |
 | --- | --- |
 | `lat`, `lng`, `radiusKm` | 좌표 기반 근처 검색(거리순) |
-| `sidoSigungu` | 지역명 기반 검색 |
+| `sido` | 시·도 단위 지역 필터(예: `경기도`) |
+| `sidoSigungu` | 시·도·시군구 단위 지역 필터 |
 | `page`, `size` | 페이지네이션 |
 
 ## RESPONSE
@@ -27,6 +28,7 @@
         "id": "center_45",
         "name": "OO체력인증센터",
         "address": "서울 OO구 ...",
+        "sido": "서울특별시",
         "sidoSigungu": "서울 OO구",
         "latitude": 37.5,
         "longitude": 127.0,

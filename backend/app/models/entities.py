@@ -44,6 +44,7 @@ class Center(TimestampMixin, Base):
     ext_center_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
+    sido: Mapped[str | None] = mapped_column(String(50), index=True)
     sido_sigungu: Mapped[str | None] = mapped_column(String(50))
     latitude: Mapped[float | None] = mapped_column(Numeric(9, 6))
     longitude: Mapped[float | None] = mapped_column(Numeric(9, 6))

@@ -11,4 +11,7 @@ Authorization: Bearer {{accessToken}}
 
 ### 지역 기반 센터 검색
 GET {{baseUrl}}/api/v1/centers?sidoSigungu=서울%20강남구&page=1&size=20
+
+### 시·도 기반 센터 검색
+GET {{baseUrl}}/api/v1/centers?sido=경기도&page=1&size=1000
 Authorization: Bearer {{accessToken}}
