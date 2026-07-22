@@ -16,9 +16,10 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import unquote
 
 import httpx
+
+from kspo_common import extract_items, fetch, normalize_key
 
 # ── 설정 ────────────────────────────────────────────────
 SERVICE_KEY = os.environ.get("KSPO_SERVICE_KEY", "")
@@ -43,28 +44,9 @@ NUM_OF_ROWS = 20   # 스키마 파악용이니 적게
 TIMEOUT = 15.0
 
 
-# ── 유틸 ────────────────────────────────────────────────
-def normalize_key(key: str) -> str:
-    """인코딩 키면 디코딩. 표준 REST는 보통 디코딩 키를 파라미터로 넣는다."""
-    return unquote(key) if "%" in key else key
-
-
 def summarize_fields(payload) -> dict:
     """표준 공공API 응답에서 아이템 리스트를 찾아 첫 아이템의 필드 키 추출."""
-    items = None
-    if isinstance(payload, dict):
-        # 표준: {"response":{"body":{"items":{"item":[...]}}}}
-        body = payload.get("response", {}).get("body", {})
-        it = body.get("items")
-        if isinstance(it, dict):
-            it = it.get("item")
-        if isinstance(it, list):
-            items = it
-        elif isinstance(it, dict):  # 아이템이 1개면 dict로 옴
-            items = [it]
-        # odcloud 대비: {"data":[...]}
-        if items is None and isinstance(payload.get("data"), list):
-            items = payload["data"]
+    items = extract_items(payload)
     if not items:
         return {"item_count": 0, "fields": [], "sample": None}
     first = items[0]
@@ -73,24 +55,6 @@ def summarize_fields(payload) -> dict:
         "fields": sorted(first.keys()) if isinstance(first, dict) else [],
         "sample": first,
     }
-
-
-def fetch(client: httpx.Client, path: str, key: str) -> dict:
-    url = f"{BASE}/{path}"
-    params = {
-        "serviceKey": key,
-        "pageNo": 1,
-        "numOfRows": NUM_OF_ROWS,
-        "resultType": "json",   # 표준 REST는 resultType 또는 type=json 인 경우가 많음
-    }
-    resp = client.get(url, params=params)
-    resp.raise_for_status()
-    text = resp.text.strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        # XML로 응답되는 경우 원문 저장 (resultType 파라미터명이 다를 수 있음)
-        return {"_raw_text": text, "_note": "JSON 파싱 실패 — XML이거나 resultType 파라미터명이 다를 수 있음"}
 
 
 # ── 메인 ────────────────────────────────────────────────
@@ -107,7 +71,7 @@ def main() -> int:
         for name, path in ENDPOINTS.items():
             print(f"[요청] {name}  {path}")
             try:
-                payload = fetch(client, path, key)
+                payload = fetch(client, BASE, path, key, NUM_OF_ROWS)
             except httpx.HTTPStatusError as e:
                 print(f"  ↳ HTTP {e.response.status_code}: {e.response.text[:200]}")
                 schema_summary["endpoints"][name] = {"error": f"HTTP {e.response.status_code}"}

@@ -110,6 +110,8 @@ def _resource_url(base_url: Any, file_name: Any = None) -> str | None:
     if base_url in (None, ""):
         return None
     base = str(base_url)
+    if base.lower().startswith("http://"):
+        base = f"https://{base[7:]}"
     if file_name in (None, "") or base.endswith(str(file_name)):
         return base
     return f"{base.rstrip('/')}/{str(file_name).lstrip('/')}"

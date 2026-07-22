@@ -44,7 +44,7 @@
 | 테스트 | Pytest / Vitest / React Testing Library | 백엔드·프론트엔드 검증 |
 | 코드 품질 | Ruff / mypy / ESLint / Prettier | 정적 검사와 일관된 포맷 (`npm run format`, `npm run format:check`) |
 | 개발 환경 | Docker Compose | 로컬 PostgreSQL 등 개발환경 표준화 |
-| 배포 | Vercel | 프론트엔드 웹 애플리케이션 배포 및 운영 |
+| 배포 | Vercel | 프론트엔드 웹 애플리케이션 및 FastAPI 백엔드(Python Function) 배포·운영 |
 
 ### 3.2 초기에는 선택하지 않는 기술
 
@@ -55,7 +55,7 @@
 
 ### 3.3 배포 및 호스팅
 
-- 프론트엔드 배포는 Vercel을 사용한다.
+- 프론트엔드와 FastAPI 백엔드는 Vercel에 배포한다. 백엔드는 `backend/index.py`의 FastAPI 앱을 Vercel Python Function으로 실행한다.
 - 운영 데이터베이스는 Neon에서 제공하는 PostgreSQL을 사용한다.
 - Neon 연결 문자열은 환경변수로 관리하고 저장소에 포함하지 않는다.
 

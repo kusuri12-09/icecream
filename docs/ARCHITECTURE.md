@@ -113,13 +113,13 @@ icecream/
 │  │  ├─ api/
 │  │  │  ├─ common.py             # 공통 응답·페이지네이션
 │  │  │  └─ v1/
-│  │  │  ├─ auth.py
-│  │  │  ├─ children.py
-│  │  │  ├─ measurements.py
-│  │  │  ├─ centers.py
-│  │  │  ├─ activities.py
-│  │  │  ├─ insights.py
-│  │  │  └─ internal.py
+│  │  │     ├─ auth.py
+│  │  │     ├─ children.py
+│  │  │     ├─ measurements.py
+│  │  │     ├─ centers.py
+│  │  │     ├─ activities.py
+│  │  │     ├─ insights.py
+│  │  │     └─ internal.py
 │  │  ├─ services/
 │  │  │  ├─ auth_service.py
 │  │  │  ├─ child_service.py

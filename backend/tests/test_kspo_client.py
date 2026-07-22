@@ -1,6 +1,12 @@
 import httpx
 
-from app.external.kspo_client import KspoClient
+from app.external.kspo_client import KspoClient, _resource_url
+
+
+def test_resource_url_normalizes_http_media_url_to_https():
+    assert _resource_url("http://openapi.kspo.or.kr/web/video/", "sample.mp4") == (
+        "https://openapi.kspo.or.kr/web/video/sample.mp4"
+    )
 
 
 def test_get_requests_json_response(monkeypatch):

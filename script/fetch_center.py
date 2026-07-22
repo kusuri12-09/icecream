@@ -14,9 +14,10 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import unquote
 
 import httpx
+
+from kspo_common import extract_items, fetch, normalize_key
 
 # ── 설정 ────────────────────────────────────────────────
 SERVICE_KEY = os.environ.get("KSPO_SERVICE_KEY", "")
@@ -31,38 +32,6 @@ TIMEOUT = 15.0
 REGION_HINTS = ["sido", "sgg", "sigungu", "addr", "지역", "시도", "시군구", "주소", "region", "area"]
 
 
-# ── 유틸 ────────────────────────────────────────────────
-def normalize_key(key: str) -> str:
-    return unquote(key) if "%" in key else key
-
-
-def extract_items(payload):
-    if isinstance(payload, dict):
-        body = payload.get("response", {}).get("body", {})
-        it = body.get("items")
-        if isinstance(it, dict):
-            it = it.get("item")
-        if isinstance(it, list):
-            return it
-        if isinstance(it, dict):
-            return [it]
-        if isinstance(payload.get("data"), list):
-            return payload["data"]
-    return []
-
-
-def fetch(client: httpx.Client, key: str) -> dict:
-    url = f"{BASE}/{ENDPOINT}"
-    params = {"serviceKey": key, "pageNo": 1, "numOfRows": NUM_OF_ROWS, "resultType": "json"}
-    resp = client.get(url, params=params)
-    resp.raise_for_status()
-    text = resp.text.strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        return {"_raw_text": text, "_note": "JSON 파싱 실패 — XML이거나 resultType 파라미터명이 다를 수 있음"}
-
-
 # ── 메인 ────────────────────────────────────────────────
 def main() -> int:
     if not SERVICE_KEY:
@@ -72,10 +41,10 @@ def main() -> int:
     key = normalize_key(SERVICE_KEY)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print(f"[요청] {BASE}/{ENDPOINT}")
+        print(f"[요청] {BASE}/{ENDPOINT}")
     try:
         with httpx.Client(timeout=TIMEOUT) as client:
-            payload = fetch(client, key)
+            payload = fetch(client, BASE, ENDPOINT, key, NUM_OF_ROWS)
     except httpx.HTTPStatusError as e:
         print(f"  ↳ HTTP {e.response.status_code}: {e.response.text[:300]}")
         return 1

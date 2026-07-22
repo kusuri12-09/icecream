@@ -46,3 +46,19 @@ def test_reload_criteria_keeps_previous_cache_when_revision_is_invalid(monkeypat
             assert diagnosis_engine.load_criteria()["meta"]["version"] == cached["meta"]["version"]
         finally:
             diagnosis_engine.load_criteria.cache_clear()
+
+
+def test_validate_criteria_rejects_invalid_grade_rule_type():
+    criteria = json.loads(diagnosis_engine.CRITERIA_PATH.read_text(encoding="utf-8"))
+    criteria["gradeRules"]["fruit"] = []
+
+    with pytest.raises(diagnosis_engine.CriteriaValidationError, match="등급 규칙 형식"):
+        diagnosis_engine.validate_criteria(criteria)
+
+
+def test_validate_criteria_rejects_required_item_outside_api_contract():
+    criteria = json.loads(diagnosis_engine.CRITERIA_PATH.read_text(encoding="utf-8"))
+    criteria["gradeRules"]["fruit"]["requiredItems"] = ["unknown"]
+
+    with pytest.raises(diagnosis_engine.CriteriaValidationError, match="requiredItems"):
+        diagnosis_engine.validate_criteria(criteria)

@@ -72,8 +72,11 @@ def validate_criteria(criteria: Any) -> None:
 
     expected_bands: set[str] | None = None
     for grade in GRADE_ORDER:
-        required_items = grade_rules[grade].get("requiredItems")
-        if not isinstance(required_items, list) or any(item not in items for item in required_items):
+        grade_rule = grade_rules[grade]
+        if not isinstance(grade_rule, dict):
+            raise CriteriaValidationError(f"기준표 {grade} 등급 규칙 형식이 올바르지 않습니다.")
+        required_items = grade_rule.get("requiredItems")
+        if not isinstance(required_items, list) or any(item not in API_ITEMS.values() for item in required_items):
             raise CriteriaValidationError(f"기준표 {grade} 등급의 requiredItems가 올바르지 않습니다.")
         grade_thresholds = thresholds.get(grade)
         if not isinstance(grade_thresholds, dict):

@@ -4,7 +4,6 @@ from typing import Literal
 import logging
 
 from sqlalchemy import select, text
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.external.kspo_client import ActivityRecord, CenterRecord, KspoClient
@@ -69,19 +68,19 @@ def sync_targets(db: Session, client: KspoClient, targets: list[str], center_url
 
 
 def acquire_sync_lock(db: Session) -> SyncLock | None:
-    """PostgreSQL advisory lock으로 중복 배치를 막고 SQLite에서는 프로세스 락을 사용한다."""
+    """트랜잭션 advisory lock으로 중복 배치를 막고 SQLite에서는 프로세스 락을 사용한다."""
     dialect = db.get_bind().dialect.name
     if dialect == "postgresql":
-        acquired = db.execute(text("SELECT pg_try_advisory_lock(:lock_key)"), {"lock_key": SYNC_LOCK_KEY}).scalar()
+        acquired = db.execute(
+            text("SELECT pg_try_advisory_xact_lock(:lock_key)"),
+            {"lock_key": SYNC_LOCK_KEY},
+        ).scalar()
         return "postgresql" if acquired else None
     return "process" if _process_sync_lock.acquire(blocking=False) else None
 
 
 def release_sync_lock(db: Session, lock: SyncLock) -> None:
     if lock == "postgresql":
-        try:
-            db.execute(text("SELECT pg_advisory_unlock(:lock_key)"), {"lock_key": SYNC_LOCK_KEY})
-        except SQLAlchemyError:
-            logger.exception("PostgreSQL 동기화 잠금 해제 실패")
+        # 트랜잭션 advisory lock은 sync_targets의 commit/rollback과 함께 해제된다.
         return
     _process_sync_lock.release()
