@@ -39,23 +39,27 @@ def _existing_activities(db: Session, records: list[ActivityRecord]) -> dict[str
 
 
 def sync_centers(db: Session, records: list[CenterRecord]) -> int:
-    existing = _existing_centers(db, records)
+    valid_records = [record for record in records if record.address.strip()]
+    skipped_count = len(records) - len(valid_records)
+    if skipped_count:
+        logger.warning("주소가 비어 있는 센터 데이터 %s건을 동기화에서 제외했습니다.", skipped_count)
+    existing = _existing_centers(db, valid_records)
     synced_at = datetime.now(timezone.utc)
-    for record in records:
+    for record in valid_records:
         center = existing.get(record.ext_center_id)
         if center is None:
-            center = Center(ext_center_id=record.ext_center_id, name=record.name, address=record.address)
+            center = Center(ext_center_id=record.ext_center_id, name=record.name, address=record.address.strip())
             db.add(center)
             existing[record.ext_center_id] = center
         center.name = record.name
-        center.address = record.address
+        center.address = record.address.strip()
         center.sido = record.sido
         center.sido_sigungu = record.sido_sigungu
         center.latitude = record.latitude
         center.longitude = record.longitude
         center.measure_count = record.measure_count
         center.synced_at = synced_at
-    return len(records)
+    return len(valid_records)
 
 
 def sync_activities(db: Session, records: list[ActivityRecord]) -> int:

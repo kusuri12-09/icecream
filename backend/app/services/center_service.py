@@ -35,7 +35,11 @@ def search(
         raise AppError("CENTER_NOT_FOUND", "체력인증센터를 찾을 수 없습니다.", 404)
     result: list[tuple[Center, float | None]] = []
     for center in rows:
-        if name and name.casefold() not in center.name.casefold():
+        address_prefix = " ".join(center.address.split()[:4])
+        search_text = " ".join(
+            value for value in (center.name, center.sido, center.sido_sigungu, address_prefix) if value
+        ).casefold()
+        if name and name.casefold() not in search_text:
             continue
         if sido and (center.sido or "") != sido:
             continue

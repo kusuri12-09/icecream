@@ -105,7 +105,7 @@
 | `id` | BIGINT | PK, AUTO_INCREMENT | 내부 기본키 |
 | `ext_center_id` | VARCHAR(50) | UNIQUE, NOT NULL | 원본 센터 식별자(동기화 중복 방지) |
 | `name` | VARCHAR(100) | NOT NULL | 센터명 |
-| `address` | VARCHAR(255) | NOT NULL | 기본 주소 |
+| `address` | VARCHAR(255) | NOT NULL, `trim(address) <> ''` | 기본 주소(빈 값 저장 금지) |
 | `sido` | VARCHAR(50) | NULLABLE | 주소 첫 토큰으로 파싱한 시·도(센터 필터용) |
 | `sido_sigungu` | VARCHAR(50) | NULLABLE | 주소 파싱한 시도·시군구(지역 인사이트 키) |
 | `latitude` | NUMERIC(9,6) | NULLABLE | 위도 |

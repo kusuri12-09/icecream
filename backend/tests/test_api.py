@@ -7,6 +7,7 @@ os.environ["DB_PASSWORD"] = ""
 os.environ["JWT_SECRET_KEY"] = "test-secret"
 
 import pytest
+from sqlalchemy.exc import IntegrityError
 from fastapi.testclient import TestClient
 
 from app.db import Base, SessionLocal, engine
@@ -148,6 +149,15 @@ def test_centers_return_not_found_when_cache_is_empty(client: TestClient):
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "CENTER_NOT_FOUND"
+
+
+def test_center_rejects_blank_address():
+    db = SessionLocal()
+    db.add(Center(ext_center_id="blank-address", name="주소 없는 센터", address="   "))
+    with pytest.raises(IntegrityError):
+        db.commit()
+    db.rollback()
+    db.close()
 
 
 def create_child(client: TestClient, headers: dict[str, str]) -> str:
@@ -303,6 +313,10 @@ def test_centers_activities_and_regional_insights(client: TestClient):
     name_search = client.get("/api/v1/centers?name=%EA%B0%95%EB%82%A8", headers=headers)
     assert name_search.status_code == 200
     assert [item["name"] for item in name_search.json()["data"]["items"]] == ["강남 센터"]
+
+    address_search = client.get("/api/v1/centers?name=%EC%84%9C%EC%9A%B8", headers=headers)
+    assert address_search.status_code == 200
+    assert [item["name"] for item in address_search.json()["data"]["items"]] == ["강남 센터"]
 
     activities = client.get("/api/v1/activities?fitnessElement=CARDIO&ageGroup=PRESCHOOL", headers=headers)
     assert activities.status_code == 200

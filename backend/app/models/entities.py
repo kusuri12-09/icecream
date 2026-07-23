@@ -52,6 +52,7 @@ class Center(TimestampMixin, Base):
     synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     measurements: Mapped[list["Measurement"]] = relationship(back_populates="center")
     __table_args__ = (
+        CheckConstraint("length(trim(address)) > 0", name="ck_center_address_not_blank"),
         Index("ix_center_sido_sigungu", "sido_sigungu"),
         Index("ix_center_lat_lng", "latitude", "longitude"),
     )

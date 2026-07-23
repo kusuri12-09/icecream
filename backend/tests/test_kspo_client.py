@@ -73,6 +73,7 @@ def test_fetch_centers_aggregates_monthly_measure_counts(monkeypatch):
                             "test_ym": "201811",
                             "test_cnt": 859,
                         },
+                        {"center_nm": "주소 없음", "center_addr1": "", "center_addr2": ""},
                     ]
                 },
             }

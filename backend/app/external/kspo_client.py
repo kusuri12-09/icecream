@@ -249,6 +249,9 @@ class KspoClient:
                 base_address = str(_first(item, "center_addr1", "address", "addr", "roadAddr", "refineRoadnmAddr") or "")
                 detail_address = str(_first(item, "center_addr2", "detailAddress") or "")
                 address = " ".join(part for part in (base_address, detail_address) if part).strip()
+                if not address:
+                    logger.warning("주소가 없는 센터 데이터를 제외했습니다. center=%s", name)
+                    continue
                 ext_id = _first(item, "extCenterId", "centerId", "fcltyNo", "id")
                 ext_id = str(ext_id or _stable_center_id(name, base_address))
                 measure_count = _integer(_first(item, "test_cnt", "measureCount", "measure_count")) or 0
